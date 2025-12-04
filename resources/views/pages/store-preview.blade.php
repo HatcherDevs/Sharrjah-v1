@@ -1,0 +1,560 @@
+@extends('pages.master')
+
+@section('css')
+    <!-- Include Amplitude JS Visualizations -->
+    <script type="text/javascript" src="https://521dimensions.com/img/open-source/amplitudejs/visualizations/michaelbromley.js"></script>
+    <style>
+        .innerpage .socials {
+            padding: 0 !important;
+            width: 100%;
+        }
+        .innerpage .socials li {
+            list-style: none !important;
+            display: block !important;
+            float: left;
+            width: 33%;
+        }
+        .innerpage .socials li a {
+            display: inline-block !important;
+            width: 28px;
+            height: 28px;
+            background-size: 100% auto;
+        }
+
+        .innerpage .socials li:last-of-type a {
+            margin: 0;
+        }
+
+        /*
+          1. Base
+        */
+        /*
+          2. Components
+        */
+        div.control-container {
+            margin-top: 10px;
+            padding: 20px 10px;
+            border: 3px solid #000;
+        }
+        div.control-container div.amplitude-play-pause {
+            width: 74px;
+            height: 74px;
+            cursor: pointer;
+            float: {{ isset($_GET['lang']) ? 'right' : 'left' }};
+            margin-left: 10px; }
+        div.control-container div.amplitude-play-pause.amplitude-paused {
+            background: url("{{ asset('public/img/audio-play.png') }}");
+            background-size: cover; }
+        div.control-container div.amplitude-play-pause.amplitude-playing {
+            background: url("{{ asset('public/img/audio-pause.png') }}");
+            background-size: cover; }
+        div.control-container div.meta-container {
+            float: {{ isset($_GET['lang']) ? 'right' : 'left' }};
+            width: calc(70%);
+            text-align: center;
+            color: #000;
+            margin-top: 10px;
+            margin-{{ isset($_GET['lang']) ? 'right' : 'left' }}: 10px;
+        }
+        div.control-container div.meta-container span[data-amplitude-song-info="name"] {
+            font-size: 18px !important;
+            color: #000;
+            display: block;
+            font-weight: bold;
+        }
+        div.control-container div.meta-container span[data-amplitude-song-info="artist"] {
+            font-weight: 400;
+            font-size: 14px;
+            color: #000;
+            display: block; }
+        div.control-container:after {
+            content: "";
+            display: table;
+            clear: both; }
+
+        /*
+          Small only
+        */
+        @media screen and (max-width: 39.9375em) {
+            div.control-container div.amplitude-play-pause {
+                background-size: cover;
+                width: 64px;
+                height: 64px; }
+            div.control-container div.meta-container {
+                width: calc(95% - 74px); }
+        }
+
+        #mobile-other-links {
+            display: none;
+        }
+
+        #mobile-other-links a {
+            float: left;
+        }
+
+        @media screen and (max-width: 767px) {
+            #mobile-other-links {
+                display: block;
+            }
+
+            #mobile-other-links a {
+                width: 100%;
+                display: block;
+                height: 40px;
+            }
+
+            #mobile-other-links svg {
+                margin-left: 0 !important;
+            }
+
+            #desk-other-links {
+                display: none;
+            }
+        }
+        /*
+          Medium only
+        */
+        /*
+          Large Only
+        */
+        div.time-container {
+            opacity: 0.5;
+            font-family: 'Open Sans';
+            font-weight: 100;
+            font-size: 12px;
+            color: #000;
+            height: 15px; }
+        div.time-container span.current-time {
+            float: left;
+            margin-left: 5px; }
+        div.time-container span.duration {
+            float: right;
+            margin-right: 5px; }
+
+        /*
+          Small only
+        */
+        /*
+          Medium only
+        */
+        /*
+          Large Only
+        */
+        progress.amplitude-song-played-progress {
+            background-color: #313252;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 30px;
+            display: block;
+            cursor: pointer;
+            border: 3px solid #000;
+            margin-top: 20px;
+        }
+        progress.amplitude-song-played-progress:not([value]) {
+            background-color: #dfdfdf; }
+
+        progress[value]::-webkit-progress-bar {
+            background-color: #DFDFDF; }
+
+        progress[value]::-moz-progress-bar {
+            background-color: #00ed00; }
+
+        progress[value]::-webkit-progress-value {
+            background-color: #00ed00; }
+
+        /*
+          Small only
+        */
+        /*
+          Medium only
+        */
+        /*
+          Large Only
+        */
+        /*
+          3. Layout
+        */
+        div.bottom-container {
+            background-color: #ffffff;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        /*
+          Small only
+        */
+        /*
+          Medium only
+        */
+        /*
+          Large Only
+        */
+        div#single-song-player {
+            margin: auto;
+            width: 100%;
+            max-width: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        div#single-song-player img[data-amplitude-song-info="cover_art_url"] {
+            width: 100%;
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            display: none;
+        }
+        .owl-carousel-holder {
+            width: 100%;
+        }
+
+        @if(isset($_GET['lang']))
+            .imgcap .en {
+            display: none !important;
+        }
+        .innerpage .socials li {
+            float: right;
+        }
+        @else
+            .imgcap .ar {
+            display: none !important;
+        }
+        @endif
+
+
+        .sideb {
+            padding-left: 3em;
+            padding-right: 3em;
+        }
+
+        @media only screen and (max-width: 991px) {
+            .sideb {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+
+        .publish_date {
+            font-size: 12px;
+            font-weight: normal;
+            color: #969696;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .current img {
+            filter: grayscale(100%);
+        }
+        .owl-carousel-holder .arrows .prev {
+            left: -80px;
+            position: absolute;
+            background-image: url({{ asset('public/img/store-arrow-left.png') }});
+        }
+
+        .owl-carousel-holder .arrows .next {
+            right: -80px;
+            position: absolute;
+            background-image: url({{ asset('public/img/store-arrow-right.png') }});
+        }
+
+        .column-box .ar {
+            font-family: 'Tahoma' !important;
+        }
+        .publish_date {
+            font-size: 12px;
+            font-weight: normal;
+            color:#969696;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        .column-box {
+            line-height: 22px;
+            max-height: 480px;
+            height: 380px;
+            overflow: hidden;
+        }
+        @media only screen and (min-width: 1520px){
+            .column-box {
+                height: 460px;
+            }
+        }
+        @media only screen and (max-width: 1120px){
+
+            .owl-carousel-holder .arrows .prev {
+                left: 30px;
+            }
+
+            .owl-carousel-holder .arrows .next {
+                right: 30px;
+            }
+        }
+    </style>
+@endsection
+
+@section('content')
+    <div class="innerpage">
+        <div class="container text-center">
+            <div class="body-section contents with-img-header">
+                <div class="row" dir="rtl">
+                    <div class="col-md-12 {{ isset($_GET['lang']) ? 'text-right' : 'text-left' }}">
+                        <div class="breadcrumbs">
+                            @if(isset($_GET['lang']))
+                                <div class="breadcrumbs ar" style="height: 20px;">
+                                    <a href="{{ url('/?lang=ar') }}" style="color: rgb(0, 0, 0);">الصفحة الرئيسية</a>
+                                    &gt;
+                                    <a href="{{ url('pages/programmes') }}" style="color: rgb(0, 0, 0);"> البرامج</a>
+                                    &gt;
+                                    <a href="{{ url('pages/programmes/sat-design-store?lang=ar') }}" style="color: rgb(0, 0, 0);">{{ $page->name_ar }}</a>
+                                </div>
+                            @else
+                                <div class="breadcrumbs en" style="height: 20px;">
+                                    <a href="{{ url('/') }}" style="color: rgb(0, 0, 0);">Home</a>
+                                    &gt;
+                                    <a href="{{ url('pages/programmes') }}" style="color: rgb(0, 0, 0);">Programmes</a>
+                                    &gt;
+                                    <a href="{{ url('pages/programmes/sat-design-store') }}" style="color: rgb(0, 0, 0);">{{ $page->name }}</a>
+                                </div>
+                            @endif
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h1>{!! isset($_GET['lang']) ? 'Design Store: Re-store Collection' : 'Design Store: Re-store Collection' !!}</h1>
+                            </div>
+
+                            <div class="col-md-3 sideb">
+                                @if(isset($_GET['lang']))
+                                    <a href="{{url()->current()}}">Switch to English
+                                    </a><br/>
+                                    <br/>
+                                @else
+                                    <a href="{{url()->current().'?lang=ar'}}" class="float-right">التبديل إلى اللغة العربية</a>
+                                    <br/>
+                                    <br/>
+                                @endif
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <?php $page = $post; ?>
+                                    @if(count($page->sliders)==1)
+                                        <div class="col-md-12">
+                                            @if($page->slider->square)
+                                                <img src="{{ asset('public/'.$page->slider->square->url) }}" width="100%" class="featured-img">
+                                                <span class="imgcap">
+                                                    @if(isset($_GET['lang']))
+                                                        <span dir="rtl" class="float-right">{{ $page->slider->square->caption_ar }}</span>
+                                                    @else
+                                                        <span class="en float-left">{{ $page->slider->square->caption }}</span>
+                                                    @endif
+                                                </span>
+                                            @elseif($page->slider->landscape)
+                                                <img src="{{ asset('public/'.$page->slider->landscape->url) }}" width="100%" class="featured-img">
+                                                <span class="imgcap">
+                                                    @if(isset($_GET['lang']))
+                                                        <span dir="rtl" class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
+                                                    @else
+                                                        <span class="en float-left">{{ $page->slider->landscape->caption }}</span>
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @elseif(count($page->sliders)>1)
+                                        <div class="col-md-12">
+                                            <div class="owl-carousel-holder" dir="ltr">
+                                                <div class="arrows">
+                                                    <button class="prev float-left"></button>
+                                                    <button class="next float-right"></button>
+                                                </div>
+                                                <div class="owl-carousel owl-theme">
+                                                    @foreach($page->sliders as $slide)
+                                                        <div class="item">
+                                                            <img src="{{ url('public/'.$slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <div id="owl-caption"></div>
+                                                <div id="owl-dots"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="col-md-12">
+                                        <h5 style="color: #909090; font-weight: 300; font-size: 14px;">{!! isset($_GET['lang']) ? $post->artist_ar : $post->artist !!}</h5>
+                                        <h3 class="mb-4">{!! isset($_GET['lang']) ? $post->title_ar : $post->title !!}</h3>
+                                    </div>
+
+                                    {{--<div class="col-md-12">--}}
+                                    {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->speaker_ar : $post->speaker !!}</h5>--}}
+                                    {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->series_ar : $post->series !!}</h5>--}}
+                                    {{--<br/>--}}
+                                    {{--</div>--}}
+
+                                    @if(isset($_GET['lang']))
+                                        @if($_GET['lang']=='ar')
+                                            <div class="col-md-12 text-right">
+                                                {!! $page->content_ar !!}
+                                                <br>
+                                                <br>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="col-md-12 text-left">
+                                            {!! $page->content !!}
+                                            <br>
+                                            <br>
+                                        </div>
+                                    @endif
+
+
+
+                                    @if($formdata)
+                                        <div class="container text-center">
+                                            <div class="body-section contents">
+                                                @include('partials.form')
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if($post->buttonLinks)
+                                        <div class="container text-center">
+                                            <div class="body-section contents">
+                                                <div class="row" dir="rtl">
+                                                    <div class="col-md-6 text-right">
+                                                        @if($post->buttonLinks->title && $post->buttonLinks->value)
+                                                            <a href="{{$post->buttonLinks->value_ar}}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
+                                                        @endif
+                                                    </div>
+                                                    <div class="col-md-6 text-left">
+                                                        @if($post->buttonLinks->title && $post->buttonLinks->value)
+                                                            <a href="{{$post->buttonLinks->value}}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="container text-center">
+                                        <br/>
+                                        <br/>
+                                        <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>"><?php echo isset($_GET['lang']) ? 'Re-store Collection' : 'Re-store Collection';?> </h3>
+                                        <br/>
+                                        <div class="row" >
+                                            @foreach($similar as $item)
+                                                @if($_GET['lang']=='ar')
+                                                    <div class="col-md-4 col-sm-6 text-right column-box {{ $item->id == $post->id ? 'current' : '' }}" style="margin-bottom: 15px !important;">
+                                                        @else
+                                                            <div class="col-md-4 col-sm-6 text-left column-box {{ $item->id == $post->id ? 'current' : '' }}" style="margin-bottom: 15px !important;;">
+                                                                @endif
+
+                                                                @if($item->id != $post->id)
+                                                                    @if(isset($_GET['lang']))
+                                                                        @if($_GET['lang']=='ar')
+                                                                            <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileDataAr->original_name.'"' : '' !!} {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                @endif
+                                                                                @else
+                                                                                    <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                        @endif
+                                                                                        @endif
+
+                                                                                        @if(count($item->sliders[0]))
+                                                                                            @if($item->sliders[0]->landscape)
+                                                                                                <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
+                                                                                            @else
+                                                                                                <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
+                                                                                            @endif
+                                                                                        @else
+                                                                                            <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
+                                                                                        @endif
+
+                                                                                        @if(isset($_GET['lang']))
+                                                                                            @if($_GET['lang']=='ar')
+                                                                                                <div class="publish_date en">{{ $item->artist_ar }}</div>
+                                                                                                {{--<div class="publication ar">{{ $item->country_ar }}</div>--}}
+                                                                                                <div class="title ar">{{ $item->title_ar }}</div>
+                                                                                                {{--<div class="author ar">{{ $item->speaker_ar }}</div>--}}
+                                                                                                {{--                                    <div class="content ar">{{ $item->excerpt_ar }}</div>--}}
+                                                                                            @endif
+                                                                                        @else
+                                                                                            <div class="publish_date en">{{ $item->artist }}</div>
+                                                                                            {{--<div class="publication en">{{ $item->country }}</div>--}}
+                                                                                            <div class="title en">{{ $item->title }}</div>
+                                                                                            {{--<div class="author en">{{ $item->speaker }}</div>--}}
+                                                                                            {{--                                <div class="content en">{{ $item->excerpt }}</div>--}}
+                                                                                        @endif
+                                                                                        @if($item->id != $post->id)
+                                                                                    </a>
+                                                                        @endif
+
+                                                            </div>
+                                                            @endforeach
+
+                                                    </div>
+
+                                                    <br/>
+
+                                                    @if(count($upcoming))
+                                                        <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left';?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : '';?>>
+                                                            <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS';?> </h3>
+                                                            <br/>
+                                                            <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>">
+                                                                @foreach($upcoming as $item)
+
+                                                                    @if(isset($_GET['lang']))
+                                                                        @if($_GET['lang']=='ar')
+                                                                            <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileDataAr->original_name.'"' : '' !!} {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                @endif
+                                                                                @else
+                                                                                    <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                        @endif
+                                                                                    </a>
+
+                                                                                    @if(isset($_GET['lang']))
+                                                                                        @if($_GET['lang']=='ar')
+                                                                                            <h4  style="font-weight:bold;text-transform: uppercase;">{{ $item->title_ar }}</h4>
+                                                                                            <p>{{ $item->publish_date->format('d-m-Y') }}</p>
+                                                                                            <p>{{ $item->excerpt }}</p>
+                                                                                        @else
+                                                                                            <h4  style="font-weight:bold;text-transform: uppercase;">{{ $item->title }}</h4>
+                                                                                            <p>{{ $item->publish_date->format('d-m-Y') }}</p>
+                                                                                            <p>{{ $item->excerpt_ar }}</p>
+                                                                                        @endif
+                                                                                    @endif
+
+                                                                                    @if(isset($_GET['lang']))
+                                                                                        @if($_GET['lang']=='ar')
+                                                                                            <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileDataAr->original_name.'"' : '' !!} {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                                @endif
+                                                                                                @else
+                                                                                                    <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
+                                                                                                        @endif
+                                                                                                        <br/>
+
+                                                                                                        {{ isset($_GET['lang']) ? 'اقرأ أكثر' : 'READ MORE' }}</a>
+                                                                                                    <hr/>
+                                                                            @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+            @endsection
+
+@section('js')
+
+@endsection
+

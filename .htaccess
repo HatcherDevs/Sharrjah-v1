@@ -1,0 +1,64 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews
+    </IfModule>
+
+    Options -Indexes
+
+    RewriteEngine On
+
+
+    <Files .env>
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    <FilesMatch "\.(env|json|lock|md|gitignore|gitattributes|yml|yaml|log|sh|bak|old|sql)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    # Prevent PHP execution in uploads and fonts directories
+    <DirectoryMatch "^.*/uploads/">
+        <FilesMatch "\.php$">
+            Order allow,deny
+            Deny from all
+        </FilesMatch>
+    </DirectoryMatch>
+    
+    <DirectoryMatch "^.*/fonts/">
+        <FilesMatch "\.php$">
+            Order allow,deny
+            Deny from all
+        </FilesMatch>
+    </DirectoryMatch>
+    
+    # Protect favicon from modification
+    <Files "favicon.ico">
+        Order allow,deny
+        Allow from all
+    </Files>
+
+    RedirectMatch 403 ^/(vendor|storage|bootstrap)/
+    RedirectMatch 403 /\..*$
+
+    RewriteCond %{REQUEST_URI} ^/robots\.txt$
+    RewriteRule ^robots\.txt$ public/robots.txt [L]
+    
+    RewriteCond %{REQUEST_URI} ^/sitemap\.xml$
+    RewriteRule ^sitemap\.xml$ public/sitemap.xml [L]
+
+    RewriteCond %{REQUEST_URI} ^/site-map\.xml$
+    RewriteRule ^site-map\.xml$ public/site-map.xml [L]
+    
+    
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
