@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # تعريف المسارات والمتغيرات
-REPO_PATH="/home/u211620568/public_html"
+REPO_PATH="/home/u211620568/domains/sharjaharchitecture.org/public_html"
 BRANCH="live"
 REMOTE="origin"
-LOG_FILE="/home/u211620568/git-cleanup.log"
+LOG_FILE="/home/u211620568/git-sat-cleanup.log"
 
 # دخول مجلد الريبو
 cd "$REPO_PATH" || exit 1
