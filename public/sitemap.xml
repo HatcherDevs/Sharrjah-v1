@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+<!-- Homepage -->
+<url>
+  <loc>https://sharjaharchitecture.org/</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>1.00</priority>
+</url>
+
+<!-- About Pages -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/mission</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/board-of-directors</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/sharjah</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/partners</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/supporters</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/contributors</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/about/opportunities</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Programs Pages -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/journeys-into-architecture-archives</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/sat-design-store</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/sat-tours</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/sat-talks-re-materialize</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/al-manakh-spaces</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programmes/sat-talks-architecture</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Calendar Pages -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programs/calendar</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programs/calendar/upcoming-events</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/pages/programs/calendar/previous-events</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.80</priority>
+</url>
+
+<!-- Research Pages -->
+<url>
+  <loc>https://sharjaharchitecture.org/research</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://sharjaharchitecture.org/research/map</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Triennial 2023 -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/triennial-2023</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.90</priority>
+</url>
+
+<!-- Publications -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/publications</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Podcasts -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/podcasts</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Spaces -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/spaces</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Stores -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/stores</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Materials / Re-materialize -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/re-materialize</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- SAT Tours -->
+<url>
+  <loc>https://sharjaharchitecture.org/pages/sat-tours</loc>
+  <lastmod>2025-11-26T13:22:50+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+</urlset>

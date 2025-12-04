@@ -1,0 +1,30 @@
+# Security: Prevent PHP execution in uploads and fonts directories
+<DirectoryMatch "^.*/uploads/">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</DirectoryMatch>
+
+<DirectoryMatch "^.*/fonts/">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</DirectoryMatch>
+
+# Protect favicon.ico
+<Files "favicon.ico">
+    # Allow access but prevent modification via web
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</Files>
+
+# Prevent access to hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+
+
+

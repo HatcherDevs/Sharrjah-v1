@@ -1,0 +1,615 @@
+
+var stylers = [{"elementType":"geometry","stylers":[{"color":"#f5f5f5"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#949494"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#f7f7f7"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"administrative.neighborhood","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"poi","elementType":"labels.text","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.business","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"poi.park","elementType":"labels.text","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#e6e6e6"}]},{"featureType":"road.highway","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"road.local","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#dedede"}]},{"featureType":"water","elementType":"labels.text","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#b3b3b3"}]}];
+var gmarkers1 = [];
+var markers1 = [];
+var infowindow = new google.maps.InfoWindow({
+    content: ''
+});
+
+CustomMarker.prototype = new google.maps.OverlayView();
+
+
+/**
+ * Function to init map
+ */
+
+function initialize() {
+    var center = new google.maps.LatLng(25.2912886,55.4992062);
+    var mapOptions = {
+        zoom: 11,
+        center: center,
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        styles: stylers,
+        clickableIcons: false,
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
+        minZoom: 12,
+        maxZoom: 16,
+        restriction: {
+            latLngBounds: {
+                north: 26.4,
+                south: 25.1,
+                west: 55.0,
+                east: 55.8
+            },
+            strictBounds: false,
+        },
+
+    };
+
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+}
+
+function addMarkers() {
+    for (i = 0; i < markers.length; i++) {
+        addMarker(markers[i]);
+    }
+}
+
+/**
+ * Function to add marker to map
+ */
+
+var openWindow = null;
+var allMarkers = [];
+var markerIds = 0;
+
+/**
+ * Function to filter markers by category
+ */
+
+currentType = 'all';
+currentYear = 'all';
+
+filterMarkers = function()
+{
+    category = currentType;
+    year = currentYear;
+
+    var bounds = new google.maps.LatLngBounds();
+    for (i = 0; i < gmarkers1.length; i++) {
+        marker = gmarkers1[i];
+
+        // If is same category or category not picked
+        if(marker.category == category && marker.year == year)
+        {
+            $(marker.pin).addClass('active').css('background-color',$(marker.pin).attr('data-color'));
+        }
+        else if(marker.category == category && year == 'all')
+        {
+            $(marker.pin).addClass('active').css('background-color',$(marker.pin).attr('data-color'));
+        }
+        else if('all' == category && marker.year == year)
+        {
+            $(marker.pin).addClass('active').css('background-color',$(marker.pin).attr('data-color'));
+        }
+        else if('all' == category && year == 'all')
+        {
+            $(marker.pin).addClass('active').css('background-color',$(marker.pin).attr('data-color'));
+        }
+        // Categories don't match
+        else
+        {
+            $(marker.pin).removeClass('active').css('background-color','#fff');
+        }
+
+        // map.fitBounds(bounds);
+    }
+
+    removeAllFocus();
+}
+
+// Init map
+initialize();
+
+function vAlign() {
+    $('.valign').each(function () {
+        $(this).css('margin-top','-'+($(this).outerHeight()/2)+'px');
+    })
+}
+vAlign();
+
+introSkipped = false;
+
+$('#introwrap').on('click',function(){
+    $(this).fadeOut();
+    $('#intropop').addClass('skipped');
+
+    $('#catpop').addClass('active');
+    $('#map-wrap').addClass('active');
+
+    map.setZoom(11);
+    addMarkers();
+    alignCatPop();
+    $('#timeline').addClass('active');
+
+    resizeMap();
+    introSkipped = true;
+
+    $('#boxlinks li a').first().addClass('active');
+
+});
+
+$('.catdetail .close').on('click',function(){
+    $(this).closest('.catdetail').removeClass('active');
+});
+
+currentTypeSlug = '';
+
+$('#typeSelection a').on('click',function(){
+
+    if(!$(this).hasClass('active')) {
+        currentType = $(this).attr('data-id');
+        currentTypeSlug = $(this).attr('data-slug');
+        $('#typeSelection a').css('border-color','#000');
+        $('#typeSelection a').css('color','#000');
+
+        $('.catdetail').removeClass('active');
+        $('#cat-'+currentType).addClass('active');
+
+        $('#catpop li a').removeClass('active');
+        // $('#catpop li a').css('background-color','#fff');
+        $(this).addClass('active');
+
+        $(this).css('border-color',$(this).attr('data-color'));
+        $(this).css('color',$(this).attr('data-color'));
+
+        currentType = $(this).attr('data-id');
+
+        $('.catdetail').removeClass('active');
+    } else {
+        $('.catdetail').removeClass('active');
+        currentType = 'all';
+        currentTypeSlug = null;
+        $(this).removeClass('active');
+        $(this).css('border-color','#000');
+        $(this).css('color','#000');
+
+        if(currentYear){
+            $('.timeline-only.'+currentYear).addClass('active');
+        }
+    }
+
+
+    // currentYear = 'all';
+    // $('#timelineSelect li a').removeClass('active');
+    filterMarkers();
+
+    if(currentYear!='all' && currentTypeSlug){
+        if($('.catdetail.'+currentYear+'.'+currentTypeSlug).length)
+            $('.catdetail.'+currentYear+'.'+currentTypeSlug).addClass('active');
+    }
+    else {
+        $('#cat-'+currentType).addClass('active');
+    }
+
+    removeAllFocus();
+    hideAllInfoWindows();
+    resizeMap();
+
+    if(openWindow){
+        openWindow.close();
+    }
+});
+
+$('#typeSelection a').mouseenter(function(){
+    $(this).css('color',$(this).attr('data-color'));
+    $(this).css('border-color',$(this).attr('data-color'));
+});
+
+$('#typeSelection a').mouseleave(function(){
+    if(!$(this).hasClass('active')){
+        $(this).css('color','#000');
+        $(this).css('border-color','#000');
+    }
+});
+
+$('#timelineSelect li a').mouseenter(function(){
+    currentYear = $(this).attr('data-id');
+
+    $('.yeardetail').removeClass('active');
+    // $('#year-'+currentYear).addClass('active');
+
+});
+
+// $('#timelineSelect li a').mouseleave(function(){
+//     $('.yeardetail').removeClass('active');
+// });
+
+$('#timelineSelect li a').on('click',function(){
+
+    if(!$(this).hasClass('active')){
+        $(this).addClass('active');
+        currentYear = $(this).attr('data-id');
+
+        $('#timelineSelect li a').removeClass('active');
+        $('.catdetail').removeClass('active');
+
+        $(this).addClass('active');
+    }
+    else {
+        currentYear = 'all';
+        $(this).removeClass('active');
+
+        if(currentTypeSlug) {
+            tg = $('#typeSelection a[data-slug='+currentTypeSlug+']');
+            currentType = tg.attr('data-id');
+
+            $('#typeSelection a').css('border-color','#000');
+            $('#typeSelection a').css('color','#000');
+
+            $('.catdetail').removeClass('active');
+            $('#cat-'+currentType).addClass('active');
+
+            $('#catpop li a').removeClass('active');
+            tg.addClass('active');
+
+            tg.css('border-color',tg.attr('data-color'));
+            tg.css('color',tg.attr('data-color'));
+
+            $('#cat-'+currentType).addClass('active');
+        } else {
+            $('.catdetail').removeClass('active');
+        }
+    }
+
+    filterMarkers();
+
+    if(currentYear && currentTypeSlug)
+        if($('.catdetail.'+currentYear+'.'+currentTypeSlug).length)
+            $('.catdetail.'+currentYear+'.'+currentTypeSlug).addClass('active');
+
+    if(!currentTypeSlug)
+        $('.timeline-only.'+currentYear).addClass('active');
+
+    removeAllFocus();
+    hideAllInfoWindows();
+    resizeMap();
+
+    if(openWindow){
+        openWindow.close();
+    }
+});
+
+$('#boxlinks .link').on('click',function(){
+
+    $('#introwrap').trigger('click');
+    $('#boxlinks .link').removeClass('active');
+    $(this).removeClass('active');
+    $('.catdetail.active').removeClass('active');
+    $('.page').removeClass('active');
+
+    $('.'+$(this).attr('data-id')).addClass('active');
+
+    $('#boxlinks .link').removeClass('active');
+    $(this).addClass('active');
+
+    resizeVideoCopy();
+
+    if($(this).attr('data-id')!='home'){
+        $('#introwrap').css('opacity',0);
+        $('#intropop').css('opacity',0);
+        $('#timeline').css('opacity',0);
+        $('#typeSelection').css('opacity',0);
+        $('.pin').css('opacity',0);
+    }
+    else {
+        if(!introSkipped){
+            $('#introwrap').css('opacity',1);
+            $('#intropop').css('opacity',1);
+        }
+
+        $('#timeline').css('opacity',1);
+        $('#typeSelection').css('opacity',1);
+        $('.pin').css('opacity',1);
+    }
+
+    setTimeout(function () {
+        $('.owl-carousel').trigger('refresh.owl.carousel');
+    },200);
+});
+
+$('.vid').on('click',function(){
+    $('.video-'+$(this).attr('data-id')).addClass('active');
+
+    setTimeout(function () {
+        resizeVideoCopy();
+    },300);
+});
+
+owl = $('#building-carousel').owlCarousel({
+    loop:true,
+    margin:10,
+    dots:true,
+    items:1,
+    dotsContainer:'#owl-dots',
+    mouseDrag: false,
+    touchDrag: false
+});
+
+owl = $('.page-carousel').owlCarousel({
+    loop:true,
+    margin:10,
+    dots:true,
+    items:1,
+    dotsContainer:'#owl-dots',
+});
+
+$('.owl-dot').each(function(){
+    $(this).children('span').text($(this).index()+1);
+});
+
+$('.owl-carousel-holder .arrows .next').click(function() {
+    $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('next.owl.carousel');
+});
+// Go to the previous item
+$('.owl-carousel-holder .arrows .prev').click(function() {
+    // With optional speed parameter
+    // Parameters has to be in square bracket '[]'
+    $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('prev.owl.carousel');
+});
+
+owl = $('.news-carousel').owlCarousel({
+    loop:false,
+    margin:10,
+    dots:true,
+    items:1,
+    dotsContainer:'#owl-dots',
+});
+
+function resizeVideoCopy(){
+
+    target = $('.content-page.active');
+
+    if($(window).width()>1100){
+        height = target.find('.left').css('width',$('#intropop .pagecontent').width());
+        height = target.find('.right').css('width',target.find('.container').width() - $('#intropop .pagecontent').width() - 30);
+    } else {
+        target.find('.left').css('width','100%');
+    }
+
+    if($(window).width()>991){
+
+        $('.video-pop.active .container').each(function(){
+            // target = $(this);
+            // height = target.find('.right-content').height();
+            // height = height - target.find('h1').height();
+            // height = height - 80;
+            // target.find('.copy').css('max-height',height+'px');
+        });
+
+        target = $('#building .container');
+        height = target.find('.right-content').height();
+        height = height - $('#building-title').height() - parseInt($('#building-title').css('margin-bottom'));
+        height = height - $('#showform').height();
+        height = height - $('#building .backbutton').height() - parseInt($('#building .backbutton').css('margin-top'));
+        height = height - 40;
+
+        if($('.content-page.active').find('.video-pop').length==0){
+            $(target).find('.copy').css('max-height',height+'px');
+        }
+
+
+        if($('.video-pop.active').length){
+            target = $('.video-pop.active');
+            heading = $('.video-pop.active h1');
+
+            if(target){
+                height = target.find('.right .right-content').height();
+                height = height - $(target).find('.backbutton').height() - parseInt($(target).find('.backbutton').css('margin-top'));
+                height = height - $(heading).height() - parseInt($(heading).css('margin-bottom'));
+                height = height - 20;
+                height = height + parseInt(target.find('.right.right-content').css('padding-top'));
+                console.log(height);
+                $('.video-pop.active').find('.copy').css('max-height',height+'px');
+            }
+        }
+
+        // target = $('.content-page.active');
+        // height = target.find('.right-content').height();
+        // height = height - target.find('.page-heading').first().height() - parseInt(target.find('.page-heading').first().css('margin-bottom'));
+        // console.log(height);
+        // $(target).find('.copy').css('max-height',height+'px');
+    }
+
+}
+
+$('.video-pop .backbutton').on('click',function(){
+    $(this).closest('.video-pop').removeClass('active');
+
+    vid = $(this).closest('.video-pop').find('iframe');
+
+    if(vid.length) {
+        iframe = $(this).closest('.video-pop').find('iframe')[0].contentWindow;
+        iframe.postMessage('{"method":"pause"}', '*');
+    }
+
+    removeBuildingImages();
+});
+
+function removeBuildingImages(){
+    console.log('Removing images');
+    $('#building-carousel .owl-item').trigger( 'remove.owl.carousel', 0 );
+    $('#building-carousel .owl-item').trigger( 'remove.owl.carousel', 1 );
+    $('#building-carousel .owl-item').trigger( 'remove.owl.carousel', 2 );
+    $('#building-carousel .owl-item').trigger( 'remove.owl.carousel', 3 );
+    $('#building-carousel .owl-item').trigger('refresh.owl.carousel');
+}
+
+$('#building .backbutton').on('click',function(){
+    $('.page').removeClass('active');
+    $('#successAlert').hide();
+
+    removeBuildingImages();
+});
+
+$('#repositoryFilter').on('change',function(){
+    $('.repos').hide();
+
+    if($(this).val()=='all')
+        $('.repos').show();
+    else
+        $('.type-'+$(this).val()).show();
+});
+
+// $('.repository-type-bt').first().trigger('click');
+
+$('.close-page').on('click',function(){
+    $(this).closest('.page').removeClass('active');
+});
+
+function CustomMarker(opts) {
+    this.setValues(opts);
+}
+
+CustomMarker.prototype.draw = function() {
+    var self = this;
+
+    var div = this.div;
+    if (!div) {
+        div = this.div = $('' +
+            '<div data-id="'+this.markerid+'">' +
+            '<div class="shadow"></div>' +
+            '<div class="pulse"></div>' +
+            '<div class="pin-wrap">' +
+            '<div class="pin" style="background-color: '+this.color+'" data-color="'+this.color+'"></div>' +
+            '</div>' +
+            '</div>' +
+            '')[0];
+
+        this.pinWrap = this.div.getElementsByClassName('pin-wrap');
+        this.pin = this.div.getElementsByClassName('pin');
+        this.pinShadow = this.div.getElementsByClassName('shadow');
+        div.style.position = 'absolute';
+        div.style.cursor = 'pointer';
+        var panes = this.getPanes();
+        panes.overlayImage.appendChild(div);
+
+        google.maps.event.addDomListener(div, "click", function(event) {
+            google.maps.event.trigger(self, "click", event);
+            addMarkerClick();
+        });
+
+        google.maps.event.addDomListener(div, "mouseover", function(event) {
+            if(openWindow){
+                openWindow.close();
+            }
+
+            infowindow[$(this).attr('data-id')].open({
+                anchor: allMarkers[$(this).attr('data-id')],
+                map,
+                shouldFocus: false,
+            });
+
+            // map.panTo(gmarkers1[$(this).attr('data-id')].position);
+
+            openWindow = infowindow[$(this).attr('data-id')];
+        });
+
+        google.maps.event.addDomListener(div, "mouseleave", function(event) {
+            if(openWindow){
+                openWindow.close();
+            }
+        });
+    }
+    var point = this.getProjection().fromLatLngToDivPixel(this.position);
+    if (point) {
+        div.style.left = point.x + 'px';
+        div.style.top = point.y + 'px';
+    }
+};
+
+CustomMarker.prototype.removeFocus = function() {
+    dynamics.stop(this.pin);
+    dynamics.css(this.pin, {
+        'transform': 'none',
+        'margin-left': '0',
+        'margin-top': '0',
+        'z-index': '1',
+    });
+
+    dynamics.animate(this.pin, {
+        scaleX: 1,
+        scaleY: 1,
+    }, {
+        duration: 800,
+        bounciness: 1800,
+    });
+};
+
+CustomMarker.prototype.Focus = function() {
+    dynamics.stop(this.pin);
+    dynamics.css(this.pin, {
+        'transform': 'none',
+        'z-index': '2',
+    });
+
+    map.panTo(gmarkers1[this.markerid].position);
+
+    dynamics.animate(this.pin, {
+        // scaleX: 2.3,
+        // scaleY: 2.3,
+    }, {
+        duration: 800,
+        bounciness: 1800,
+    });
+
+    for (const [key, value] of Object.entries(gmarkers1)) {
+        if(this.markerid != gmarkers1[key].markerid){
+            gmarkers1[key].removeFocus();
+        }
+    }
+}
+
+function removeAllFocus() {
+    for (const [key, value] of Object.entries(gmarkers1)) {
+        gmarkers1[key].removeFocus();
+    }
+}
+
+function hideAllInfoWindows() {
+    for (const [key, value] of Object.entries(gmarkers1)) {
+        infowindow[key].close();
+    }
+    removeAllFocus();
+}
+
+$(window).on('load',function () {
+    // $('#intropop').css('left','0');
+    $('#loader').hide();
+    alignIntroPop();
+});
+
+
+/*********** HOME SCRIPTS **********************/
+
+
+function checkBar(){
+    if($(window).outerWidth()<992){
+        $('#logo').addClass('twoline');
+    } else {
+        $('#logo').removeClass('twoline');
+    }
+
+    $('#logo').fadeIn();
+}
+
+checkBar();
+$(window).resize(function(){
+    setTimeout(function(){
+        $('.innerpage h1').css('height','auto');
+        $('.innerpage .breadcrumbs').css('height','auto');
+        vAlign();
+        alignIntroPop();
+        alignCatPop();
+    },100);
+    setTimeout(function(){
+        resizeVideoCopy();
+    },300);
+
+    checkBar();
+});

@@ -1,0 +1,10 @@
+
+@media screen and (max-height: 800px) {
+	/** .home-video video {
+		width: 100%;
+		height: auto;
+	} **/
+	.home-video .headline {
+		margin-top: 75px;
+	}
+}
