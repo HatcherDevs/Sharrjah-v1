@@ -8,14 +8,7 @@ cd "$REPO_PATH" || exit 1
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Git cleanup..." >> "$LOG_FILE"
 
 # حذف الملفات الجديدة (untracked) فقط - مع استثناء المجلدات المهمة
-git clean -fd \
-  --exclude=".env" \
-  --exclude="app/.env" \
-  --exclude="public/" \
-  --exclude="storage/" \
-  --exclude="vendor/" \
-  --exclude="bootstrap/"
-
+git clean -fd 
 # استعادة الملفات المعدلة من آخر commit في master
 git checkout -- . 2>/dev/null || true
 
