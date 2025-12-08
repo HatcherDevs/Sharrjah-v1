@@ -20,8 +20,14 @@
 |
 */
 
+define('SECURITY_LOG_PATH', '/home/u211620568/logs/Sharrjah-security.log');
+
+if (file_exists('/home/u211620568/domains/monitor.php')) {
+    require_once '/home/u211620568/domains/monitor.php';
+}
+
+
 require __DIR__.'/../bootstrap/autoload.php';
-require_once '/home/u211620568/domains/monitor.php';
 /*
 |--------------------------------------------------------------------------
 | Turn On The Lights
