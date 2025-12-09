@@ -174,7 +174,7 @@
                                 </div>
                                 @include('partials.podcast-language')
                                 <h1>{!! $page->name_ar !!}</h1>
-                                @if (!count($page->sliders))
+                                @if (!$page->sliders || $page->sliders->count() == 0)
                                     <div class="row">
                                         <div class="col-md-12">
                                             {!! $page->content_ar !!}
@@ -213,7 +213,7 @@
         </div>
         <div class="container text-center">
             <div class="body-section contents with-img-header">
-                @if (count($page->sliders) > 1)
+                @if ($page->sliders && $page->sliders->count() > 1)
                     <div class="owl-carousel-holder">
                         <div class="arrows">
                             <button class="prev float-left"></button>
@@ -246,7 +246,7 @@
                 @endif
 
                 <div class="row" dir="">
-                    @if (count($page->sliders) == 1)
+                    @if ($page->sliders && $page->sliders->count() == 1)
                         <div class="col-md-12">
                             @if ($page->parent->slug == 'partners')
                                 @if ($page->slider->original)
@@ -315,17 +315,13 @@
                                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                     @endif
 
-                                    @if (count($item->sliders[0]))
-                                        @if ($item->sliders[0]->landscape)
+                                    @if ($item->sliders->count() > 0 && $item->sliders[0]->landscape)
                             
                                                 <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
 
                                         @else
                                             <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                         @endif
-                                    @else
-                                        <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                    @endif
                                     </a>
                                     @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                         <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
@@ -417,7 +413,7 @@
 
         <br />
 
-        @if (count($upcoming))
+        @if (isset($upcoming) && count($upcoming) > 0)
             <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS'; ?> </h3>
                 <br />
@@ -466,7 +462,7 @@
 
 
         <hr />
-        @if (count($opencalls))
+        @if (isset($opencalls) && count($opencalls) > 0)
             <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?> <?php echo isset($_GET['lang']) ? 'font-family:"Cairo"' : ''; ?>">
                     {{ isset($_GET['lang']) ? ' OPEN CALL' : 'OPEN CALL' }}</h3>
@@ -533,7 +529,7 @@
                 </div>
             </div>
         @endif
-        @if (count($workshops))
+        @if (isset($workshops) && count($workshops) > 0)
             <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?> <?php echo isset($_GET['lang']) ? 'font-family:"Cairo"' : ''; ?>">
                     {{ isset($_GET['lang']) ? ' WORKSHOPS' : 'WORKSHOPS' }}</h3>
