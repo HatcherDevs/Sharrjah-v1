@@ -274,14 +274,14 @@
 
                                                 @if(isset($_GET['lang']))
                                                     @if($_GET['lang']=='ar')
-                                                        <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div>
+                                                        <div class="publish_date en">{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</div>
                                                         {{--<div class="publication ar">{{ $item->country_ar }}</div>--}}
                                                         <div class="title ar">{{ $item->title_ar }}</div>
                                                         {{--<div class="author ar">{{ $item->speaker_ar }}</div>--}}
                                                         <div class="content ar">{{ $item->excerpt_ar }}</div>
                                                     @endif
                                                 @else
-                                                    <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div>
+                                                    <div class="publish_date en">{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</div>
                                                     {{--<div class="publication en">{{ $item->country }}</div>--}}
                                                     <div class="title en">{{ $item->title }}</div>
                                                     {{--<div class="author en">{{ $item->speaker }}</div>--}}
