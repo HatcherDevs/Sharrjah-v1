@@ -29,7 +29,9 @@ Route::post('admin/login', 'Auth\AuthController@login');
 Route::post('admin/logout', 'Auth\AuthController@logout')->name('logout');
 Route::get('logout', 'Auth\AuthController@logout')->name('logout.get');
 
-Route::get('admin/', 'Auth\AuthController@adminRedirect');
+Route::get('admin/', function () {
+    return response('');
+})->middleware('admin.redirect');
 
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
