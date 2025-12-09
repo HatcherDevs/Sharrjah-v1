@@ -1,19 +1,16 @@
 
 <?php
 $count = count($page->breadcrumbs);
-$loop = 0;
 ?>
 @if($count)
     @foreach($page->breadcrumbs as $link)
-        <?php $loop++; ?>
-
-        @if ($loop==1)
+        @if ($loop->first)
             <a href="{{ url($link['link']) }}">{{ $link['name_ar'] }}</a>
         @else
             <a href="{{ url('pages'.$link['link']) }}">{{ $link['name_ar'] }}</a>
         @endif
 
-        @if ($count!=$loop)
+        @if (!$loop->last)
             >
         @else
             @if($post)
