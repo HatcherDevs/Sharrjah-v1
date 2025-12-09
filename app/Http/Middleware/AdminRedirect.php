@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AdminRedirect
 {
@@ -16,10 +17,14 @@ class AdminRedirect
      */
     public function handle($request, Closure $next)
     {
+        Log::info('AdminRedirect middleware called');
+        
         if (Auth::check()) {
+            Log::info('User authenticated, redirecting to /admin/home');
             return redirect('/admin/home');
         }
 
+        Log::info('User not authenticated, redirecting to /admin/login');
         return redirect('/admin/login');
     }
 }

@@ -29,9 +29,13 @@ Route::post('admin/login', 'Auth\AuthController@login');
 Route::post('admin/logout', 'Auth\AuthController@logout')->name('logout');
 Route::get('logout', 'Auth\AuthController@logout')->name('logout.get');
 
+// Admin root redirect - check authentication
 Route::get('admin/', function () {
-    return response('');
-})->middleware('admin.redirect');
+    if (auth()->check()) {
+        return redirect('/admin/home');
+    }
+    return redirect('/admin/login');
+});
 
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
