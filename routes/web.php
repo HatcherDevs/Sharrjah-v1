@@ -17,10 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('admin/posts', function () {
-    return view('admin.posts');
-});
-
 Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents');
 
 // Authentication Routes
@@ -29,20 +25,17 @@ Route::post('admin/login', 'Auth\AuthController@login');
 Route::post('admin/logout', 'Auth\AuthController@logout')->name('logout');
 Route::get('logout', 'Auth\AuthController@logout')->name('logout.get');
 
-// Admin root redirect - check authentication
-Route::get('admin/', function () {
-    if (auth()->check()) {
-        return redirect('/admin/home');
-    }
-    return redirect('/admin/login');
-});
+// Admin root redirect - check authentication (WITHOUT middleware - will check inside)
+Route::get('admin/', 'Auth\AuthController@adminRedirect');
 
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
-    Route::get('/', 'HomeController@index');
+    Route::get('home', 'HomeController@index');
+    Route::get('posts', function () {
+        return view('admin.posts');
+    });
     Route::get('subscribers', 'SubscribeController@show');
 
-    Route::get('home', 'HomeController@index');
     Route::post('home/update', 'HomeController@updateHome');
     Route::get('home/featured', 'HomeController@featured');
     Route::get('home/footer', 'HomeController@footer');
