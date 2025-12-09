@@ -1,0 +1,41 @@
+# ===========================
+
+# Security Configuration
+
+# ===========================
+
+# Prevent execution of PHP files in uploads directory
+
+# Created: December 9, 2025
+
+# Disable PHP execution
+
+<FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|phps|phar)$">
+Order Deny,Allow
+Deny from all
+</FilesMatch>
+
+# Disable execution of other dangerous file types
+
+<FilesMatch "\.(aspx|asp|jsp|cgi|pl|py|sh|bash|exe|dll|bat|cmd)$">
+Order Deny,Allow
+Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+
+Options -Indexes
+
+# Prevent access to hidden files
+
+<FilesMatch "^\.">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+# Only allow specific file types
+
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|csv|mp3|mp4|webp|svg)$">
+Order Allow,Deny
+Allow from all
+</FilesMatch>
