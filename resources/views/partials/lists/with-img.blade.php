@@ -1,15 +1,12 @@
 @inject('pageService', 'App\Services\PageService')
 
-<?php
-$loop = 1;
-?>
 <div class="container text-center">
     <div class="row">
         <div class="body-section contents">
             <div class="row">
             <ul class="figure-list">
             @foreach($data as $child)
-                @if($loop%2==1)
+                @if($loop->iteration%2==1)
                     <li class="al-right">
                         <div class="colm titles">
                             {{ $child->pageType }}
@@ -118,7 +115,6 @@ $loop = 1;
                         </div>
                     </li>
                 @endif
-                <?php $loop++; ?>
             @endforeach
 
             </ul>
