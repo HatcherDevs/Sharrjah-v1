@@ -92,9 +92,9 @@ class PageService
     {
 
         if (LandingElement::count() > 0)
-            return LandingElement::get()->random(1);
+            return LandingElement::get()->random(1)->first();
 
-        return [];
+        return null;
     }
 
     public function getGetMaterialSeriesContent()

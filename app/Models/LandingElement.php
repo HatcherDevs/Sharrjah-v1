@@ -16,6 +16,6 @@ class LandingElement extends Model
 
     public function uploads()
     {
-        return $this->morphOne('App\Models\Upload', 'uploadable');
+        return $this->morphMany('App\Models\Upload', 'uploadable');
     }
 }

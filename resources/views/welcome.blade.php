@@ -1,20 +1,24 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <meta name="description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia." />
+    <meta name="description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia." />
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="Sharjah Architecture Triennial">
-    <meta itemprop="description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
+    <meta itemprop="description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
     <meta itemprop="image" content="http://sharjaharchitecture.org/og.JPG">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
     <meta name="twitter:site" content="@publisher_handle">
     <meta name="twitter:title" content="Sharjah Architecture Triennial">
-    <meta name="twitter:description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
+    <meta name="twitter:description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
     <meta name="twitter:creator" content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
     <meta name="twitter:image:src" content="ttp://sharjaharchitecture.org/og.JPG">
@@ -80,8 +84,8 @@
     <link href="https://fonts.googleapis.com/css?family=Cairo:400,700&amp;subset=arabic" rel="stylesheet">
     <link href="{{ asset('public/fonts/stylesheet.css') }}" rel="stylesheet">
     <link href="{{ asset('public/fonts/roboto/stylesheet.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/css/style.css') }}?v={{rand(1,99999)}}" rel="stylesheet">
-    <link href="{{ asset('public/css/responsive.css') }}?v={{rand(1,99999)}}" rel="stylesheet">
+    <link href="{{ asset('public/css/style.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
+    <link href="{{ asset('public/css/responsive.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
     <link href="{{ asset('public/css/home.css') }}" rel="stylesheet">
 
     <link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
@@ -115,7 +119,7 @@
         }
 
         #video-logo.black {
-            background-image: url('{{asset('public/img/sharjah-architecture-logo-dark.png')}}');
+            background-image: url('{{ asset('public/img/sharjah-architecture-logo-dark.png') }}');
         }
 
         #featured-list .featured .overlay {
@@ -156,13 +160,17 @@
         @inject('pageService', 'App\Services\PageService')
         <?php $landingElement = $pageService->getHomeLandingElement(); ?>
         <?php
-            $randomElement = $landingElement->uploads()->where('template','high')->first();
-
-            if(!$randomElement)
-                $randomElement = $landingElement->uploads()->where('template','')->first();
+        $randomElement = null;
+        if ($landingElement) {
+            $randomElement = $landingElement->uploads()->where('template', 'high')->first();
+        
+            if (!$randomElement) {
+                $randomElement = $landingElement->uploads()->where('template', '')->first();
+            }
+        }
         ?>
 
-        @if($randomElement->mime_type=='image/jpeg')
+        @if ($randomElement && $randomElement->mime_type == 'image/jpeg')
             @media only screen and (max-width: 1366px) {
                 .bgimg {
                     background-size: auto 120% !important;
@@ -186,37 +194,26 @@
 <?php
 $video = 6;
 
-if (!isset($_COOKIE['firsttime']))
-{
-    setcookie("firsttime", "no");
+if (!isset($_COOKIE['firsttime'])) {
+    setcookie('firsttime', 'no');
     $video = 6;
-}
-else if (!isset($_COOKIE['secondtime']))
-{
-    setcookie("secondtime", "no");
+} elseif (!isset($_COOKIE['secondtime'])) {
+    setcookie('secondtime', 'no');
     $video = 5;
-}
-else if (!isset($_COOKIE['thirdtime']))
-{
-    setcookie("thirdtime", "no");
+} elseif (!isset($_COOKIE['thirdtime'])) {
+    setcookie('thirdtime', 'no');
     $video = 4;
-}
-else if (!isset($_COOKIE['fourthtime']))
-{
-    setcookie("fourthtime", "no");
+} elseif (!isset($_COOKIE['fourthtime'])) {
+    setcookie('fourthtime', 'no');
     $video = 3;
-}
-else if (!isset($_COOKIE['fifthtime']))
-{
-    setcookie("fifthtime", "no");
+} elseif (!isset($_COOKIE['fifthtime'])) {
+    setcookie('fifthtime', 'no');
     $video = 2;
-}
-else if (!isset($_COOKIE['sixthtime']))
-{
-    setcookie("sixthtime", "no");
+} elseif (!isset($_COOKIE['sixthtime'])) {
+    setcookie('sixthtime', 'no');
     $video = 1;
 } else {
-    $video = rand(1,6);
+    $video = rand(1, 6);
 }
 ?>
 
@@ -250,71 +247,69 @@ else if (!isset($_COOKIE['sixthtime']))
 </main>
 
 
-@if($randomElement->mime_type=='image/jpeg')
-<main role="main" class="container-fluid bgimg {{ $landingElement->link == '#' ? 'fullmob' : '' }}" id="home-video-container" style="background-image: url({{ asset('public'.$randomElement->url) }})">
+@if ($randomElement && $randomElement->mime_type == 'image/jpeg')
+<main role="main" class="container-fluid bgimg {{ $landingElement && $landingElement->link == '#' ? 'fullmob' : '' }}" id="home-video-container" style="background-image: url({{ asset('public' . $randomElement->url) }})">
     <div class="row">
         <div class="container" style="position: relative;">
             <div class="row">
-                <a href="{{ url('/') }}" id="video-logo" class="<?php echo $landingElement->white_logos ? 'black' : '' ?>"></a>
-                <img src="{{ $landingElement->white_logos ? asset('public/img/menu-bt-dark.png') : asset('public/img/menu-bt.png') }}" style="{{ $landingElement->white_logos ? 'border-color:#000000' : '' }}" id="video-menu" width="50">
+                <a href="{{ url('/') }}" id="video-logo" class="<?php echo $landingElement && $landingElement->white_logos ? 'black' : ''; ?>"></a>
+                <img src="{{ $landingElement && $landingElement->white_logos ? asset('public/img/menu-bt-dark.png') : asset('public/img/menu-bt.png') }}" style="{{ $landingElement && $landingElement->white_logos ? 'border-color:#000000' : '' }}" id="video-menu" width="50">
                 <div id="scroll-down"></div>
             </div>
         </div>
     </div>
 </main>
 
-@else($randomElement->mime_type=='video/mp4')
+@elseif($randomElement && $randomElement->mime_type == 'video/mp4')
 
     <div id="videoholder">
         <main role="main" class="container main" id="home-video-container">
             <div class="row">
                 <div class="container" style="position: relative;">
                     <div class="row">
-                        <a href="{{ url('/') }}" id="video-logo" class="<?php echo $landingElement->white_logos ? 'black' : '' ?>"></a>
+                        <a href="{{ url('/') }}" id="video-logo" class="<?php echo $landingElement->white_logos ? 'black' : ''; ?>"></a>
                         <img src="{{ $landingElement->white_logos ? asset('public/img/menu-bt-dark.png') : asset('public/img/menu-bt.png') }}" style="{{ $landingElement->white_logos ? 'border-color:#000000' : '' }}" id="video-menu" width="50">
                         <div class="home-video auto-height">
-                            @if($landingElement)
+                            @if ($landingElement)
 
                                     <?php
                                     $mtClass = '';
-
-                                    if(
-                                        $randomElement->original_name == "4.mp4" ||
-                                        $randomElement->original_name == "5.mp4" ||
-                                        $randomElement->original_name == "6.mp4"
-                                    )
+                                    
+                                    if ($randomElement && ($randomElement->original_name == '4.mp4' || $randomElement->original_name == '5.mp4' || $randomElement->original_name == '6.mp4')) {
                                         $mtClass = 'margin-top-negative';
-
-
+                                    }
+                                    
                                     ?>
+                                    @if ($randomElement)
                                     <video autoplay muted loop playsinline id="video" class="<?php echo $mtClass; ?>">
-                                        <source src="{{ asset('public') }}{{$randomElement->url}}" type="video/mp4">
+                                        <source src="{{ asset('public') }}{{ $randomElement->url }}" type="video/mp4">
                                     </video>
+                                    @endif
 
-                                @if($landingElement->link)
+                                @if ($landingElement->link)
                                     <a href="{{ $landingElement->link }}"><div class="overlay"></div></a>
                                 @else
                                     <div class="overlay"></div>
                                 @endif
                             @endif
                             <div class=""></div>
-                            {{--<div class="headline auto-height-holder">--}}
-                                {{--<div class="v-content">--}}
-                                      {{--<span class="ar" dir="rtl">--}}
-                                        {{--{!! $pageService->getHomeData('headline-ar')->value !!}--}}
-                                      {{--</span>--}}
-                                    {{--<span class="en">--}}
-                                        {{--{!! $pageService->getHomeData('headline-en')->value !!}--}}
-                                      {{--</span>--}}
+                            {{-- <div class="headline auto-height-holder"> --}}
+                                {{-- <div class="v-content"> --}}
+                                      {{-- <span class="ar" dir="rtl"> --}}
+                                        {{-- {!! $pageService->getHomeData('headline-ar')->value !!} --}}
+                                      {{-- </span> --}}
+                                    {{-- <span class="en"> --}}
+                                        {{-- {!! $pageService->getHomeData('headline-en')->value !!} --}}
+                                      {{-- </span> --}}
 
-                                    {{--<span class="ar" dir="rtl" style="text-align:right; {{$landingElement->white_logos ? 'color:#000' : ''}}">--}}
-                                    {{--{!! $landingElement->title_ar !!}--}}
-                                    {{--</span>--}}
-                                    {{--<span class="en" {{$landingElement->white_logos ? 'style=color:#000' : ''}}>--}}
-                                    {{--{!! $landingElement->title !!}--}}
-                                    {{--</span>--}}
-                                {{--</div>--}}
-                            {{--</div>--}}
+                                    {{-- <span class="ar" dir="rtl" style="text-align:right; {{$landingElement->white_logos ? 'color:#000' : ''}}"> --}}
+                                    {{-- {!! $landingElement->title_ar !!} --}}
+                                    {{-- </span> --}}
+                                    {{-- <span class="en" {{$landingElement->white_logos ? 'style=color:#000' : ''}}> --}}
+                                    {{-- {!! $landingElement->title !!} --}}
+                                    {{-- </span> --}}
+                                {{-- </div> --}}
+                            {{-- </div> --}}
                         </div>
                         <div id="scroll-down"></div>
                     </div>
@@ -362,19 +357,19 @@ else if (!isset($_COOKIE['sixthtime']))
     <div class="container text-center">
         <div class="body-section text-center">
             <div class="row" id="featured-list">
-                @foreach($pageService->getHomeBoxes(0) as $item)
+                @foreach ($pageService->getHomeBoxes(0) as $item)
                     <a href="{{ $item->link }}">
                         <div class="col-md-6 col-sm-6 featured white-text"  >
-                            {{--<div class="v-content">--}}
-                                {{--<span class="ar" dir="rtl">--}}
-                                    {{--{!! $item->title_ar !!}--}}
-                                {{--</span><br>--}}
-                                {{--<span class="en">--}}
-                                    {{--{!! $item->title !!}--}}
-                                {{--</span>--}}
-                            {{--</div>--}}
+                            {{-- <div class="v-content"> --}}
+                                {{-- <span class="ar" dir="rtl"> --}}
+                                    {{-- {!! $item->title_ar !!} --}}
+                                {{-- </span><br> --}}
+                                {{-- <span class="en"> --}}
+                                    {{-- {!! $item->title !!} --}}
+                                {{-- </span> --}}
+                            {{-- </div> --}}
                             <a href="{{ $item->link }}" class="overlay">
-                                <img src="{{ $item->slider ? asset('public/'.$item->slider->square->url) : asset('public/img/placeholder-200x200.png') }}" class=" blk-border" width="100%">
+                                <img src="{{ $item->slider ? asset('public/' . $item->slider->square->url) : asset('public/img/placeholder-200x200.png') }}" class=" blk-border" width="100%">
                             </a>
 
                             <br>
@@ -647,35 +642,34 @@ integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b
             os = null;
         if (macosPlatforms.indexOf(platform) !== -1) {
             os = 'Mac OS';
-            $('.home-video').first().css('background-color','{{$landingElement->background_macos}}');
-            $('#videoholder').css('background-color','{{$landingElement->background_macos}}');
+            $('.home-video').first().css('background-color','{{ $landingElement->background_macos }}');
+            $('#videoholder').css('background-color','{{ $landingElement->background_macos }}');
             // $('.home-video').first().css('background-color','#0d5afb');
         }
         else if (iosPlatforms.indexOf(platform) !== -1) {
             os = 'iOS';
-            $('.home-video').first().css('background-color','{{$landingElement->background_macos}}');
-            $('#videoholder').css('background-color','{{$landingElement->background_macos}}');
+            $('.home-video').first().css('background-color','{{ $landingElement->background_macos }}');
+            $('#videoholder').css('background-color','{{ $landingElement->background_macos }}');
             // $('.home-video').first().css('background-color','#0d5afb');
         } else if (windowsPlatforms.indexOf(platform) !== -1) {
             os = 'Windows';
-            $('.home-video').first().css('background-color','{{$landingElement->background_windows}}');
-            $('#videoholder').css('background-color','{{$landingElement->background_windows}}');
+            $('.home-video').first().css('background-color','{{ $landingElement->background_windows }}');
+            $('#videoholder').css('background-color','{{ $landingElement->background_windows }}');
         } else if (/Android/.test(userAgent)) {
             os = 'Android';
-            $('.home-video').first().css('background-color','{{$landingElement->background_windows}}');
-            $('#videoholder').css('background-color','{{$landingElement->background_windows}}');
+            $('.home-video').first().css('background-color','{{ $landingElement->background_windows }}');
+            $('#videoholder').css('background-color','{{ $landingElement->background_windows }}');
             // $('.home-video').first().css('background-color','#094df8');
         } else if (!os && /Linux/.test(platform)) {
             os = 'Linux';
-            $('.home-video').first().css('background-color','{{$landingElement->background_windows}}');
-            $('#videoholder').css('background-color','{{$landingElement->background_windows}}');
+            $('.home-video').first().css('background-color','{{ $landingElement->background_windows }}');
+            $('#videoholder').css('background-color','{{ $landingElement->background_windows }}');
         }
         return os;
     }
 
-    @if($randomElement->mime_type=='video/mp4')
-        getOS();
-    @endif
+    @if ($randomElement && $randomElement->mime_type == 'video/mp4')
+        getOS(); @endif
 
 </script>
 </body>
