@@ -25,11 +25,9 @@ Route::post('admin/login', 'Auth\AuthController@login');
 Route::post('admin/logout', 'Auth\AuthController@logout')->name('logout');
 Route::get('logout', 'Auth\AuthController@logout')->name('logout.get');
 
-// Admin root redirect - check authentication (WITHOUT middleware - will check inside)
-Route::get('admin/', 'Auth\AuthController@adminRedirect');
-
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
+    Route::get('/', 'HomeController@index');
     Route::get('home', 'HomeController@index');
     Route::get('posts', function () {
         return view('admin.posts');
