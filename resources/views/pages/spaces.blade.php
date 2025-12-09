@@ -131,7 +131,7 @@
                                 </div>
                                 @include('partials.podcast-language')
                                 <h1>{!!  $page->name_ar !!}</h1>
-                                @if(!count($page->sliders))
+                                @if(!$page->sliders || $page->sliders->count() == 0)
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -152,7 +152,7 @@
 
                             @include('partials.podcast-language')
                             <h1 class="en">{!! $page->name !!}</h1>
-                            @if(!count($page->sliders))
+                            @if(!$page->sliders || $page->sliders->count() == 0)
                                 <div class="row">
                                     <div class="col-md-12">
                                         {!! $page->content !!}
@@ -171,7 +171,7 @@
         </div>
             <div class="container text-center">
                 <div class="body-section contents with-img-header">
-                    @if(count($page->sliders)>1)
+                    @if($page->sliders && $page->sliders->count() > 1)
                         <div class="owl-carousel-holder">
                             <div class="arrows">
                                 <button class="prev float-left"></button>
@@ -200,7 +200,7 @@
                     @endif
 
                     <div class="row" dir="">
-                        @if(count($page->sliders)==1)
+                        @if($page->sliders && $page->sliders->count() == 1)
                             <div class="col-md-12">
                                 @if($page->parent->slug=="partners")
                                     @if($page->slider->original)
@@ -251,12 +251,8 @@
                             <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
                         @endif
 
-                            @if(count($item->sliders[0]))
-                                @if($item->sliders[0]->landscape)
-                                    <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
-                                @else
-                                    <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                @endif
+                            @if($item->sliders->count() > 0 && $item->sliders[0]->landscape)
+                                <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
                             @else
                                 <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                             @endif
@@ -285,7 +281,7 @@
 
                     <br/>
 
-                    @if(count($upcoming))
+                    @if(isset($upcoming) && count($upcoming) > 0)
                         <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left';?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : '';?>>
                             <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS';?> </h3>
                             <br/>
