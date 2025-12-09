@@ -27,6 +27,7 @@ Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents'
 Route::get('admin/login', 'Auth\AuthController@showLoginForm')->name('login');
 Route::post('admin/login', 'Auth\AuthController@login');
 Route::post('admin/logout', 'Auth\AuthController@logout')->name('logout');
+Route::get('logout', 'Auth\AuthController@logout')->name('logout.get');
 
 Route::get('admin/', function () {
     return redirect('/admin/login');
