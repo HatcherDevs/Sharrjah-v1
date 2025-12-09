@@ -51,7 +51,9 @@ class Post extends Model
         'active',
     ];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
 
     public function parent(){
         return $this->hasOne('App\Models\Page','id','page_id');
