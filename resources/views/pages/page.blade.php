@@ -251,7 +251,7 @@
         @endif
 
 
-        @if ($page->slug == contact)
+        @if ($page->slug == 'contact')
             <div class="container text-center">
                 <div class="body-section contents with-img-header">
                     <div class="row">
