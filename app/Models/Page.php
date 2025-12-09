@@ -107,12 +107,13 @@ class Page extends Model
 
     public function getSlidersAttribute()
     {
-        return $this->sliders()->get();
+        $result = $this->sliders()->get();
+        return $result ?? collect([]);
     }
 
     public function getSliderAttribute()
     {
-        return $this->sliders()->first();
+        return $this->sliders()->first() ?? null;
     }
 
     public function getParentAttribute()

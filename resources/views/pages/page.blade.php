@@ -75,12 +75,12 @@
             <div class="body-section contents with-img-header">
                 <div class="row" dir="">
                     <div class="col-md-6 text-left">
-                        @if ($page->sliders->count() == 0)
+                        @if (!$page->sliders || $page->sliders->count() == 0)
                             {!! $page->content !!}
                         @endif
                     </div>
                     <div class="col-md-6 text-right cairo">
-                        @if ($page->sliders->count() == 0)
+                        @if (!$page->sliders || $page->sliders->count() == 0)
                             {!! $page->content_ar !!}
                         @endif
                     </div>
@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        @if ($page->sliders->count() > 0)
+        @if ($page->sliders && $page->sliders->count() > 0)
             @include('partials.slide-images')
         @endif
 
