@@ -326,6 +326,6 @@ if (version_compare(PHP_VERSION, '7.2.0', '>=')) {
     // error_reporting(E_ALL ^ E_WARNING); // Maybe this is enough
 }
 
-Route::auth();
+// Route::auth();
 
 Route::get('/home', 'HomeController@index');

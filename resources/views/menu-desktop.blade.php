@@ -9,7 +9,7 @@
 
                         <a href="{{ url($page['page']->link) }}" class="mainlink"><span
                                 class="ar">{{ $page['page']->name_ar }}</span><br />{{ $page['page']->name }}</a>
-                        @if (count($page['children']))
+                        @if ($page['children'] && count($page['children']))
                             <ul class="sub english-nav">
                         @endif
 
@@ -32,28 +32,24 @@
 
 
                 @if ($child->slug == 'team-1')
-                <?php 
-                $opportunities =  $pageService->getPageById(50);
-                $opportunitiesPage = $pageService->getPostById(477); 
-                $opportunitiesSlug =   $opportunities->slug;
-                
-                ?>
-            
-                @if ($opportunities->active == 1) 
-                    <li>
-                        <a href="{{ url('pages/about/' . $opportunitiesSlug) }}">
-                            <span class="ar">فرص العمل</span><br />Opportunities
-                        </a>
-                    </li>
+                    <?php
+                    $opportunities = $pageService->getPageById(50);
+                    $opportunitiesPage = $pageService->getPostById(477);
+                    $opportunitiesSlug = $opportunities->slug;
+                    
+                    ?>
 
+                    @if ($opportunities->active == 1)
+                        <li>
+                            <a href="{{ url('pages/about/' . $opportunitiesSlug) }}">
+                                <span class="ar">فرص العمل</span><br />Opportunities
+                            </a>
+                        </li>
+                    @endif
                 @endif
-            @endif
-
-
-
             @endforeach
 
-            @if (count($page['children']))
+            @if ($page['children'] && count($page['children']))
         </ul>
         @endif
         </li>

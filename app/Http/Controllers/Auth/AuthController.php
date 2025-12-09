@@ -5,32 +5,18 @@ namespace App\Http\Controllers\Auth;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
     /**
      * Where to redirect users after login / registration.
      *
      * @var string
      */
     protected $redirectTo = '/admin/home';
-    protected $loginPath = '/admin/login';
-    protected $redirectPath = '/admin/home';
     protected $redirectAfterLogout = '/admin/login';
 
     /**
@@ -40,13 +26,13 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest', ['except' => 'logout']);
+        $this->middleware('guest', ['except' => ['logout', 'showLoginForm']]);
     }
     
     /**
      * Show the application login form.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function showLoginForm()
     {
@@ -54,23 +40,44 @@ class AuthController extends Controller
     }
     
     /**
-     * Get the post login redirect path.
+     * Handle a login request to the application.
      *
-     * @return string
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirectPath()
+    public function login(Request $request)
     {
-        return '/admin/home';
+        // Validate credentials
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        // Attempt authentication
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended($this->redirectTo);
+        }
+
+        // Authentication failed
+        return back()->withErrors([
+            'email' => 'These credentials do not match our records.',
+        ])->onlyInput('email');
     }
-    
+
     /**
-     * Get the login username to be used by the controller.
+     * Log the user out of the application.
      *
-     * @return string
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function username()
+    public function logout(Request $request)
     {
-        return 'email';
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect($this->redirectAfterLogout);
     }
 
     /**
@@ -99,7 +106,7 @@ class AuthController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => Hash::make($data['password']),
         ]);
     }
 }
