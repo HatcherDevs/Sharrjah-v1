@@ -152,6 +152,9 @@ class Page extends Model
         foreach ($childrenIds as $childId)
             $ids[] = $childId->page_id;
 
+        if (empty($ids))
+            return [];
+
         $children = Page::whereIn('id', $ids)->orderBy('created_at', 'ASC')->get();
 
         return $children;
