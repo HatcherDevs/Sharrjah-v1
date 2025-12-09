@@ -18,6 +18,12 @@ class HomeController extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $puploader;
+    protected $luploader;
+    protected $fuploader;
+
     public function __construct(Option $model, LandingElementUploader $uploader,PostImagesUploader $puploader, PostLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
         $this->model = $model;
