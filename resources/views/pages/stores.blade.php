@@ -194,7 +194,7 @@
 
                             @include('partials.podcast-language')
                             <h1 class="en">{!! $page->name !!}</h1>
-                            @if (!count($page->sliders))
+                            @if (!$page->sliders || $page->sliders->count() == 0)
                                 <div class="row">
                                     <div class="col-md-12">
                                         {!! $page->content !!}
@@ -316,12 +316,10 @@
                                     @endif
 
                                     @if ($item->sliders->count() > 0 && $item->sliders[0]->landscape)
-                            
-                                                <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
-
-                                        @else
-                                            <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                        @endif
+                                        <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
+                                    @else
+                                        <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
+                                    @endif
                                     </a>
                                     @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                         <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
@@ -492,17 +490,20 @@
                             @if ($_GET['lang'] == 'ar')
                                 <h4 style="font-weight:bold;text-transform: uppercase;">{{ $opencallsitem->title_ar }}
                                 </h4>
-                                <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}</p>
+                                <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}
+                                </p>
                                 {{--                                                            <p>{{ $item->excerpt }}</p> --}}
                             @else
                                 <h4 style="font-weight:bold;text-transform: uppercase;">{{ $opencallsitem->title }}
                                 </h4>
-                                <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}</p>
+                                <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}
+                                </p>
                                 {{--                                                            <p>{{ $item->excerpt_ar }}</p> --}}
                             @endif
                         @else
                             <h4 style="font-weight:bold;text-transform: uppercase;">{{ $opencallsitem->title }}</h4>
-                            <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}</p>
+                            <p>{{ is_string($opencallsitem->publish_date) ? \Carbon\Carbon::parse($opencallsitem->publish_date)->format('d-m-Y') : $opencallsitem->publish_date->format('d-m-Y') }}
+                            </p>
                             {{--                                                        <p>{{ $item->excerpt }}</p> --}}
                         @endif
 
@@ -559,7 +560,9 @@
                             @endif
                         @else
                             <h4 style="font-weight:bold;text-transform: uppercase;">{{ $item->title }}</h4>
-                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</p>rbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</p>
+                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
+                            </p>rbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
+                            </p>
                             {{--                                                        <p>{{ $item->excerpt }}</p> --}}
                         @endif
 
