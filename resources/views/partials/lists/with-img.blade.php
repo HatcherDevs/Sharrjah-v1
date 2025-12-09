@@ -9,7 +9,7 @@
                 @if($loop->iteration%2==1)
                     <li class="al-right">
                         <div class="colm titles">
-                            {{ $child->pageType }}
+                            
                             <div class="title ar" dir="rtl">
                                 <a href="{{ $child->linkAr }}" {{ $child->pageType['type']=="url" || $child->pageType['type']=="file" ? 'target="_blank"' : "" }}>
                                     <strong>{{ $child->title_ar }}</strong><br/>
