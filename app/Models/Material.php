@@ -57,7 +57,10 @@ class Material extends Model
         'belongs_to'
     ];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
+
     public $timestamps = false;
 
     public function links()
