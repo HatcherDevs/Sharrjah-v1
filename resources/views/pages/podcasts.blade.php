@@ -131,7 +131,7 @@
                                 </div>
                                 @include('partials.podcast-language')
                                 <h1>{!!  $page->name_ar !!}</h1>
-                                @if(!count($page->sliders))
+                                @if($page->sliders->count() == 0)
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -153,7 +153,7 @@
 
                             @include('partials.podcast-language')
                             <h1 class="en">{!! $page->name !!}</h1>
-                            @if(!count($page->sliders))
+                            @if($page->sliders->count() == 0)
                                 <div class="row">
                                     <div class="col-md-12">
                                         {!! $page->content !!}
@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        @if(count($page->sliders))
+        @if($page->sliders->count() > 0)
             @include('partials.slide-images')
         @endif
 
@@ -195,12 +195,8 @@
                                 <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
                             @endif
 
-                            @if(count($item->sliders[0]))
-                                @if($item->sliders[0]->landscape)
-                                    <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
-                                @else
-                                    <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                @endif
+                            @if($item->sliders->count() > 0 && $item->sliders[0]->landscape)
+                                <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
                             @else
                                 <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                             @endif
