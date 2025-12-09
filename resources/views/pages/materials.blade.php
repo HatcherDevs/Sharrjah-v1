@@ -152,7 +152,7 @@
                                 </div>
                                 @include('partials.podcast-language')
                                 <h1>{!!  $page->name_ar !!}</h1>
-                                @if(!count($page->sliders))
+                                @if(!$page->sliders || $page->sliders->count() == 0)
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -173,7 +173,7 @@
 
                             @include('partials.podcast-language')
                             <h1 class="en">{!! $page->name !!}</h1>
-                            @if(!count($page->sliders))
+                            @if(!$page->sliders || $page->sliders->count() == 0)
                                 <div class="row">
                                     <div class="col-md-12">
                                         {!! $page->content !!}
@@ -193,7 +193,7 @@
         
         <div class="container text-center">
             <div class="body-section contents with-img-header">
-                @if(count($page->sliders)>1)
+                @if($page->sliders && $page->sliders->count() > 1)
                     <div class="owl-carousel-holder">
                         <div class="arrows">
                             <button class="prev float-left"></button>
@@ -222,7 +222,7 @@
                 @endif
 
                 <div class="row" dir="">
-                    @if(count($page->sliders)==1)
+                    @if($page->sliders && $page->sliders->count() == 1)
                         <div class="col-md-12">
                             @if($page->parent->slug=="partners")
                                 @if($page->slider->original)
@@ -306,7 +306,7 @@
 {{--                    </div>--}}
 {{--                    </div>--}}
 
-                @if(count($videos))
+                @if(isset($videos) && count($videos) > 0)
                 
                 <br/>
                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>">{{ isset($_GET['lang']) ? $materialContent->series_1_title_ar : $materialContent->series_1_title }}</h3>
@@ -333,12 +333,8 @@
                             <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
                                 @endif
 
-                                @if(count($item->sliders[0]))
-                                    @if($item->sliders[0]->landscape)
-                                        <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
-                                    @else
-                                        <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                    @endif
+                                @if($item->sliders->count() > 0 && $item->sliders[0]->landscape)
+                                    <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
                                 @else
                                     <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                 @endif
@@ -376,7 +372,7 @@
                     </div>
                     <br/>
                     <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?>">
-                    @if(count($openCalls))
+                    @if(isset($openCalls) && count($openCalls) > 0)
                                     <div class="row">
                                     @foreach($openCalls as $item)
                                         @if($_GET['lang']=='ar')
@@ -393,12 +389,8 @@
                                             <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileData->original_name.'"' : '' !!}  {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}>
                                         @endif
 
-                                        @if(count($item->sliders[0]))
-                                            @if($item->sliders[0]->landscape)
-                                                <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
-                                            @else
-                                                <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                            @endif
+                                        @if($item->sliders->count() > 0 && $item->sliders[0]->landscape)
+                                            <img src="{{ asset('public/'.$item->sliders[0]->landscape->url) }}" width="100%">
                                         @else
                                             <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                         @endif
@@ -424,7 +416,7 @@
                         @endif
                         </div>
                 </div>
-                    @if(count($past))
+                    @if(isset($past) && count($past) > 0)
                     <hr/>
                             <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left';?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : '';?>>
                                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?> <?php echo isset($_GET['lang']) ? 'font-family:"Cairo"' : '';?>">{{ isset($_GET['lang']) ? ' الأحداث الماضية' : 'PAST EVENTS' }}</h3>
@@ -473,7 +465,7 @@
                             </div>
                             @endif
 
-                            @if(count($upcoming))
+                            @if(isset($upcoming) && count($upcoming) > 0)
                             <div class="mt-5 <?php echo isset($_GET['lang']) ? 'text-right' : 'text-left';?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : '';?>>
                                 <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left';?> <?php echo isset($_GET['lang']) ? 'font-family:"Cairo"' : '';?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS';?></h3>
                                 <br/>
