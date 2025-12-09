@@ -109,4 +109,17 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
     }
+
+    /**
+     * Redirect admin route to dashboard or login based on auth status.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function adminRedirect()
+    {
+        if (auth()->check()) {
+            return redirect('/admin/home');
+        }
+        return redirect('/admin/login');
+    }
 }
