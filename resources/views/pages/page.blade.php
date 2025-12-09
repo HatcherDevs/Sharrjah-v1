@@ -75,12 +75,12 @@
             <div class="body-section contents with-img-header">
                 <div class="row" dir="">
                     <div class="col-md-6 text-left">
-                        @if (!count($page->sliders))
+                        @if ($page->sliders->count() == 0)
                             {!! $page->content !!}
                         @endif
                     </div>
                     <div class="col-md-6 text-right cairo">
-                        @if (!count($page->sliders))
+                        @if ($page->sliders->count() == 0)
                             {!! $page->content_ar !!}
                         @endif
                     </div>
@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        @if (count($page->sliders))
+        @if ($page->sliders->count() > 0)
             @include('partials.slide-images')
         @endif
 
@@ -98,21 +98,21 @@
                     <div class="row">
                         <ul class="pages-list">
                             @foreach ($page->children as $child)
-                    @if ($child->active && $child->link !== 'pages/about/open-call-exhibition-designer')
-                        <li><a href="{{ url($child->link) }}">{{ $child->name_ar }}<br><span
-                                    class="en">{{ $child->name }}</span></a></li>
-                    @endif
-@endforeach
-@php
-    // dd($page);
-@endphp
-@if ($page->slug == 'about')
-<li>
-    <a href="{{ url('pages/about/opportunities') }}">
-        <span class="ar">فرص العمل</span><br />Opportunities
-    </a>
-</li>
-@endif
+                                @if ($child->active && $child->link !== 'pages/about/open-call-exhibition-designer')
+                                    <li><a href="{{ url($child->link) }}">{{ $child->name_ar }}<br><span
+                                                class="en">{{ $child->name }}</span></a></li>
+                                @endif
+                            @endforeach
+                            @php
+                                // dd($page);
+                            @endphp
+                            @if ($page->slug == 'about')
+                                <li>
+                                    <a href="{{ url('pages/about/opportunities') }}">
+                                        <span class="ar">فرص العمل</span><br />Opportunities
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -229,17 +229,17 @@
             <div class="container text-center">
                 <div class="body-section contents with-img-header">
                     <div class="row">
-                        @foreach ($additional2_content_en as $i =>$value)
+                        @foreach ($additional2_content_en as $i => $value)
                             <div class="col-md-12">
-                                @if($currentImgs[$i] != null)
-                                    <img src="{{ url('public/'.$currentImgs[$i]) }}" class="w-100">
+                                @if ($currentImgs[$i] != null)
+                                    <img src="{{ url('public/' . $currentImgs[$i]) }}" class="w-100">
                                 @endif
                             </div>
                             <div class="col">
                                 {!! $additional2_content_en[$i] !!}
                             </div>
-                            
-                            @if(str_word_count(strip_tags($additional2_content_ar[$i], allowed_tags)) > 0)
+
+                            @if (str_word_count(strip_tags($additional2_content_ar[$i], allowed_tags)) > 0)
                                 <div class="col">
                                     {!! $additional2_content_ar[$i] !!}
                                 </div>
