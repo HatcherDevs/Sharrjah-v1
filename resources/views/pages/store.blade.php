@@ -497,7 +497,7 @@
                         <div class="col-md-12">
                             <div class="row">
                             <?php $page = $post; ?>
-                                    @if (count($page->sliders) == 1)
+                                    @if ($page->sliders && $page->sliders->count() == 1)
                                         <div class="col-md-12">
                                             @if ($page->slider->square)
                                                 <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
@@ -519,7 +519,7 @@
                                                 </span>
                                             @endif
                                         </div>
-                                    @elseif(count($page->sliders) > 1)
+                                    @elseif($page->sliders && $page->sliders->count() > 1)
                                         <div class="col-md-12">
                                             <div class="owl-carousel-holder" dir="ltr">
                                                 <div class="arrows">
@@ -621,12 +621,8 @@
                                                             @endif
                                                     @endif
 
-                                                                    @if (count($item->sliders[0]))
-                                                                        @if ($item->sliders[0]->landscape)
-                                                                            <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
-                                                                        @else
-                                                                            <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                                                        @endif
+                                                                    @if ($item->sliders->count() > 0 && $item->sliders[0]->landscape)
+                                                                        <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
                                                                     @else
                                                                         <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                                                     @endif
@@ -686,7 +682,7 @@
 
                                     <br/>
 
-                                    @if (count($upcoming))
+                                    @if (isset($upcoming) && count($upcoming) > 0)
                                         <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                                             <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS'; ?> </h3>
                                             <br/>
