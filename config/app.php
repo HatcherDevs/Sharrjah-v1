@@ -160,7 +160,6 @@ return [
          * Custom Service Providers...
          */
         Intervention\Image\ImageServiceProvider::class,
-        Orangehill\Iseed\IseedServiceProvider::class,
 
     ],
 
