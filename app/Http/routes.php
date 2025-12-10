@@ -17,9 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('admin/posts', function () {
-    return view('admin.posts');
-});
 
 Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents');
 
