@@ -63,7 +63,7 @@
                     <ul class="figure-list">
                         @include('partials.lists.no-img')
                     </ul>
-                    {{ $data->links() }}
+                    {{ $data->links('vendor.pagination.bootstrap-3') }}
                 </div>
             </div>
 
@@ -102,7 +102,7 @@
                             </li>
                         @endforeach
                     </ul>
-                    {{ $data->links() }}
+                    {{ $data->links('vendor.pagination.bootstrap-3') }}
                 </div>
             </div>
 
@@ -112,7 +112,7 @@
                     <ul class="figure-list">
                         @include('partials.lists.with-img')
                     </ul>
-                    {{ $data->links() }}
+                    {{ $data->links('vendor.pagination.bootstrap-3') }}
                 </div>
             </div>
         @endif
