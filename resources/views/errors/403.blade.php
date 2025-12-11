@@ -1,4 +1,5 @@
 @include('header-inner')
+
 <style>
 .innerpage a:hover, .innerpage a:hover span {
     color: #000000ad !important;
@@ -10,21 +11,22 @@
     min-height: 900px;
 }
 </style>
+
 <div class="innerpage">
-   <div class="container text-center" style="display: flex;justify-content: center;">
+<div class="container text-center" style="display: flex;justify-content: center;">
         <div class="body-section contents"
             style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
             <div>
-                <h1 style="font-size: 120px; margin-bottom: 20px; font-weight: bold;">503</h1>
+                <h1 style="font-size: 120px; margin-bottom: 20px; font-weight: bold;">403</h1>
                 <h2 style="margin-bottom: 30px;">
-                    <span class="en">Service Unavailable</span><br>
-                    <span class="ar">الخدمة غير متاحة</span>
+                    <span class="en">Access Forbidden</span><br>
+                    <span class="ar">الوصول محظور</span>
                 </h2>
                 <p style="margin-bottom: 40px; font-size: 18px;">
-                    <span class="en">We're performing scheduled maintenance. We'll be back soon!</span><br>
-                    <span class="ar">نحن نقوم بإجراء صيانة مجدولة. سنعود قريباً!</span>
+                    <span class="en">You don't have permission to access this resource.</span><br>
+                    <span class="ar">ليس لديك إذن للوصول إلى هذا المورد.</span>
                 </p>
-                              <a href="{{ url('/') }}" style="padding: 12px 30px;font-size: 16px;background: transparent;border-color: #000;border-radius: 0 !important;border: 2px solid;">
+                               <a href="{{ url('/') }}" style="padding: 12px 30px;font-size: 16px;background: transparent;border-color: #000;border-radius: 0 !important;border: 2px solid;">
                     <span class="en">Go to Homepage</span>
                     <span class="ar">العودة للصفحة الرئيسية</span>
                 </a>
