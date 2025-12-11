@@ -30,7 +30,7 @@ require base_path('routes/admin.php');
 Route::group(['prefix' => 'research'], function () {
     Route::get('/', 'ResearchController@index');
     Route::get('/map', 'ResearchController@mapData')->name('researchMap');
-    Route::post('/submit', 'ResearchController@submit');
+    Route::post('/submit', 'ResearchController@submit')->middleware('throttle:5,1');
     Route::get('/submit', function() { abort(404); });
     Route::get('/get-data/{slug}', 'ResearchController@getData');
     Route::get('/{slug}', 'ResearchController@single');

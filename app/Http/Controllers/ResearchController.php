@@ -69,10 +69,20 @@ class ResearchController extends Controller
 
     public function submit(Request $request)
     {
-        $data = $request->input();
-        $data['ip'] = $request->ip();
+        // Validate input
+        $validated = $request->validate([
+            'email' => 'required|email|max:255',
+            'message' => 'required|string|max:5000',
+            'research_building_id' => 'required|integer|exists:research_buildings,id'
+        ]);
 
-        if (ResearchFeedback::create($data))
+        // Add IP address
+        $validated['ip'] = $request->ip();
+
+        // Sanitize message to prevent XSS
+        $validated['message'] = strip_tags($validated['message']);
+
+        if (ResearchFeedback::create($validated))
             return 1;
 
         return 0;
