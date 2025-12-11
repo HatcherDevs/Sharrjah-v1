@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ResearchFeedback extends Model
 {
+    protected $table = 'research_feedbacks';
     protected $fillable = ['email','message','ip','research_building_id'];
 
     public function caseStudy(){

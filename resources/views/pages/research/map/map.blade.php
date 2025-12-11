@@ -31,37 +31,38 @@
 
 
 @if ($content['map-page-title']->content_ar_two)
-<div class="modal fade show d-block" id="mapModalCenter" style="display: flex!important;background-color: rgb(0 0 0 / 0%);"
-    data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" style="
+    <div class="modal fade show d-block" id="mapModalCenter"
+        style="display: flex!important;background-color: rgb(0 0 0 / 0%);" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" style="
     width: 100%;top:0%
 ">
-<div class="modal-content" style="background-color: #ccff00;height: 65vh;width: 100%;max-width: 97%;">
-    <div class="modal-header py-2 border-0 d-inline" style="background-color: #ccff00;z-index:100">
-        <button type="button" id="close" class="btn-close float-left btn_close_repo_insid"
-            data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content" style="background-color: #ccff00;height: 65vh;width: 100%;max-width: 97%;">
+                <div class="modal-header py-2 border-0 d-inline" style="background-color: #ccff00;z-index:100">
+                    <button type="button" id="close" class="btn-close float-left btn_close_repo_insid"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+
+                <div class="modal-body pt-3 vh-100 scrollbar Repo_insid_ModalToggle_modal_body"
+                    style="overflow-y: auto;">
+
+
+                    @if ($lang == 'ar')
+                        {!! $content['map-page-title']->content_ar !!}
+                    @else
+                        {!! $content['map-page-title']->content !!}
+                    @endif
+                </div>
+            </div>
+
+        </div>
     </div>
-
-
-    <div class="modal-body pt-3 vh-100 scrollbar Repo_insid_ModalToggle_modal_body" style="overflow-y: auto;">
-     
-
-        @if ($lang == 'ar')
-        {!! $content['map-page-title']->content_ar !!}
-    @else
-    {!! $content['map-page-title']->content !!}
-    @endif
-    </div>
-</div>
-
-</div>
-</div>
 
 
 @endif
 
-       
+
 
 
 
@@ -112,10 +113,10 @@
         <div class="slide-in-left animateleft" id="catpop">
             <ul id="typeSelection" style="padding-left: 15px;">
                 @foreach ($types as $type)
-                    @if($type['content_is_hidden'])
+                    @if ($type['content_is_hidden'])
                         <style>
-                            #cat-{{$type['id']}}{
-                                display:none!important;
+                            #cat-{{ $type['id'] }} {
+                                display: none !important;
                             }
                         </style>
                     @endif
@@ -150,10 +151,10 @@
             @endif
 
             @foreach ($timelines as $timeline)
-                @if($type[$timeline.'_is_hidden'] == 0)
-                    
+                @if ($type[$timeline . '_is_hidden'] == 0)
                     @if ($lang == 'ar' && $type[$timeline . '_ar'])
-                        <div class="valign slide-in-right catdetail {{ $timeline }} {{ $type['slug'] }}" data-type="">
+                        <div class="valign slide-in-right catdetail {{ $timeline }} {{ $type['slug'] }}"
+                            data-type="">
                             <div class="close"></div>
                             <div class="scrollwrap" data-simplebar data-simplebar-auto-hide="false">
                                 {!! $type[$timeline . '_ar'] !!}
@@ -174,19 +175,18 @@
 
         @foreach ($timelineContent as $slug => $timeline)
             @if (trim(strip_tags($timeline->content)))
-                @if($timeline->is_hidden == 0 || $timeline->content == "")
-                    
-                <div class="valign slide-in-left catdetail {{ $slug }} timeline-only" data-type="">
-                    <div class="close"></div>
-                    <div class="scrollwrap" data-simplebar data-simplebar-auto-hide="false">
-                        @if ($lang == 'ar')
-                            {!! $timeline->content_ar !!}
-                        @else
-                            {!! $timeline->content !!}
-                        @endif
+                @if ($timeline->is_hidden == 0 || $timeline->content == '')
+                    <div class="valign slide-in-left catdetail {{ $slug }} timeline-only" data-type="">
+                        <div class="close"></div>
+                        <div class="scrollwrap" data-simplebar data-simplebar-auto-hide="false">
+                            @if ($lang == 'ar')
+                                {!! $timeline->content_ar !!}
+                            @else
+                                {!! $timeline->content !!}
+                            @endif
 
+                        </div>
                     </div>
-                </div>
                 @endif
             @endif
         @endforeach
@@ -223,7 +223,8 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-3']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}" width="100%">
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                        width="100%">
                                 </div>
                             @endforeach
                         </div>
@@ -256,7 +257,8 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-3']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}" width="100%">
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                        width="100%">
                                 </div>
                             @endforeach
                         </div>
@@ -297,7 +299,8 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-2']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}" width="100%">
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                        width="100%">
                                 </div>
                             @endforeach
                         </div>
@@ -330,7 +333,7 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-2']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}"
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
                                         width="100%">
                                 </div>
                             @endforeach
@@ -385,7 +388,8 @@
                                     <div class="vid {{ $repository->type->is_video ? 'is_video' : '' }}"
                                         data-id="{{ $repository->id }}">
                                         <div class="wrap">
-                                            <img loading="lazy"  src="{{ asset('public/' . $repository->image) }}" width="100%">
+                                            <img loading="lazy" src="{{ asset('public/' . $repository->image) }}"
+                                                width="100%">
                                         </div>
 
                                         @if ($lang == 'ar')
@@ -432,8 +436,9 @@
                                     @endif
                                     <div class="owl-carousel owl-theme news-carousel">
                                         @foreach ($repository->images as $image)
-                                            <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}"
-                                                    width="100%"></div>
+                                            <div class="item"><img loading="lazy"
+                                                    src="{{ asset('public/' . $image->image) }}" width="100%">
+                                            </div>
                                         @endforeach
                                     </div>
                                     <div id="owl-dots"></div>
@@ -481,8 +486,9 @@
                                     @endif
                                     <div class="owl-carousel owl-theme news-carousel">
                                         @foreach ($repository->images as $image)
-                                            <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}"
-                                                    width="100%"></div>
+                                            <div class="item"><img loading="lazy"
+                                                    src="{{ asset('public/' . $image->image) }}" width="100%">
+                                            </div>
                                         @endforeach
                                     </div>
                                     <div id="owl-dots"></div>
@@ -526,7 +532,7 @@
                         {{--                        @endif --}}
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-4']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}"
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
                                         width="100%">
                                 </div>
                             @endforeach
@@ -560,7 +566,7 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-4']->images as $image)
-                                <div class="item"><img loading="lazy"  src="{{ asset('public/' . $image->image) }}"
+                                <div class="item"><img loading="lazy" src="{{ asset('public/' . $image->image) }}"
                                         width="100%">
                                 </div>
                             @endforeach
@@ -578,7 +584,7 @@
         {{-- @foreach ($types as $type)
             <ul id="timelineSelect" class="timeline_{{$type['slug']}}">
                 @foreach ($timelines as $timeline)
-                    @if($type[$timeline.'_is_hidden'] == 0)
+                    @if ($type[$timeline . '_is_hidden'] == 0)
                         <li><span><a href="#" data-id="{{ $timeline }}">
                                 @if ($lang == 'ar')
                                     {{ $content[$timeline]->title_ar }}
@@ -594,12 +600,12 @@
         <ul id="timelineSelect" class="timeline_global">
             @foreach ($timelines as $timeline)
                 <li><span><a href="#" data-id="{{ $timeline }}">
-                        @if ($lang == 'ar')
-                            {{ $content[$timeline]->title_ar }}
-                        @else
-                            {{ $content[$timeline]->title }}
-                        @endif
-                    </a></span>
+                            @if ($lang == 'ar')
+                                {{ $content[$timeline]->title_ar }}
+                            @else
+                                {{ $content[$timeline]->title }}
+                            @endif
+                        </a></span>
                 </li>
             @endforeach
         </ul>
@@ -638,6 +644,7 @@
                     <div id="successAlert" class="alert-success alert">Thank you for your feedback.</div>
                     <div id="form">
                         <form action="{{ url('research/submit') }}" method="post" id="researchForm">
+                            @csrf
                             <input type="hidden" name="research_building_id" id="researchId">
                             <label>
                                 @if ($lang == 'ar')
@@ -681,5 +688,3 @@
 </div>
 {{-- <div id="cursor"></div> --}}
 {{-- <div id="cursorFollow"></div> --}}
-
-
