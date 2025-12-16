@@ -701,11 +701,11 @@
                                                                     @if (isset($_GET['lang']))
                                                                         @if ($_GET['lang'] == 'ar')
                                                                             <h4  style="font-weight:bold;text-transform: uppercase;">{{ $item->title_ar }}</h4>
-                                                                            <p>{{ $item->publish_date->format('d-m-Y') }}</p>
+                                                                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</p>
                                                                             <p>{{ $item->excerpt }}</p>
                                                                         @else
                                                                             <h4  style="font-weight:bold;text-transform: uppercase;">{{ $item->title }}</h4>
-                                                                            <p>{{ $item->publish_date->format('d-m-Y') }}</p>
+                                                                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</p>
                                                                             <p>{{ $item->excerpt_ar }}</p>
                                                                         @endif
                                                                     @endif
