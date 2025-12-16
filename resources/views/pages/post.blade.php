@@ -9,12 +9,12 @@
                         <div class="breadcrumbs en">
                             @include('partials.breadcrumbs')
                         </div>
-                        @if($post->parent->slug=="partners" || $post->parent->slug=="calendar")
+                        @if ($post->parent->slug == 'partners' || $post->parent->slug == 'calendar')
                             <h1 class="en">{!! $post->description !!}</h1>
                         @else
                             <h1 class="en">{!! $post->title !!}</h1>
                         @endif
-                        @if(!count($post->sliders))
+                        @if (!count($post->sliders))
                             {!! $post->content !!}
                         @endif
                     </div>
@@ -23,14 +23,14 @@
                             @include('partials.breadcrumbs-ar')
                         </div>
 
-                        @if($post->parent->slug=="partners" || $post->parent->slug=="calendar")
+                        @if ($post->parent->slug == 'partners' || $post->parent->slug == 'calendar')
                             <h1>{!! $post->description_ar !!}</h1>
                         @else
                             <h1>{!! $post->title_ar !!}</h1>
                         @endif
 
-                        @if(!count($post->sliders))
-                            @if($post->parent->slug=="open-call-exhibition-designer")
+                        @if (!count($post->sliders))
+                            @if ($post->parent->slug == 'open-call-exhibition-designer')
                                 <style>
                                     .innerpage .contents .text-right span {
                                         font-family: 'Cairo' !important;
@@ -46,12 +46,12 @@
             </div>
         </div>
 
-        @if(count($post->sliders))
+        @if (count($post->sliders))
             <?php $page = $post; ?>
             @include('partials.slide-images')
         @endif
 
-        @if($post->additional_content_bottom)
+        @if ($post->additional_content_bottom)
             <div class="container text-center">
                 <div class="body-section contents with-img-header">
                     <div class="row" dir="rtl">
@@ -63,7 +63,7 @@
             </div>
         @endif
 
-        @if($formdata)
+        @if ($formdata)
             <div class="container text-center">
                 <div class="body-section contents">
                     @include('partials.form')
@@ -71,18 +71,20 @@
             </div>
         @endif
 
-        @if($post->buttonLinks)
+        @if ($post->buttonLinks)
             <div class="container text-center">
                 <div class="body-section contents">
                     <div class="row" dir="rtl">
                         <div class="col-md-6 text-right">
-                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                             <a href="{{$post->buttonLinks->value_ar}}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
+                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                <a href="{{ $post->buttonLinks->value_ar }}"><input type="submit" class="ar"
+                                        value="{{ $post->buttonLinks->title_ar }}"></a>
                             @endif
                         </div>
                         <div class="col-md-6 text-left">
-                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                                <a href="{{$post->buttonLinks->value}}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
+                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                <a href="{{ $post->buttonLinks->value }}"><input type="submit" class="en"
+                                        value="{{ $post->buttonLinks->title }}"></a>
                             @endif
                         </div>
                     </div>
@@ -90,28 +92,28 @@
             </div>
         @endif
 
-        @if(count($relatedPages['pages']) || count($relatedPages['posts'])  )
+        @if (count($relatedPages['pages'] ?? []) || count($relatedPages['posts'] ?? []))
             <div class="container text-center">
                 <div class="body-section related-links">
                     <div class="row" dir="rtl">
                         <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                             الصفحات المرتبطة
-                            <br/>
-                            @foreach($relatedPages['pages'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->name_ar }}</a><br/>
+                            <br />
+                            @foreach ($relatedPages['pages'] as $item)
+                                <a href="{{ url($item->link) }}">{{ $item->name_ar }}</a><br />
                             @endforeach
-                            @foreach($relatedPages['posts'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->title_ar }}</a><br/>
+                            @foreach ($relatedPages['posts'] as $item)
+                                <a href="{{ url($item->link) }}">{{ $item->title_ar }}</a><br />
                             @endforeach
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-6 text-left en">
                             RELATED PAGES
-                            <br/>
-                            @foreach($relatedPages['pages'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->name }}</a><br/>
+                            <br />
+                            @foreach ($relatedPages['pages'] as $item)
+                                <a href="{{ url($item->link) }}">{{ $item->name }}</a><br />
                             @endforeach
-                            @foreach($relatedPages['posts'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->title }}</a><br/>
+                            @foreach ($relatedPages['posts'] as $item)
+                                <a href="{{ url($item->link) }}">{{ $item->title }}</a><br />
                             @endforeach
                         </div>
                     </div>
@@ -121,4 +123,3 @@
 
     </div>
 @endsection
-
