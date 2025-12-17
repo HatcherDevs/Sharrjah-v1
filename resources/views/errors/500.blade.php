@@ -17,12 +17,14 @@
             <div>
                 <h1 style="font-size: 120px; margin-bottom: 20px; font-weight: bold;">500</h1>
                 <h2 style="margin-bottom: 30px;">
-                    <span class="en">Internal Server Error</span><br>
                     <span class="ar">خطأ في الخادم</span>
+                    <br>
+                    <span class="en">Internal Server Error</span>
                 </h2>
-                <p style="margin-bottom: 40px; font-size: 18px;">
-                    <span class="en">Something went wrong on our end. We're working to fix the problem.</span><br>
-                    <span class="ar">حدث خطأ ما من جانبنا. نحن نعمل على حل المشكلة.</span>
+                <p style="margin-bottom: 40px; font-size: 18px;line-height: 2;">
+                    <span class="ar">.حدث خطأ ما من جانبنا. نحن نعمل على حل المشكلة</span>
+                    <br>
+                    <span class="en">Something went wrong on our end. We're working to fix the problem.</span>
                 </p>
                                 <a href="{{ url('/') }}" style="padding: 12px 30px;font-size: 16px;background: transparent;border-color: #000;border-radius: 0 !important;border: 2px solid;">
                     <span class="en">Go to Homepage</span>

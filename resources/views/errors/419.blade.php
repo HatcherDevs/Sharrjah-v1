@@ -17,18 +17,17 @@
             <div>
                 <h1 style="font-size: 120px; margin-bottom: 20px; font-weight: bold;">419</h1>
                 <h2 style="margin-bottom: 30px;">
-                    <span class="en">Page Expired</span><br>
                     <span class="ar">انتهت صلاحية الصفحة</span>
+                    <br>
+                    <span class="en">Page Expired</span>
                 </h2>
-                <p style="margin-bottom: 40px; font-size: 18px;">
-                    <span class="en">Your session has expired. Please refresh the page and try again.</span><br>
-                    <span class="ar">انتهت صلاحية جلستك. يرجى تحديث الصفحة والمحاولة مرة أخرى.</span>
+                <p style="margin-bottom: 40px; font-size: 18px;line-height: 2;">
+                    <span class="ar">.انتهت صلاحية جلستك. يرجى تحديث الصفحة والمحاولة مرة أخرى</span>
+
+                    <br>
+                    <span class="en">Your session has expired. Please refresh the page and try again.</span>
                 </p>
-                <a href="javascript:history.back()" class="btn btn-secondary"
-                    style="padding: 12px 30px; font-size: 16px; margin-right: 10px;">
-                    <span class="en">Go Back</span>
-                    <span class="ar">العودة</span>
-                </a>
+     
                                <a href="{{ url('/') }}" style="padding: 12px 30px;font-size: 16px;background: transparent;border-color: #000;border-radius: 0 !important;border: 2px solid;">
                     <span class="en">Go to Homepage</span>
                     <span class="ar">العودة للصفحة الرئيسية</span>

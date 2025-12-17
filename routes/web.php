@@ -24,23 +24,37 @@ Route::get('admin/posts', function () {
 Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents');
 
 // Test Error Pages (Remove in production)
-Route::get('test-error/{code}', function ($code) {
-    switch ($code) {
-        case '403':
-            abort(403);
-        case '404':
-            abort(404);
-        case '419':
-            abort(419);
-        case '429':
-            abort(429);
-        case '500':
-            abort(500);
-        case '503':
-            abort(503);
-        default:
-            return 'Available codes: 403, 404, 419, 429, 500, 503';
-    }
+Route::prefix('test-errors')->group(function () {
+    Route::get('/', function () {
+        $errors = [
+            '403' => 'Forbidden',
+            '404' => 'Not Found',
+            '419' => 'Token Expired',
+            '429' => 'Too Many Requests',
+            '500' => 'Server Error',
+            '503' => 'Service Unavailable'
+        ];
+        return view('errors.test-errors', compact('errors'));
+    });
+    
+    Route::get('{code}', function ($code) {
+        switch ($code) {
+            case '403':
+                abort(403);
+            case '404':
+                abort(404);
+            case '419':
+                abort(419);
+            case '429':
+                abort(429);
+            case '500':
+                abort(500);
+            case '503':
+                abort(503);
+            default:
+                return 'Available codes: 403, 404, 419, 429, 500, 503';
+        }
+    });
 });
 
 // Load admin routes from separate file
