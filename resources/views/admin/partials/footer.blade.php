@@ -219,6 +219,51 @@
             "'Open Sans Condensed',sans-serif": 'Open Sans Condensed'
         },
         fontFamilySelection: true,
+
+        // Enable HTML/Code View
+        htmlAllowedTags: ['.*'],
+        htmlAllowedAttrs: ['.*'],
+        htmlRemoveTags: [],
+
+        // Toolbar buttons - including code view
+        toolbarButtons: {
+            'moreText': {
+                'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
+                    'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'inlineClass', 'inlineStyle',
+                    'clearFormatting'
+                ]
+            },
+            'moreParagraph': {
+                'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
+                    'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight', 'outdent',
+                    'indent', 'quote'
+                ]
+            },
+            'moreRich': {
+                'buttons': ['insertLink', 'insertImage', 'insertVideo', 'insertTable', 'emoticons',
+                    'fontAwesome', 'specialCharacters', 'embedly', 'insertHR'
+                ]
+            },
+            'moreMisc': {
+                'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll',
+                    'html', 'help'
+                ],
+                'align': 'right',
+                'buttonsVisible': 2
+            }
+        },
+
+        // Enable code view plugin
+        pluginsEnabled: ['align', 'charCounter', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'embedly',
+            'emoticons', 'entities', 'file', 'fontAwesome', 'fontFamily', 'fontSize', 'fullscreen', 'image',
+            'imageTUI', 'imageManager', 'inlineStyle', 'inlineClass', 'lineBreaker', 'lineHeight', 'link',
+            'lists', 'paragraphFormat', 'paragraphStyle', 'print', 'quickInsert', 'quote', 'save',
+            'specialCharacters', 'table', 'url', 'video', 'wordPaste'
+        ],
+
+        // Code view options
+        codeViewKeepActiveButtons: ['fullscreen'],
+
         // Image upload settings
         imageUploadURL: '{{ url('admin/upload-image') }}',
         imageUploadParams: {
