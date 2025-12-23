@@ -26,6 +26,9 @@ Route::get('admin/', function () {
 // Protected admin routes
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
+    // Image upload for Froala Editor
+    Route::post('upload-image', 'Admin\ImageUploadController@upload');
+
     Route::get('/', 'HomeController@index');
     Route::get('subscribers', 'SubscribeController@show');
 
