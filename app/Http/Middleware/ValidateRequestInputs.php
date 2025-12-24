@@ -24,6 +24,20 @@ class ValidateRequestInputs
     protected $allowedOrderDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
     /**
+     * Fields that should allow HTML content (WYSIWYG editors)
+     */
+    protected $htmlAllowedFields = [
+        'content',
+        'content_ar',
+        'additional_content_top',
+        'additional_content_bottom',
+        'description',
+        'description_ar',
+        'body',
+        'body_ar',
+    ];
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -56,7 +70,11 @@ class ValidateRequestInputs
         // Sanitize other string inputs to prevent XSS
         foreach ($request->all() as $key => $value) {
             if (is_string($value) && !in_array($key, ['sort', 'order', '_token'])) {
-                // Basic XSS protection
+                // Skip HTML-allowed fields (WYSIWYG editors)
+                if (in_array($key, $this->htmlAllowedFields)) {
+                    continue;
+                }
+                // Basic XSS protection for non-HTML fields
                 $request->merge([
                     $key => strip_tags($value)
                 ]);
