@@ -248,7 +248,7 @@
                                     
                                     if (isset($page)) {
                                         if ($page->publish_date) {
-                                            $date = $page->publish_date->format('m/d/y');
+                                            $date = \Carbon\Carbon::parse($page->publish_date)->format('m/d/y');
                                         }
                                     }
                                     ?>
