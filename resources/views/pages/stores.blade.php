@@ -566,7 +566,6 @@
                         @else
                             <h4 style="font-weight:bold;text-transform: uppercase;">{{ $item->title }}</h4>
                             <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
-                            </p>rbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
                             </p>
                             {{--                                                        <p>{{ $item->excerpt }}</p> --}}
                         @endif
