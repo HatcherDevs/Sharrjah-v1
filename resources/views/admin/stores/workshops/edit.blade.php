@@ -252,7 +252,7 @@
                                         }
                                     }
                                     ?>
-                                    <input type="text" class="form-control datetimepicker" readonly placeholder=""
+                                    <input type="text" class="form-control datetimepicker" placeholder=""
                                         name="publish_date" value="{{ $date }}">
                                     @include('admin.partials.pages.status')
                                 </div>

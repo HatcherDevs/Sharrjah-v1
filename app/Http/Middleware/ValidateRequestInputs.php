@@ -84,7 +84,7 @@ class ValidateRequestInputs
 
         // Sanitize other string inputs to prevent XSS
         foreach ($request->all() as $key => $value) {
-            if (is_string($value) && !in_array($key, ['sort', 'order', '_token'])) {
+            if (is_string($value) && !in_array($key, ['sort', 'order', '_token', 'id', 'publish_date', 'created_at', 'external'])) {
                 // Skip HTML-allowed fields (WYSIWYG editors)
                 if (in_array($key, $this->htmlAllowedFields)) {
                     continue;

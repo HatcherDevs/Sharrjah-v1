@@ -92,7 +92,14 @@ class StoreWorkshopController extends Controller
 
         $data = $request->except('images','external','buttonLink','others');
         $data['slug'] = $this->generateSlug($request->input('title'));
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        
+        // Convert date string (m/d/y) to proper datetime format
+        try {
+            $data['publish_date'] = \Carbon\Carbon::createFromFormat('m/d/y', $request->input('publish_date'))->format('Y-m-d');
+        } catch (\Exception $e) {
+            // If parsing fails, use current date
+            $data['publish_date'] = now()->format('Y-m-d');
+        }
 
         $newPage = $this->model->create($data);
 
@@ -176,7 +183,13 @@ class StoreWorkshopController extends Controller
         if($data['title'] != $page->title)
             $data['slug'] = $this->generateSlug($request->input('title'));
 
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        // Convert date string (m/d/y) to proper datetime format
+        try {
+            $data['publish_date'] = \Carbon\Carbon::createFromFormat('m/d/y', $request->input('publish_date'))->format('Y-m-d');
+        } catch (\Exception $e) {
+            // If parsing fails, keep the original date
+            $data['publish_date'] = $page->publish_date;
+        }
 
         $page->update($data);
 
