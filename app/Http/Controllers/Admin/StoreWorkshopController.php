@@ -210,18 +210,18 @@ class StoreWorkshopController extends Controller
                             $targetSlide = StoreWorkshopImageSlide::find($target->uploadable_id);
 
                             if($target->template=="square")
-                                $photo = ($files != null ? $this->uploader->upload($upload) : false);
+                                $photo = $this->uploader->upload($upload);
                             else
-                                $photo = ($files != null ? $this->luploader->upload($upload) : false);
+                                $photo = $this->luploader->upload($upload);
 
-                            $newUpload = $targetSlide->uploads()->create($photo[0]);
+                            if($photo && isset($photo[0])){
+                                $newUpload = $targetSlide->uploads()->create($photo[0]);
 
-                            $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
 
-                            unset($uploadCaptions[$target->id]);
-                            $target->delete();
-                        } else {
-
+                                unset($uploadCaptions[$target->id]);
+                                $target->delete();
+                            }
                         }
                     }
                 }
