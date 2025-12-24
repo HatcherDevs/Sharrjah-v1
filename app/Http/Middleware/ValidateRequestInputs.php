@@ -67,6 +67,21 @@ class ValidateRequestInputs
             }
         }
 
+        // Validate and normalize lang parameter
+        if ($request->has('lang')) {
+            $lang = strtolower($request->input('lang'));
+            
+            // Normalize Arabic language variants (arArabic, ar-SA, arabic, etc.) to 'ar'
+            if (strpos($lang, 'ar') === 0 || $lang === 'arabic') {
+                $request->merge(['lang' => 'ar']);
+                $_GET['lang'] = 'ar'; // Also update $_GET for backward compatibility
+            } elseif (!in_array($lang, ['ar', 'en'])) {
+                // Remove invalid lang parameter
+                $request->request->remove('lang');
+                unset($_GET['lang']);
+            }
+        }
+
         // Sanitize other string inputs to prevent XSS
         foreach ($request->all() as $key => $value) {
             if (is_string($value) && !in_array($key, ['sort', 'order', '_token'])) {
