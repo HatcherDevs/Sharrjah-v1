@@ -218,11 +218,13 @@ class PostController extends Controller
                             else
                                 $photo = ($files != null ? $this->luploader->upload($upload) : false);
 
-                            $newUpload = $targetSlide->uploads()->create($photo[0]);
+                            if($photo && isset($photo[0]) && is_array($photo[0])) {
+                                $newUpload = $targetSlide->uploads()->create($photo[0]);
 
-                            $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
 
-                            unset($uploadCaptions[$target->id]);
+                                unset($uploadCaptions[$target->id]);
+                            }
                             $target->delete();
                         } else {
 
@@ -267,14 +269,18 @@ class PostController extends Controller
 
                 if($newUploads['square']) {
                     // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
-                    $slide->uploads()->create($photo[0]);
+                    $photo = $this->uploader->upload($newUploads['square']);
+                    if($photo && isset($photo[0]) && is_array($photo[0])) {
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
 
                 if($newUploads['landscape']) {
                     // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
-                    $slide->uploads()->create($photo[0]);
+                    $photo = $this->luploader->upload($newUploads['landscape']);
+                    if($photo && isset($photo[0]) && is_array($photo[0])) {
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
             }
 
