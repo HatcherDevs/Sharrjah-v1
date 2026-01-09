@@ -189,8 +189,8 @@
                             @endif
                             <div class="owl-carousel owl-theme news-carousel">
                                 @foreach ($content['tab-3']->images as $image)
-                                    <div class="item"><img src="{{ asset('public/' . $image->image) }}"
-                                            width="100%">
+                                    <div class="item"><img loading="lazy"
+                                            src="{{ asset('public/' . $image->image) }}" width="100%">
                                     </div>
                                 @endforeach
                             </div>
@@ -212,7 +212,8 @@
                                     <div class="swiper-wrapper">
                                         @foreach ($content['tab-3']->images as $image)
                                             <div class="swiper-slide">
-                                                <img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                                <img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                                    width="100%">
                                             </div>
                                         @endforeach
 
@@ -248,8 +249,8 @@
                             @endif
                             <div class="owl-carousel owl-theme news-carousel">
                                 @foreach ($content['tab-2']->images as $image)
-                                    <div class="item"><img src="{{ asset('public/' . $image->image) }}"
-                                            width="100%"></div>
+                                    <div class="item"><img loading="lazy"
+                                            src="{{ asset('public/' . $image->image) }}" width="100%"></div>
                                 @endforeach
                             </div>
                             <div id="owl-dots"></div>
@@ -271,7 +272,8 @@
                                     <div class="swiper-wrapper">
                                         @foreach ($content['tab-2']->images as $image)
                                             <div class="swiper-slide">
-                                                <img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                                <img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                                    width="100%">
                                             </div>
                                         @endforeach
 
@@ -374,7 +376,8 @@
                                 <div class="vid {{ $repository->type->is_video ? 'is_video' : '' }}"
                                     data-id="{{ $repository->id }}">
                                     <div class="wrap">
-                                        <img src="{{ asset('public/' . $repository->image) }}" width="100%">
+                                        <img loading="lazy" src="{{ asset('public/' . $repository->image) }}"
+                                            width="100%">
                                     </div>
 
                                     @if ($lang == 'ar')
@@ -397,109 +400,14 @@
             </div>
         </div>
 
-        @foreach ($repositories as $repository)
-            <div class="video-pop video-{{ $repository->id }}
-                <?php
-                if (isset($_GET['article'])) {
-                    echo $repository->slug == $_GET['article'] ? 'active' : '';
-                }
-                ?>"
-                style="background-color:{{ $repository->background }};@if ($lang == 'ar') padding-left @else padding-right @endif:10px">
-                <div class="pagecontent" data-simplebar data-simplebar-auto-hide="false">
-                    @if ($lang == 'ar')
-                        <button class="backbutton"
-                            @if ($lang == 'ar') style="float:right!important" @endif>
-                            العودة إلى لأرشيف
-                        </button>
-                    @endif
-                    <div class="grid ">
-                        <div class="leftColumn container">
-                            @if ($lang !== 'ar')
-                                <button class="backbutton"
-                                    @if ($lang == 'ar') style="float:right!important" @endif>
-                                    Back to repository
-                                </button><br>
-                            @endif
-
-                            @if ($repository->type_set == 'video')
-                                <iframe class="right-content vimeovid  mobile-only"
-                                    src="https://player.vimeo.com/video/{{ $repository->video }}" width="100%"
-                                    frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-                                <script src="https://player.vimeo.com/api/player.js"></script>
-                            @else
-                                <div class="owl-carousel-holder right-content mb-3 mobile-only" dir="ltr">
-                                    @if (count($repository->images) > 1)
-                                        <div class="arrows">
-                                            <button class="prev float-left"></button>
-                                            <button class="next float-right"></button>
-                                        </div>
-                                    @endif
-                                    <div class="owl-carousel owl-theme news-carousel">
-                                        @foreach ($repository->images as $image)
-                                            <div class="item"><img src="{{ asset('public/' . $image->image) }}"
-                                                    width="100%"></div>
-                                        @endforeach
-                                    </div>
-                                    <div id="owl-dots"></div>
-                                </div>
-                            @endif
-
-                            @if ($lang == 'ar')
-                                <h1 style=" ">{{ $repository->title_ar }}</h1>
-                                <p><b>{{ $repository->subtitle_ar }}</b></p>
-                            @else
-                                <h1 style="">{{ $repository->title }}</h1>
-                                <p><b>{{ $repository->subtitle }}</b></p>
-                            @endif
-
-
-                            @if ($lang == 'ar')
-                                {!! $repository->content_ar !!}
-                            @else
-                                {!! $repository->content !!}
-                            @endif
-
-                        </div>
-
-                        <div id="videoIframe" class="rightColumn {{ $repository->subtitle ? 'has_sub' : '' }}">
-                            <div class="gallery">
-                                <figure class="figureImg">
-                                    @if ($repository->type_set == 'video')
-                                        <div class="right-content vimeovid" id="parent_iframe">
-                                            <iframe id="vimeovid"
-                                                src="https://player.vimeo.com/video/{{ $repository->video }}"
-                                                width="100%" frameborder="0" webkitallowfullscreen
-                                                mozallowfullscreen allowfullscreen style=""></iframe>
-                                            <script src="https://player.vimeo.com/api/player.js"></script>
-                                            <button
-                                                onclick="fullWidthIframe(`https:/\/player.vimeo.com/video/{{ $repository->video }}`)">Play
-                                                Iframe</button>
-                                        </div>
-                                    @else
-                                        <div class="owl-carousel-holder right-content mb-3" dir="ltr">
-                                            @if (count($repository->images) > 1)
-                                                <div class="arrows">
-                                                    <button class="prev float-left"></button>
-                                                    <button class="next float-right"></button>
-                                                </div>
-                                            @endif
-                                            <div class="owl-carousel owl-theme news-carousel">
-                                                @foreach ($repository->images as $image)
-                                                    <div class="item"><img
-                                                            src="{{ asset('public/' . $image->image) }}"
-                                                            width="100%"></div>
-                                                @endforeach
-                                            </div>
-                                            <div id="owl-dots"></div>
-                                        </div>
-                                    @endif
-                                </figure>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Single container for repository details - loaded via AJAX -->
+        <div id="repository-detail-container" class="video-pop" style="display:none;">
+            <div class="pagecontent" data-simplebar data-simplebar-auto-hide="false">
+                <div id="repository-detail-content">
+                    <!-- Content will be loaded dynamically -->
                 </div>
             </div>
-        @endforeach
+        </div>
     </div>
     <div class="page page-4 content-page"
         style="@if ($lang == 'ar') padding-left @else padding-right @endif:15px">
@@ -517,8 +425,8 @@
                             @endif
                             <div class="owl-carousel owl-theme news-carousel">
                                 @foreach ($content['tab-4']->images as $image)
-                                    <div class="item"><img src="{{ asset('public/' . $image->image) }}"
-                                            width="100%"></div>
+                                    <div class="item"><img loading="lazy"
+                                            src="{{ asset('public/' . $image->image) }}" width="100%"></div>
                                 @endforeach
                             </div>
                             <div id="owl-dots"></div>
@@ -540,7 +448,8 @@
                                         <div class="swiper-wrapper">
                                             @foreach ($content['tab-4']->images as $image)
                                                 <div class="swiper-slide">
-                                                    <img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                                    <img loading="lazy" src="{{ asset('public/' . $image->image) }}"
+                                                        width="100%">
                                                 </div>
                                             @endforeach
 
@@ -1170,7 +1079,8 @@
                 @endif
                 $('#researchId').val(data.id);
 
-                $('#building-carousel').trigger('add.owl.carousel', ['<div class="item"><img src="' + data
+                $('#building-carousel').trigger('add.owl.carousel', [
+                    '<div class="item"><img loading="lazy" src="' + data
                     .slides + '" width="100%" height="100%"> </div>'
                 ]);
 
@@ -1178,7 +1088,8 @@
                     Object.keys(data.gallery).forEach(key => {
                         console.log(data.gallery[key].image);
                         $('#building-carousel').trigger('add.owl.carousel', [
-                            '<div class="item"><img src="' + siteUrl + '/public/' + data
+                            '<div class="item"><img loading="lazy" src="' + siteUrl +
+                            '/public/' + data
                             .gallery[key].image + '" width="100%" height="100%"> </div>'
                         ]);
                     });
@@ -1250,8 +1161,8 @@
     //     var contentString = '<div class="mapcontent">' +
     //         '<div class="siteNotice">' +
     //         '</div>' +
-    //         '<a href="#" data-id="'+slug+'" class="show-building"><img src="'+thumb+'" class="marker-thumb" width="200"></a></div>' +
-    //         {{-- '<a href="#" data-id="'+slug+'" class="show-building"><img src="'+thumb+'" class="marker-thumb" width="200">{{ $lang == 'ar'  ? 'اضغط للعرض ' : 'Click to view' }} '+title+'</a></div>' +? --}}
+    //         '<a href="#" data-id="'+slug+'" class="show-building"><img loading="lazy" src="'+thumb+'" class="marker-thumb" width="200"></a></div>' +
+    //         {{-- '<a href="#" data-id="'+slug+'" class="show-building"><img loading="lazy" src="'+thumb+'" class="marker-thumb" width="200">{{ $lang == 'ar'  ? 'اضغط للعرض ' : 'Click to view' }} '+title+'</a></div>' +? --}}
     //         // "<button>Read More</button>" +
     //         "" +
     //         "</div></div>";
@@ -1387,9 +1298,9 @@
 <!-- Swiper JS -->
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
-<script src="{{ asset('public/js/research.js?v=3.6') }}"></script>
+<script src="{{ asset('public/js/research.js?v=3.8') }}"></script>
 
-<script src="//code.jquery.com/jquery.min.js"></script>
+{{-- jQuery already loaded above, removed duplicate --}}
 <script>
     //open popup
     window.addEventListener("load", function() {
@@ -1496,6 +1407,27 @@ repos.forEach(function(ele){
 --}}
 </script>
 
+<!-- Lazy load Vimeo videos on click -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.video-placeholder').forEach(function(placeholder) {
+            placeholder.addEventListener('click', function() {
+                var videoId = this.getAttribute('data-video-id');
+                if (videoId) {
+                    var iframe = document.createElement('iframe');
+                    iframe.src = 'https://player.vimeo.com/video/' + videoId + '?autoplay=1';
+                    iframe.width = '100%';
+                    iframe.height = this.offsetHeight + 'px';
+                    iframe.frameBorder = '0';
+                    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                    iframe.allowFullscreen = true;
+                    iframe.style.cssText = this.style.cssText;
+                    this.parentNode.replaceChild(iframe, this);
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 

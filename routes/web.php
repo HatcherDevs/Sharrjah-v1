@@ -67,6 +67,7 @@ Route::group(['prefix' => 'research'], function () {
     Route::post('/submit', 'ResearchController@submit')->middleware('throttle:5,1');
     Route::get('/submit', function() { abort(404); });
     Route::get('/get-data/{slug}', 'ResearchController@getData');
+    Route::get('/repository-html/{id}', 'ResearchController@getRepositoryHtml');
     Route::get('/{slug}', 'ResearchController@single');
 });
 

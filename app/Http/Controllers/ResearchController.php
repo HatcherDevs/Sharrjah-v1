@@ -88,6 +88,27 @@ class ResearchController extends Controller
         return 0;
     }
 
+    public function getRepositoryHtml($id)
+    {
+        $repository = Repository::with('images')->find($id);
+        
+        if (!$repository) {
+            return response()->json(['error' => 'Repository not found'], 404);
+        }
+        
+        $lang = request()->get('lang', 'en');
+        
+        $html = view('pages.research.repository-detail', [
+            'repository' => $repository,
+            'lang' => $lang
+        ])->render();
+        
+        return response()->json([
+            'html' => $html,
+            'background' => $repository->background
+        ]);
+    }
+
     public function getData($id)
     {
         $target = $this->model->where('id', $id)->first();

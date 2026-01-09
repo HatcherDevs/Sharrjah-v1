@@ -1094,7 +1094,7 @@
     //     window.speechSynthesis.speak(msg);
     // });
 </script>
-<script src="{{ asset('public/js/research.js?v=3.1') }}"></script>
+<script src="{{ asset('public/js/research.js?v=3.8') }}"></script>
 
 
 

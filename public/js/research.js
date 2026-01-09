@@ -387,12 +387,81 @@ $('#boxlinks .link').on('click', function () {
     }, 200);
 });
 
+// Load repository content via AJAX
 $('.vid').on('click', function () {
-    $('.video-' + $(this).attr('data-id')).addClass('active');
-
-    setTimeout(function () {
-        resizeVideoCopy();
-    }, 300);
+    var repositoryId = $(this).attr('data-id');
+    var container = $('#repository-detail-container');
+    var contentDiv = $('#repository-detail-content');
+    var lang = $('html').attr('lang') || 'en';
+    
+    // Show loading state
+    container.show().addClass('active');
+    contentDiv.html('<div style="text-align:center;padding:50px;"><p>Loading...</p></div>');
+    
+    // Fetch repository HTML via AJAX
+    $.ajax({
+        url: '/research/repository-html/' + repositoryId,
+        data: { lang: lang },
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // Set background color
+            if (response.background) {
+                container.css('background-color', response.background);
+            }
+            
+            // Insert HTML content
+            contentDiv.html(response.html);
+            
+            // Initialize carousels in the loaded content
+            if (typeof $.fn.owlCarousel !== 'undefined') {
+                contentDiv.find('.owl-carousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    dots: true,
+                    items: 1,
+                    dotsContainer: contentDiv.find('#owl-dots'),
+                    mouseDrag: false,
+                    touchDrag: false
+                });
+                
+                // Setup carousel arrows
+                contentDiv.find('.arrows .next').on('click', function() {
+                    $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('next.owl.carousel');
+                });
+                contentDiv.find('.arrows .prev').on('click', function() {
+                    $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('prev.owl.carousel');
+                });
+            }
+            
+            // Initialize video placeholders
+            contentDiv.find('.video-placeholder').on('click', function() {
+                var videoId = $(this).data('video-id');
+                if (videoId) {
+                    $(this).html('<iframe src="https://player.vimeo.com/video/' + videoId + '?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>');
+                }
+            });
+            
+            // Setup back button
+            contentDiv.find('.backbutton').on('click', function() {
+                container.removeClass('active').hide();
+                // Stop any playing videos
+                var iframe = container.find('iframe');
+                if (iframe.length) {
+                    iframe[0].contentWindow.postMessage('{"method":"pause"}', '*');
+                }
+                // Clear content to free memory
+                contentDiv.html('');
+            });
+            
+            setTimeout(function () {
+                resizeVideoCopy();
+            }, 300);
+        },
+        error: function() {
+            contentDiv.html('<div style="text-align:center;padding:50px;"><p>Error loading content. Please try again.</p></div>');
+        }
+    });
 });
 
 // Check if owlCarousel is available
@@ -495,16 +564,18 @@ function resizeVideoCopy() {
 
 }
 
-$('.video-pop .backbutton').on('click', function () {
-    $(this).closest('.video-pop').removeClass('active');
-
-    vid = $(this).closest('.video-pop').find('iframe');
-
-    if (vid.length) {
-        iframe = $(this).closest('.video-pop').find('iframe')[0].contentWindow;
-        iframe.postMessage('{"method":"pause"}', '*');
+// Back button handler for repository detail (delegated for AJAX content)
+$(document).on('click', '#repository-detail-container .backbutton', function () {
+    var container = $('#repository-detail-container');
+    container.removeClass('active').hide();
+    
+    var iframe = container.find('iframe');
+    if (iframe.length) {
+        iframe[0].contentWindow.postMessage('{"method":"pause"}', '*');
     }
-
+    
+    // Clear content to free memory
+    $('#repository-detail-content').html('');
     removeBuildingImages();
 });
 
@@ -543,8 +614,8 @@ function CustomMarker(opts) {
     this.setValues(opts);
 }
 
-// Set up CustomMarker prototype after function is defined
-if (typeof google !== 'undefined' && google.maps) {
+// Set up CustomMarker prototype
+if (typeof google !== 'undefined' && google.maps && google.maps.OverlayView) {
     CustomMarker.prototype = new google.maps.OverlayView();
 }
 
@@ -864,23 +935,36 @@ function fullWidthIframe(url) {
 //     }
 // })
 
-
-
-
-
-
-setInterval(() => {
+// Remove Froala branding (run once on load and use MutationObserver instead of setInterval)
+function removeFroalaBranding() {
     document.querySelectorAll('.show-placeholder a').forEach(ele => {
         if (ele.text == "Unlicensed copy of the Froala Editor. Use it legally by purchasing a license.") {
             ele.style.display = "none"
         }
-    })
-    document.querySelectorAll('#fr-logo').forEach(ele => {
-        $(ele).remove()
-    })
-    $('#fr-logo').remove();
-    document.querySelectorAll('[data-f-id="pbf"]').forEach(ele => {
-        $(ele).remove()
-    })
-    $('[data-f-id="pbf"]').remove()
-}, 100);
+    });
+    document.querySelectorAll('#fr-logo, [data-f-id="pbf"]').forEach(ele => {
+        ele.remove();
+    });
+}
+
+// Run once on DOMContentLoaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', removeFroalaBranding);
+} else {
+    removeFroalaBranding();
+}
+
+// Use MutationObserver for dynamic content instead of setInterval
+var froalaObserver = new MutationObserver(function(mutations) {
+    removeFroalaBranding();
+});
+
+// Start observing after DOM is ready
+$(document).ready(function() {
+    froalaObserver.observe(document.body, { childList: true, subtree: true });
+    
+    // Stop observing after 10 seconds to save resources
+    setTimeout(function() {
+        froalaObserver.disconnect();
+    }, 10000);
+});
