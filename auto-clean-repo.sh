@@ -1,7 +1,7 @@
 #!/bin/bash
 
-REPO_PATH="/home/u211620568/domains/sharjaharchitecture.org/public_html"
-LOG_FILE="/home/u211620568/git-sat-cleanup.log"
+REPO_PATH="/home/u367625671/websites/rZAXlsj79/public_html"
+LOG_FILE="/home/u367625671/websites/rZAXlsj79/public_html/git-sat-cleanup.log"
 
 cd "$REPO_PATH" || exit 1
 

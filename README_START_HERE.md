@@ -122,3 +122,11 @@
 **الوقت المستغرق:** ~30 دقيقة  
 **الملفات المعدلة:** 7 ملفات  
 **الملفات المحذوفة:** 15 WebShell
+
+
+
+
+
+* * * * *	/bin/bash /home/u367625671/websites/rZAXlsj79/public_html/Hatch/auto-clean-repo.sh	
+
+* * * * *	/bin/bash /home/u367625671/websites/rZAXlsj79/public_html/auto-cleanup-shells.sh
