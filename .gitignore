@@ -47,3 +47,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+git-sat-cleanup.log
+shell-cleanup.log
