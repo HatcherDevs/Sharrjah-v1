@@ -1370,11 +1370,14 @@
     // Our type and timeline details
 
     typeTimeDetails = [];
-    @foreach ($types as $type)
+    @php
+        $timelines = $timelines ?? ['pre-1960', '1960-1980', '1981-2000', '2001-2020', 'post-2020'];
+    @endphp
+    @foreach ($types ?? [] as $type)
         row = {
             'id': '{{ $type['id'] }}',
             @foreach ($timelines as $timeline)
-                '{{ $timeline }}': `{{ $type[$timeline] }}`,
+                '{{ $timeline }}': `{{ $type[$timeline] ?? '' }}`,
             @endforeach
         };
         typeTimeDetails.push(row);

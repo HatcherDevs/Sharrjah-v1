@@ -5,28 +5,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <meta name="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
+    <meta name="description"
+        content="{{ isset($post) ? (isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt) : 'SAT Research Initiative' }}" />
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="Sharjah Architecture Triennial || Research">
-    <meta itemprop="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
-    <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
+    <meta itemprop="description"
+        content="{{ isset($post) ? (isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt) : 'SAT Research Initiative' }}">
+    <meta itemprop="image"
+        content="{{ isset($post) && $post->slider ? asset('public/' . $post->slider->square->url) : asset('public/og.JPG') }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
     <meta name="twitter:site" content="@publisher_handle">
     <meta name="twitter:title" content="Sharjah Architecture Triennial || Research">
-    <meta name="twitter:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
+    <meta name="twitter:description"
+        content="{{ isset($post) ? (isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt) : 'SAT Research Initiative' }}">
     <meta name="twitter:creator"
         content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
-    <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
+    <meta name="twitter:image:src" content="{{ isset($post) && $post->slider ? asset('public/' . $post->slider->square->url) : asset('public/og.JPG') }}">
 
     <!-- Open Graph data -->
     <meta property="og:title" content="Sharjah Architecture Triennial || Research" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ url('pages/podcasts/' . $post->slug) }}" />
-    <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
-    <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
+    <meta property="og:url" content="{{ isset($post) ? url('pages/podcasts/' . $post->slug) : url('research') }}" />
+    <meta property="og:image" content="{{ isset($post) && $post->slider ? asset('public/' . $post->slider->square->url) : asset('public/og.JPG') }}" />
+    <meta property="og:description" content="{{ isset($post) ? (isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt) : 'SAT Research Initiative' }}" />
     <meta property="og:site_name" content="Sharjah Architecture Triennial" />
     <meta property="article:published_time" content="2018-10-28T05:59:00+01:00" />
     <meta property="article:modified_time" content="2018-010-28T19:08:47+01:00" />
@@ -344,11 +348,11 @@
 
 
 @if (!$content['svg-logo']->is_hidden)
-    @foreach($content['svg-logo']->images as $image)
+    @foreach ($content['svg-logo']->images as $image)
     <div class="img_logo">
         <div class="position-relative d-flex justify-content-center">
-            <img class="w-100" src="{{ asset('public/'.$image->image) }}">
-            <a class="btn btn-dark text-center" href="{{ $content['svg-logo']->content }}">{{-- ENTER DIGITAL EXHIBITION--}} LAUNCHING SOON {{-- - ENTERVIRTUALEXHIBITION--}} </a>
+            <img class="w-100" src="{{ asset('public/' . $image->image) }}">
+            <a class="btn btn-dark text-center" href="{{ $content['svg-logo']->content }}">{{-- ENTER DIGITAL EXHIBITION --}} LAUNCHING SOON {{-- - ENTERVIRTUALEXHIBITION --}} </a>
         </div>
     </div>
     @endforeach
@@ -417,35 +421,35 @@
             .img_logo:hover {
                 right: 15px !important;
             }
-        </style>
-    @endif
+        </style> @endif
 
 
 
 
-<div class="layout_iframe_pop" style="display: none">
+<div class="layout_iframe_pop"
+        style="display: none">
     <button id="message" class="btn btn-danger close_layout_iframe_pop">&times;</button>
-    <iframe id="fullWidthIframe"  src="" ></iframe>
-</div>
-<style>
-    .layout_iframe_pop{
-        position: absolute;
-        top: 10%;
-        bottom: 0;
-        left: 10%;
-        right: 0;
-        width: 80%;
-        height: 80%;
-        z-index: 199999;
-        background-color: #fff;
-        border: 0px;
-        outline: 0px transparent;
-    }
-    .close_layout_iframe_pop{
-        position: absolute;
-        z-index: 19999999999;
-        top: 0;
-        left: 0;
-    }
-</style>
+    <iframe id="fullWidthIframe" src=""></iframe>
+    </div>
+    <style>
+        .layout_iframe_pop {
+            position: absolute;
+            top: 10%;
+            bottom: 0;
+            left: 10%;
+            right: 0;
+            width: 80%;
+            height: 80%;
+            z-index: 199999;
+            background-color: #fff;
+            border: 0px;
+            outline: 0px transparent;
+        }
 
+        .close_layout_iframe_pop {
+            position: absolute;
+            z-index: 19999999999;
+            top: 0;
+            left: 0;
+        }
+    </style>

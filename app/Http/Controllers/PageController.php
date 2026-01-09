@@ -44,6 +44,11 @@ class PageController extends Controller
     public function goToPageSlug($page, $slug)
     {
         $page = $this->model->with('parent', 'posts')->where('slug', $slug)->first();
+        
+        if (!$page) {
+            abort(404, 'Page not found');
+        }
+
         $data = Post::where('page_id', $page->id)->where('active', 1)->orderBy('publish_date', 'DESC')->paginate(5);
 
         if ($slug == "contributors") {

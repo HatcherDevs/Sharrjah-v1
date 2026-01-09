@@ -9,11 +9,11 @@
 
                         <a href="{{ url($page['page']->link) }}" class="mainlink"><span
                                 class="ar">{{ $page['page']->name_ar }}</span><br />{{ $page['page']->name }}</a>
-                        @if ($page['children'] && count($page['children']))
+                        @if (isset($page['children']) && count($page['children']))
                             <ul class="sub english-nav">
                         @endif
 
-                        @foreach ($page['children'] as $child)
+                        @foreach ($page['children'] ?? [] as $child)
                             @if ($child->slug != 'open-call-exhibition-designer')
                     <li><a href="{{ url($child->link) }}"><span
                                 class="ar">{{ $child->name_ar }}</span><br />{{ $child->name }}</a></li>
@@ -49,7 +49,7 @@
                 @endif
             @endforeach
 
-            @if ($page['children'] && count($page['children']))
+            @if (isset($page['children']) && count($page['children']))
         </ul>
         @endif
         </li>

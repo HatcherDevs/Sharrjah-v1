@@ -180,7 +180,7 @@
         @endif
 
 
-        @if ($formdata)
+         @if (isset($formdata) && $formdata)
             <div class="container text-center">
                 <div class="body-section contents">
                     @include('partials.form')

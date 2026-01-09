@@ -1,21 +1,26 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<meta name="description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia." />
-	<!-- Schema.org markup for Google+ -->
-	<meta itemprop="name" content="Sharjah Architecture Triennial">
-	<meta itemprop="description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
-	<meta itemprop="image" content="http://sharjaharchitecture.org/og.JPG">
+    <meta name="description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia." />
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="Sharjah Architecture Triennial">
+    <meta itemprop="description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
+    <meta itemprop="image" content="http://sharjaharchitecture.org/og.JPG">
 
-	<!-- Twitter Card data -->
-	<meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
-	<meta name="twitter:site" content="@publisher_handle">
-	<meta name="twitter:title" content="Sharjah Architecture Triennial">
-	<meta name="twitter:description" content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
-	<meta name="twitter:creator" content="@author_handle">
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
+    <meta name="twitter:site" content="@publisher_handle">
+    <meta name="twitter:title" content="Sharjah Architecture Triennial">
+    <meta name="twitter:description"
+        content="Sharjah Architecture Triennial is the first major platform for architecture and urbanism in the Middle East, North and East Africa, and Asia.">
+    <meta name="twitter:creator"
+        content="@author_handle">
 	<!-- Twitter summary card with large image must be at least 280x150px -->
 	<meta name="twitter:image:src" content="ttp://sharjaharchitecture.org/og.JPG">
 
@@ -81,8 +86,8 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
     <link href="{{ asset('public/fonts/stylesheet.css') }}" rel="stylesheet">
     <link href="{{ asset('public/fonts/roboto/stylesheet.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/css/style2.css') }}?v={{rand(1,99999)}}" rel="stylesheet">
-    <link href="{{ asset('public/css/responsive.css') }}?v={{rand(1,99999)}}" rel="stylesheet">
+    <link href="{{ asset('public/css/style2.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
+    <link href="{{ asset('public/css/responsive.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
     <link href="{{ asset('public/css/owl.carousel.min.css') }}" rel="stylesheet">
 	<link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
 	<style>
@@ -185,78 +190,77 @@
 
     @yield('css')
 
-    @if($page->slug=='website-credits')
+    @if (isset($page) && $page->slug == 'website-credits')
 	  <style>
 		  .body-section.contents a {
 			  font-weight: 300;
 		  }
-	  </style>
-	@endif
+	  </style> @endif
   </head>
 
   <body>
 
 	<header class="clearfix">
-		<div class="container-fluid dark min" id="header">
-			<div class="row">
-			</div>
-		</div>
-	</header>
-	<header class="clearfix">
-		<div class="container-fluid dark min floating" id="floating-header">
-			<div class="container" style="position: relative">
-				<div class="row">
-					<a href="{{ url('/') }}/" class="logo-link">
-						<div id="logo" class="clearfix">
-							<img src="{{ asset('public/img/svg/ar-1.svg') }}" class="ar1">
-							<img src="{{ asset('public/img/svg/ar-2.svg') }}" class="ar2">
-							<img src="{{ asset('public/img/svg/ar-3.svg') }}" class="ar3">
-							<img src="{{ asset('public/img/svg/en-1.svg') }}" class="en1">
-							<img src="{{ asset('public/img/svg/en-2.svg') }}" class="en2">
-							<img src="{{ asset('public/img/svg/en-3.svg') }}" class="en3">
-						</div>
-					</a>
-					<div class="buttons">
-						<a href="#" class="menu-icon menu-click dark" id="menu-bt"></a>
-					</div>
-				</div>
-			</div>
-			
-		</div>
-	</header>
+    <div class="container-fluid dark min" id="header">
+        <div class="row">
+        </div>
+    </div>
+    </header>
+    <header class="clearfix">
+        <div class="container-fluid dark min floating" id="floating-header">
+            <div class="container" style="position: relative">
+                <div class="row">
+                    <a href="{{ url('/') }}/" class="logo-link">
+                        <div id="logo" class="clearfix">
+                            <img src="{{ asset('public/img/svg/ar-1.svg') }}" class="ar1">
+                            <img src="{{ asset('public/img/svg/ar-2.svg') }}" class="ar2">
+                            <img src="{{ asset('public/img/svg/ar-3.svg') }}" class="ar3">
+                            <img src="{{ asset('public/img/svg/en-1.svg') }}" class="en1">
+                            <img src="{{ asset('public/img/svg/en-2.svg') }}" class="en2">
+                            <img src="{{ asset('public/img/svg/en-3.svg') }}" class="en3">
+                        </div>
+                    </a>
+                    <div class="buttons">
+                        <a href="#" class="menu-icon menu-click dark" id="menu-bt"></a>
+                    </div>
+                </div>
+            </div>
 
-	<div id="print-logo">
-	 	 <div class="container">
-			<img src="{{ asset('public') }}/img/svg/SAT-LOGO.svg" width="200">
-		  	<span style="float:right; text-align: right;">
-				Sharjah Architecture Triennal Website <br/>
-				{{ \Carbon\Carbon::now()->format('F d, Y') }} <br/>
-				http://sharjaharchitecture.org
-			</span>
-		</div>
-	</div>
+        </div>
+    </header>
+
+    <div id="print-logo">
+        <div class="container">
+            <img src="{{ asset('public') }}/img/svg/SAT-LOGO.svg" width="200">
+            <span style="float:right; text-align: right;">
+                Sharjah Architecture Triennal Website <br />
+                {{ \Carbon\Carbon::now()->format('F d, Y') }} <br />
+                http://sharjaharchitecture.org
+            </span>
+        </div>
+    </div>
 
     <main role="main" class="container main" id="menu">
-      <div class="row">
-		  <div class="container">
-			  <div class="row">
-				<a href="#" id="main-logo"></a>
-				<div class="buttons">
-					<a href="#" class="menu-icon menu-close-click" id="menu-bt-close"></a>
-					<a href="#" class="menu-icon search-click" id="search-bt"></a>
-					<form action="{{ url('search') }}" method="post">
-						<input type="hidden" value="{!! csrf_token() !!}" name="_token">
-						<input type="text" id="search" name="keyword">
-						<input type="submit" value="" id="search-submit">
-					</form>
-				</div>
-				<div class="menu-holder auto-height">
-				  <div class="headline auto-height-holder">
-					 @include('menu-desktop')
-				     @include('menu-mobile')
-				  </div>
-				</div>
-			  </div>
-		  </div>
-      </div>
+        <div class="row">
+            <div class="container">
+                <div class="row">
+                    <a href="#" id="main-logo"></a>
+                    <div class="buttons">
+                        <a href="#" class="menu-icon menu-close-click" id="menu-bt-close"></a>
+                        <a href="#" class="menu-icon search-click" id="search-bt"></a>
+                        <form action="{{ url('search') }}" method="post">
+                            <input type="hidden" value="{!! csrf_token() !!}" name="_token">
+                            <input type="text" id="search" name="keyword">
+                            <input type="submit" value="" id="search-submit">
+                        </form>
+                    </div>
+                    <div class="menu-holder auto-height">
+                        <div class="headline auto-height-holder">
+                            @include('menu-desktop')
+                            @include('menu-mobile')
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>

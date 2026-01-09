@@ -21,7 +21,8 @@
         "laravel/sail": "^1.0",
         "mockery/mockery": "^1.5",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^2.0"
+        "spatie/laravel-ignition": "^2.0",
+        "barryvdh/laravel-ide-helper": "^3.1"
     },
     "autoload": {
         "classmap": [

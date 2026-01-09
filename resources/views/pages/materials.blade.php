@@ -140,7 +140,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
 
 
         @if (isset($_GET['lang']))
-            @if ($_GET['lang'] == 'ar')
+            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                 h1,
                 h2,
                 h3,
@@ -161,7 +161,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
             <div class="body-section contents with-img-header">
                 <div class="row" dir="rtl">
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <div class="col-md-12 text-right">
                                 <div class="breadcrumbs">
                                     @include('partials.breadcrumbs-ar')
@@ -283,14 +283,14 @@ if ($page->slug == 'journeys-into-architecture-archives') {
 
                     {{--                <div class="row" > --}}
                     {{--                    @foreach ($openCalls as $item) --}}
-                    {{--                        @if ($_GET['lang'] == 'ar') --}}
+                    {{--                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar') --}}
                     {{--                            <div class="col-md-4 col-sm-6 text-right column-box" style="margin-bottom: 15px !important;"> --}}
                     {{--                                @else --}}
                     {{--                                    <div class="col-md-4 col-sm-6 text-left column-box" style="margin-bottom: 15px !important;;"> --}}
                     {{--                                        @endif --}}
 
                     {{--                                        @if (isset($_GET['lang'])) --}}
-                    {{--                                            @if ($_GET['lang'] == 'ar') --}}
+                    {{--                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar') --}}
                     {{--                                                <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!!  $item->pageType['type']=="file" ?  'download="'.$item->fileDataAr->original_name.'"' : '' !!} {!! $item->pageType['type']=="url" || $item->pageType['type']=="file" ? 'target="_blank"' : "" !!}> --}}
                     {{--                                            @endif --}}
                     {{--                                            @else --}}
@@ -307,7 +307,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     {{--                                                @endif --}}
 
                     {{--                                                @if (isset($_GET['lang'])) --}}
-                    {{--                                                    @if ($_GET['lang'] == 'ar') --}}
+                    {{--                                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar') --}}
                     {{--                                                        <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div> --}}
                     {{--                                                        --}}{{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
                     {{--                                                        <div class="title ar">{{ $item->title_ar }}</div> --}}
@@ -342,7 +342,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     @endif
                     <div class="row">
                         @foreach ($videos as $item)
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <div class="col-md-4 col-sm-6 text-right column-box"
                                     style="margin-bottom: 15px !important;">
                                 @else
@@ -351,7 +351,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                             @endif
 
                             @if (isset($_GET['lang']))
-                                @if ($_GET['lang'] == 'ar')
+                                @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                     <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                         {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                 @endif
@@ -367,7 +367,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                             @endif
 
                             @if (isset($_GET['lang']))
-                                @if ($_GET['lang'] == 'ar')
+                                @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                     <div class="publish_date en">
                                         {{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
                                     </div>
@@ -406,7 +406,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
             @if (isset($openCalls) && count($openCalls) > 0)
                 <div class="row">
                     @foreach ($openCalls as $item)
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <div class="col-md-4 col-sm-6 text-right column-box" style="margin-bottom: 15px !important;">
                             @else
                                 <div class="col-md-4 col-sm-6 text-left column-box"
@@ -414,7 +414,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                         @endif
 
                         @if (isset($_GET['lang']))
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                     {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                             @endif
@@ -430,7 +430,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                         @endif
 
                         @if (isset($_GET['lang']))
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <div class="publish_date en">
                                     {{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
                                 </div>
@@ -463,7 +463,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
             <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
                 @foreach ($past as $item)
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
@@ -474,7 +474,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     </a>
 
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <h4 style="font-weight:bold;text-transform: uppercase;">{{ $item->title_ar }}</h4>
                             <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
                             </p>
@@ -493,7 +493,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     @endif
 
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
@@ -517,7 +517,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
             <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
                 @foreach ($upcoming as $item)
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
@@ -528,7 +528,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     </a>
 
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <h4 style="font-weight:bold;text-transform: uppercase;">{{ $item->title_ar }}</h4>
                             <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
                             </p>
@@ -547,7 +547,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
                     @endif
 
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
@@ -567,7 +567,7 @@ if ($page->slug == 'journeys-into-architecture-archives') {
     </div>
     @endif
 
-    @if ($formdata)
+    @if (isset($formdata) && $formdata)
         <div class="container text-center">
             <div class="body-section contents">
                 @include('partials.form')

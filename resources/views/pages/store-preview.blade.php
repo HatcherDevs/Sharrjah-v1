@@ -29,11 +29,11 @@
         }
 
         /*
-              1. Base
-            */
+                      1. Base
+                    */
         /*
-              2. Components
-            */
+                      2. Components
+                    */
         div.control-container {
             margin-top: 10px;
             padding: 20px 10px;
@@ -88,8 +88,8 @@
         }
 
         /*
-              Small only
-            */
+                      Small only
+                    */
         @media screen and (max-width: 39.9375em) {
             div.control-container div.amplitude-play-pause {
                 background-size: cover;
@@ -131,11 +131,11 @@
         }
 
         /*
-              Medium only
-            */
+                      Medium only
+                    */
         /*
-              Large Only
-            */
+                      Large Only
+                    */
         div.time-container {
             opacity: 0.5;
             font-family: 'Open Sans';
@@ -156,14 +156,14 @@
         }
 
         /*
-              Small only
-            */
+                      Small only
+                    */
         /*
-              Medium only
-            */
+                      Medium only
+                    */
         /*
-              Large Only
-            */
+                      Large Only
+                    */
         progress.amplitude-song-played-progress {
             background-color: #313252;
             -webkit-appearance: none;
@@ -193,17 +193,17 @@
         }
 
         /*
-              Small only
-            */
+                      Small only
+                    */
         /*
-              Medium only
-            */
+                      Medium only
+                    */
         /*
-              Large Only
-            */
+                      Large Only
+                    */
         /*
-              3. Layout
-            */
+                      3. Layout
+                    */
         div.bottom-container {
             background-color: #ffffff;
             border-bottom-right-radius: 10px;
@@ -213,14 +213,14 @@
         }
 
         /*
-              Small only
-            */
+                      Small only
+                    */
         /*
-              Medium only
-            */
+                      Medium only
+                    */
         /*
-              Large Only
-            */
+                      Large Only
+                    */
         div#single-song-player {
             margin: auto;
             width: 100%;
@@ -384,8 +384,8 @@
                                     @if (count($page->sliders) == 1)
                                         <div class="col-md-12">
                                             @if ($page->slider->square)
-                                                <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%"
-                                                    class="featured-img">
+                                                <img src="{{ asset('public/' . $page->slider->square->url) }}"
+                                                    width="100%" class="featured-img">
                                                 <span class="imgcap">
                                                     @if (isset($_GET['lang']))
                                                         <span dir="rtl"
@@ -444,7 +444,7 @@
                                     {{-- </div> --}}
 
                                     @if (isset($_GET['lang']))
-                                        @if ($_GET['lang'] == 'ar')
+                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                             <div class="col-md-12 text-right">
                                                 {!! $page->content_ar !!}
                                                 <br>
@@ -461,7 +461,7 @@
 
 
 
-                                    @if ($formdata)
+                                    @if (isset($formdata) && $formdata)
                                         <div class="container text-center">
                                             <div class="body-section contents">
                                                 @include('partials.form')
@@ -500,7 +500,7 @@
                                         <br />
                                         <div class="row">
                                             @foreach ($similar as $item)
-                                                @if ($_GET['lang'] == 'ar')
+                                                @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                     <div class="col-md-4 col-sm-6 text-right column-box {{ $item->id == $post->id ? 'current' : '' }}"
                                                         style="margin-bottom: 15px !important;">
                                                     @else
@@ -510,7 +510,7 @@
 
                                                 @if ($item->id != $post->id)
                                                     @if (isset($_GET['lang']))
-                                                        @if ($_GET['lang'] == 'ar')
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                         @endif
@@ -534,7 +534,7 @@
                                                 @endif
 
                                                 @if (isset($_GET['lang']))
-                                                    @if ($_GET['lang'] == 'ar')
+                                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                         <div class="publish_date en">{{ $item->artist_ar }}</div>
                                                         {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
                                                         <div class="title ar">{{ $item->title_ar }}</div>
@@ -567,7 +567,7 @@
                                             <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
                                                 @foreach ($upcoming as $item)
                                                     @if (isset($_GET['lang']))
-                                                        @if ($_GET['lang'] == 'ar')
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                         @endif
@@ -578,7 +578,7 @@
                                                     </a>
 
                                                     @if (isset($_GET['lang']))
-                                                        @if ($_GET['lang'] == 'ar')
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <h4 style="font-weight:bold;text-transform: uppercase;">
                                                                 {{ $item->title_ar }}</h4>
                                                             <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
@@ -594,7 +594,7 @@
                                                     @endif
 
                                                     @if (isset($_GET['lang']))
-                                                        @if ($_GET['lang'] == 'ar')
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                                                 {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                         @endif

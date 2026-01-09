@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,22 +9,23 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="SAT Talks || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
     <meta itemprop="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
-    <meta itemprop="image" content="{{asset('public/'.$post->slider->square->url)}}">
+    <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
     <meta name="twitter:site" content="@publisher_handle">
-    <meta name="twitter:title" content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
+    <meta name="twitter:title"
+        content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
     <meta name="twitter:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
     <meta name="twitter:creator" content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
-    <meta name="twitter:image:src" content="{{asset('public/'.$post->slider->square->url)}}">
+    <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
 
     <!-- Open Graph data -->
     <meta property="og:title" content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ url('pages/spaces/'.$post->slug) }}" />
-    <meta property="og:image" content="{{asset('public/'.$post->slider->square->url)}}" />
+    <meta property="og:url" content="{{ url('pages/spaces/' . $post->slug) }}" />
+    <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
     <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
     <meta property="og:site_name" content="Sharjah Architecture Triennial" />
     <meta property="article:published_time" content="2018-10-28T05:59:00+01:00" />
@@ -290,7 +292,7 @@
             width: 100%;
         }
 
-        @if(isset($_GET['lang']))
+        @if (isset($_GET['lang']))
             .imgcap .en {
                 display: none !important;
             }
@@ -391,7 +393,7 @@
                 <div class="row" dir="rtl">
                     <div class="col-md-12 {{ isset($_GET['lang']) ? 'text-right' : 'text-left' }}">
                         <div class="breadcrumbs">
-                            @if(isset($_GET['lang']))
+                            @if (isset($_GET['lang']))
                                 <div class="breadcrumbs ar" style="height: 20px;">
                                     <a href="{{ url('/?lang=ar') }}" style="color: rgb(0, 0, 0);">الصفحة الرئيسية</a>
                                     &gt;
@@ -417,12 +419,12 @@
                             </div>
 
                             <div class="col-md-3 sideb">
-                                @if(isset($_GET['lang']))
-                                    <a href="{{url()->current()}}">Switch to English
+                                @if (isset($_GET['lang']))
+                                    <a href="{{ url()->current() }}">Switch to English
                                     </a><br/>
                                     <br/>
                                 @else
-                                    <a href="{{url()->current().'?lang=ar'}}" class="float-right">التبديل إلى اللغة العربية</a>
+                                    <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة العربية</a>
                                     <br/>
                                     <br/>
                                 @endif
@@ -434,21 +436,21 @@
                         <div class="col-md-9">
                             <div class="row">
                             <?php $page = $post; ?>
-                                    @if(count($page->sliders)==1)
+                                    @if (count($page->sliders) == 1)
                                         <div class="col-md-12">
-                                            @if($page->slider->square)
-                                                <img src="{{ asset('public/'.$page->slider->square->url) }}" width="100%" class="featured-img">
+                                            @if ($page->slider->square)
+                                                <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
-                                                    @if(isset($_GET['lang']))
+                                                    @if (isset($_GET['lang']))
                                                         <span dir="rtl" class="float-right">{{ $page->slider->square->caption_ar }}</span>
                                                     @else
                                                         <span class="en float-left">{{ $page->slider->square->caption }}</span>
                                                     @endif
                                                 </span>
                                             @elseif($page->slider->landscape)
-                                                <img src="{{ asset('public/'.$page->slider->landscape->url) }}" width="100%" class="featured-img">
+                                                <img src="{{ asset('public/' . $page->slider->landscape->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
-                                                    @if(isset($_GET['lang']))
+                                                    @if (isset($_GET['lang']))
                                                         <span dir="rtl" class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
                                                     @else
                                                         <span class="en float-left">{{ $page->slider->landscape->caption }}</span>
@@ -456,7 +458,7 @@
                                                 </span>
                                             @endif
                                         </div>
-                                    @elseif(count($page->sliders)>1)
+                                    @elseif(count($page->sliders) > 1)
                                         <div class="col-md-12">
                                             <div class="owl-carousel-holder" dir="ltr">
                                                 <div class="arrows">
@@ -464,9 +466,9 @@
                                                     <button class="next float-right"></button>
                                                 </div>
                                                 <div class="owl-carousel owl-theme">
-                                                    @foreach($page->sliders as $slide)
+                                                    @foreach ($page->sliders as $slide)
                                                         <div class="item">
-                                                            <img src="{{ url('public/'.$slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
+                                                            <img src="{{ url('public/' . $slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -481,14 +483,14 @@
                                         <br/>
                                     </div>
 
-                                    {{--<div class="col-md-12">--}}
-                                        {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->speaker_ar : $post->speaker !!}</h5>--}}
-                                        {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->series_ar : $post->series !!}</h5>--}}
-                                        {{--<br/>--}}
-                                    {{--</div>--}}
+                                    {{-- <div class="col-md-12"> --}}
+                                        {{-- <h5 class="ar">{!! isset($_GET['lang']) ? $post->speaker_ar : $post->speaker !!}</h5> --}}
+                                        {{-- <h5 class="ar">{!! isset($_GET['lang']) ? $post->series_ar : $post->series !!}</h5> --}}
+                                        {{-- <br/> --}}
+                                    {{-- </div> --}}
 
-                                    @if(isset($_GET['lang']))
-                                        @if($_GET['lang']=='ar')
+                                    @if (isset($_GET['lang']))
+                                        @if ($_GET['lang'] == 'ar')
                                             <div class="col-md-12 text-right">
                                                 {!! $page->content_ar !!}
                                                 <br>
@@ -505,7 +507,7 @@
 
 
 
-                        @if($formdata)
+                        @if (isset($formdata) && $formdata)
                             <div class="container text-center">
                                 <div class="body-section contents">
                                     @include('partials.form')
@@ -513,18 +515,18 @@
                             </div>
                         @endif
 
-                        @if($post->buttonLinks)
+                        @if ($post->buttonLinks)
                             <div class="container text-center">
                                 <div class="body-section contents">
                                     <div class="row" dir="rtl">
                                         <div class="col-md-6 text-right">
-                                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                                                <a href="{{$post->buttonLinks->value_ar}}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
+                                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                                <a href="{{ $post->buttonLinks->value_ar }}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
                                             @endif
                                         </div>
                                         <div class="col-md-6 text-left">
-                                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                                                <a href="{{$post->buttonLinks->value}}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
+                                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                                <a href="{{ $post->buttonLinks->value }}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
                                             @endif
                                         </div>
                                     </div>
@@ -534,16 +536,16 @@
                             </div>
                 </div>
                 <div class="col-md-3 sideb">
-                    @if(count($similar))
+                    @if (count($similar))
                         <b>MORE FROM THIS SERIES</b><br/>
                         <br/>
-                        @foreach($similar as $pod)
-                            <a href="{{ url('pages/spaces/'.$pod->slug) }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}">
+                        @foreach ($similar as $pod)
+                            <a href="{{ url('pages/spaces/' . $pod->slug) }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}">
 
-                                @if($page->slider->landscape)
-                                    <img src="{{url('public/'.$pod->slider->landscape->url)}}" width="100%" class="featured-img"><br/>
+                                @if ($page->slider->landscape)
+                                    <img src="{{ url('public/' . $pod->slider->landscape->url) }}" width="100%" class="featured-img"><br/>
                                 @elseif($page->slider->square)
-                                    <img src="{{url('public/'.$pod->slider->square->url)}}" width="100%" class="featured-img"><br/>
+                                    <img src="{{ url('public/' . $pod->slider->square->url) }}" width="100%" class="featured-img"><br/>
                                 @else
                                     <img src="https://via.placeholder.com/250" width="100%" class="featured-img"><br/>
                                 @endif
@@ -556,8 +558,8 @@
                     @endif
                     <b>{{ isset($_GET['lang']) ? 'شارك هذا الرابط' : 'SHARE THIS' }}</b><br/>
                     <ul class="socials">
-                        <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('pages/spaces/'.$post->slug) }}&picture={{url('public/'.$page->slider->square->url)}}&title={{ $post->title }}&description={{ $post->excerpt }}" class="fb"></a></li>
-                        <li><a target="_blank" href="https://twitter.com/intent/tweet?text={{ url('pages/spaces/'.$post->slug) }}" class="tw"></a></li>
+                        <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('pages/spaces/' . $post->slug) }}&picture={{ url('public/' . $page->slider->square->url) }}&title={{ $post->title }}&description={{ $post->excerpt }}" class="fb"></a></li>
+                        <li><a target="_blank" href="https://twitter.com/intent/tweet?text={{ url('pages/spaces/' . $post->slug) }}" class="tw"></a></li>
                     </ul>
                 </div>
             </div>
@@ -585,30 +587,35 @@
     <script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><script type='text/javascript'>(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='MMERGE5';ftypes[5]='text';fnames[6]='MMERGE6';ftypes[6]='dropdown';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
     <!--End mc_embed_signup-->
 
-    @if(\Request::path()=="/")
+    @if (\Request::path() == '/')
         <script src="{{ asset('public/js/home.js') }}"></script>
     @else
-        <script src="{{ asset('public/js/inner.js') }}"></script>
-    @endif
+        <script src="{{ asset('public/js/inner.js') }}"></script> @endif
 
     <script>
         var owl = $('.owl-carousel').owlCarousel({
-            loop:true,
-            margin:0,
-            nav:false,
-            items:1,
-            dotsContainer:'#owl-dots',
-            onChange: function (elem) {
-                setTimeout(function(){
-                    html = '<span class="imgcap"><span class="en float-left">'+$('.owl-item.active img').attr('data-en')+'</span><span dir="rtl" class="ar float-right">'+$('.owl-item.active img').attr('data-ar')+'</span></span>';
+            loop: true,
+            margin: 0,
+            nav: false,
+            items: 1,
+            dotsContainer: '#owl-dots',
+            onChange: function(elem) {
+                setTimeout(function() {
+                    html = '<span class="imgcap"><span class="en float-left">' + $(
+                            '.owl-item.active img').attr('data-en') +
+                        '</span><span dir="rtl" class="ar float-right">' + $('.owl-item.active img')
+                        .attr('data-ar') + '</span></span>';
                     $('#owl-caption').html(html);
-                },300);
+                }, 300);
             },
-            onInitialize: function (elem) {
-                setTimeout(function(){
-                    html = '<span class="imgcap"><span class="en float-left">'+$('.owl-item.active img').attr('data-en')+'</span><span dir="rtl" class="ar float-right">'+$('.owl-item.active img').attr('data-ar')+'</span></span>';
+            onInitialize: function(elem) {
+                setTimeout(function() {
+                    html = '<span class="imgcap"><span class="en float-left">' + $(
+                            '.owl-item.active img').attr('data-en') +
+                        '</span><span dir="rtl" class="ar float-right">' + $('.owl-item.active img')
+                        .attr('data-ar') + '</span></span>';
                     $('#owl-caption').html(html);
-                },500);
+                }, 500);
             }
         });
 
@@ -621,11 +628,7 @@
             // Parameters has to be in square bracket '[]'
             owl.trigger('prev.owl.carousel');
         });
-
     </script>
 
 </body>
 </html>
-
-
-

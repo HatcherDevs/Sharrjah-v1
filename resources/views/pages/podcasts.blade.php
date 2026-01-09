@@ -138,7 +138,7 @@
                 <div class="row" dir="rtl">
 
                     @if (isset($_GET['lang']))
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <div class="col-md-12 text-right">
                                 <div class="breadcrumbs">
                                     @include('partials.breadcrumbs-ar')
@@ -194,7 +194,7 @@
                 <br />
                 <div class="row" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                     @foreach ($data as $item)
-                        @if ($_GET['lang'] == 'ar')
+                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                             <div class="col-md-4 col-sm-6 text-right column-box" style="margin-bottom: 15px !important;">
                             @else
                                 <div class="col-md-4 col-sm-6 text-left column-box"
@@ -202,7 +202,7 @@
                         @endif
 
                         @if (isset($_GET['lang']))
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                     {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                             @endif
@@ -218,7 +218,7 @@
                         @endif
 
                         @if (isset($_GET['lang']))
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div>
                                 <div class="publication ar">{{ $item->country_ar }}</div>
                                 <div class="title ar">{{ $item->title_ar }}</div>
@@ -241,7 +241,7 @@
         </div>
     </div>
 
-    @if ($formdata)
+    @if (isset($formdata) && $formdata)
         <div class="container text-center">
             <div class="body-section contents">
                 @include('partials.form')

@@ -13,7 +13,7 @@ $count = is_array($breadcrumbs) ? count($breadcrumbs) : 0;
         @if (!$loop->last)
             >
         @else
-            @if ($post)
+            @if (isset($post) && $post)
                 > <a href="">{{ $post->title }}</a>
             @endif
         @endif

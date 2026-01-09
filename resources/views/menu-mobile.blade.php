@@ -9,7 +9,7 @@
                                 class="ar">{{ $page['page']->name_ar }}</span><br />{{ $page['page']->name }}</span>
                     </a>
                     <ul>
-                        @foreach ($page['children'] as $child)
+                        @foreach ($page['children'] ?? [] as $child)
                             @if ($child->slug != 'open-call-exhibition-designer')
                                 <li><a href="{{ url($child->link) }}"><span
                                             class="ar">{{ $child->name_ar }}</span><br />{{ $child->name }}</a></li>
@@ -27,25 +27,23 @@
                             @endif
 
                             @if ($child->slug == 'team-1')
-                                            <?php 
-                                                        $opportunities =  $pageService->getPageById(50);
+                                <?php
+                                $opportunities = $pageService->getPageById(50);
+                                
+                                $opportunitiesPage = $pageService->getPostById(477);
+                                $opportunitiesSlug = $opportunities->slug;
+                                
+                                ?>
 
-                                                        $opportunitiesPage = $pageService->getPostById(477); 
-                                                        $opportunitiesSlug =  $opportunities->slug;
-                                                        
-                                            ?>
-                                        
-                                            @if ($opportunities->active == 1)  {{-- Only show if active is NOT 1 --}}
-                                                <li>
-                                                    <a href="{{ url('pages/about/' . $opportunitiesSlug) }}">
-                                                        <span class="ar">فرص العمل</span><br />Opportunities
-                                                    </a>
-                                                </li>
-
-                                                
-
-                                            @endif
-                                        @endif
+                                @if ($opportunities->active == 1)
+                                    {{-- Only show if active is NOT 1 --}}
+                                    <li>
+                                        <a href="{{ url('pages/about/' . $opportunitiesSlug) }}">
+                                            <span class="ar">فرص العمل</span><br />Opportunities
+                                        </a>
+                                    </li>
+                                @endif
+                            @endif
                             @if ($child->slug == 'open-call-exhibition-designer')
                                 <?php $research = $pageService->getPageBySlug('opportunitiesi'); ?>
                                 {{-- @if ($opportunitiesi->active == 1)
@@ -105,8 +103,8 @@
                         class="mainlink"><span class="ar">ترينالي
                             2019</span><br />Triennial 2019 </a>
                 </li>
-                <li class="nav-item"> <a href="https://2023.sharjaharchitecture.org/{{-- url('/pages/triennial-2023') --}}" class="mainlink"><span
-                            class="ar">ترينالي 2023</span><br />Triennial 2023</a>
+                <li class="nav-item"> <a href="https://2023.sharjaharchitecture.org/{{-- url('/pages/triennial-2023') --}}"
+                        class="mainlink"><span class="ar">ترينالي 2023</span><br />Triennial 2023</a>
                 </li>
 
             </ul>
@@ -117,7 +115,7 @@
     </div>
 </div>
 <style>
-    #menu .menu-holder{
+    #menu .menu-holder {
         overflow-y: auto;
     }
 </style>

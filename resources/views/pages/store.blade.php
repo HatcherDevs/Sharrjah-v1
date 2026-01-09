@@ -551,7 +551,7 @@
                                     {{-- </div> --}}
 
                                     @if (isset($_GET['lang']))
-                                    @if ($_GET['lang'] == 'ar')
+                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                             <div class="col-md-12 text-right">
                                                 {!! $page->content_ar !!}
                                                 <br>
@@ -568,7 +568,7 @@
 
 
 
-                        @if ($formdata)
+                        @if (isset($formdata) && $formdata)
                             <div class="container text-center">
                                 <div class="body-section contents">
                                     @include('partials.form')
@@ -605,7 +605,7 @@
                         <div class="row" >
                             @foreach ($similar as $item)
                        
-                                @if ($_GET['lang'] == 'ar')
+                                @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                     <div class="col-md-4 col-sm-6 text-right column-box {{ $item->id == $post->id ? 'current' : '' }}" style="margin-bottom: 15px !important;">
                                         @else
                                             <div class="col-md-4 col-sm-6 text-left column-box {{ $item->id == $post->id ? 'current' : '' }}" style="margin-bottom: 15px !important;;">
@@ -613,7 +613,7 @@
 
                                                     @if ($item->id != $post->id)
                                                             @if (isset($_GET['lang']))
-                                                                    @if ($_GET['lang'] == 'ar')
+                                                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                                         <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                                     @endif
                                                             @else
@@ -628,7 +628,7 @@
                                                                     @endif
                                                                 </a>
                                                                     @if (isset($_GET['lang']))
-                                                                        @if ($_GET['lang'] == 'ar')
+                                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
 
 
                                                                         <?php $series = str_replace(' ', '-', $item->artist); ?>
@@ -690,7 +690,7 @@
                                                 @foreach ($upcoming as $item)
 
                                                     @if (isset($_GET['lang']))
-                                                        @if ($_GET['lang'] == 'ar')
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                                 @endif
                                                                 @else
@@ -699,7 +699,7 @@
                                                                     </a>
 
                                                                     @if (isset($_GET['lang']))
-                                                                        @if ($_GET['lang'] == 'ar')
+                                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                                             <h4  style="font-weight:bold;text-transform: uppercase;">{{ $item->title_ar }}</h4>
                                                                             <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}</p>
                                                                             <p>{{ $item->excerpt }}</p>
@@ -711,7 +711,7 @@
                                                                     @endif
 
                                                                     @if (isset($_GET['lang']))
-                                                                        @if ($_GET['lang'] == 'ar')
+                                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"  {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                                                 @endif
                                                                                 @else

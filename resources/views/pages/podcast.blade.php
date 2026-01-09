@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,7 +9,7 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="SAT Talks || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
     <meta itemprop="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
-    <meta itemprop="image" content="{{asset('public/'.$post->slider->square->url)}}">
+    <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
@@ -17,13 +18,13 @@
     <meta name="twitter:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
     <meta name="twitter:creator" content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
-    <meta name="twitter:image:src" content="{{asset('public/'.$post->slider->square->url)}}">
+    <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
 
     <!-- Open Graph data -->
     <meta property="og:title" content="SAT Talks || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ url('pages/podcasts/'.$post->slug) }}" />
-    <meta property="og:image" content="{{asset('public/'.$post->slider->square->url)}}" />
+    <meta property="og:url" content="{{ url('pages/podcasts/' . $post->slug) }}" />
+    <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
     <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
     <meta property="og:site_name" content="Site Name, i.e. Moz" />
     <meta property="article:published_time" content="2018-10-28T05:59:00+01:00" />
@@ -290,7 +291,7 @@
             width: 100%;
         }
 
-        @if(isset($_GET['lang']))
+        @if (isset($_GET['lang']))
             .imgcap .en {
                 display: none !important;
             }
@@ -388,7 +389,7 @@
                 <div class="row" dir="rtl">
                     <div class="col-md-12 {{ isset($_GET['lang']) ? 'text-right' : 'text-left' }}">
                         <div class="breadcrumbs">
-                            @if(isset($_GET['lang']))
+                            @if (isset($_GET['lang']))
                                 <div class="breadcrumbs ar" style="height: 20px;">
                                     <a href="{{ url('/') }}" style="color: rgb(0, 0, 0);">الصفحة الرئيسية</a>
                                     &gt;
@@ -414,12 +415,12 @@
                             </div>
 
                             <div class="col-md-3 sideb">
-                                @if(isset($_GET['lang']))
-                                    <a href="{{url()->current()}}">Switch to English
+                                @if (isset($_GET['lang']))
+                                    <a href="{{ url()->current() }}">Switch to English
                                     </a><br/>
                                     <br/>
                                 @else
-                                    <a href="{{url()->current().'?lang=ar'}}" class="float-right">التبديل إلى اللغة العربية</a>
+                                    <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة العربية</a>
                                     <br/>
                                     <br/>
                                 @endif
@@ -431,21 +432,21 @@
                         <div class="col-md-9">
                             <div class="row">
                             <?php $page = $post; ?>
-                                    @if(count($page->sliders)==1)
+                                    @if (count($page->sliders) == 1)
                                         <div class="col-md-12">
-                                            @if($page->slider->square)
-                                                <img src="{{ asset('public/'.$page->slider->square->url) }}" width="100%" class="featured-img">
+                                            @if ($page->slider->square)
+                                                <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
-                                                    @if(isset($_GET['lang']))
+                                                    @if (isset($_GET['lang']))
                                                         <span dir="rtl" class="float-right">{{ $page->slider->square->caption_ar }}</span>
                                                     @else
                                                         <span class="en float-left">{{ $page->slider->square->caption }}</span>
                                                     @endif
                                                 </span>
                                             @elseif($page->slider->landscape)
-                                                <img src="{{ asset('public/'.$page->slider->landscape->url) }}" width="100%" class="featured-img">
+                                                <img src="{{ asset('public/' . $page->slider->landscape->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
-                                                    @if(isset($_GET['lang']))
+                                                    @if (isset($_GET['lang']))
                                                         <span dir="rtl" class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
                                                     @else
                                                         <span class="en float-left">{{ $page->slider->landscape->caption }}</span>
@@ -453,7 +454,7 @@
                                                 </span>
                                             @endif
                                         </div>
-                                    @elseif(count($page->sliders)>1)
+                                    @elseif(count($page->sliders) > 1)
                                         <div class="col-md-12">
                                             <div class="owl-carousel-holder" dir="ltr">
                                                 <div class="arrows">
@@ -461,9 +462,9 @@
                                                     <button class="next float-right"></button>
                                                 </div>
                                                 <div class="owl-carousel owl-theme">
-                                                    @foreach($page->sliders as $slide)
+                                                    @foreach ($page->sliders as $slide)
                                                         <div class="item">
-                                                            <img src="{{ url('public/'.$slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
+                                                            <img src="{{ url('public/' . $slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -501,21 +502,21 @@
 
 
                                                 <div id="mobile-other-links" class="clearfix">
-                                                    @if(isset($_GET['lang']))
+                                                    @if (isset($_GET['lang']))
                                                         <br/><br/><b>طرق أكثر للاستماع</b><br/><br/>
                                                     @else
                                                         <br/><br/><b>MORE WAYS TO LISTEN</b><br/><br/>
                                                     @endif
-                                                @if($page->links->soundcloud_url)
-                                                    <a href="{{$page->links->soundcloud_url}}" target="_blank"><svg style="{{ isset($_GET['lang']) ? 'float: right; margin-left:10px;' : 'float: left;' }} display: block" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="25px" id="Layer_1" version="1.1" viewBox="0 0 100 100" width="25px" xml:space="preserve"><defs><path id="SVGID_1_" d="M0 0h100v100H0z"/></defs><path d="M5 59.023c0 3.044 1.385 5.764 3.568 7.598V51.43C6.385 53.259 5 55.982 5 59.023m7.342-9.591v19.183c.891.246 1.832.385 2.801.385h.974V49.094a10.365 10.365 0 0 0-3.775.338m8.336 1.245a9.632 9.632 0 0 0-.789-.457V69h3.773V43.881a15.49 15.49 0 0 0-2.984 6.796m6.759-10.328V69h3.774V38.491a16.044 16.044 0 0 0-3.774 1.858m7.547-2.639V69h3.774V37.825a16.18 16.18 0 0 0-3.774-.115m9.628 2.206a16.068 16.068 0 0 0-3.966-1.69V69h5.66V37.646a19.432 19.432 0 0 0-1.694 2.27m3.583-4.162V69h35.852v-.044C91.596 68.473 95 63.79 95 58.075c0-6.035-4.562-10.925-10.703-10.925-1.576 0-2.874.325-4.245.913C79.069 38.481 70.941 31 60.932 31c-4.896 0-9.346 1.793-12.737 4.754"/><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description about="https://iconscout.com/legal#licenses" dc:title="soundcloud" dc:description="soundcloud" dc:publisher="Iconscout" dc:date="2017-09-19" dc:format="image/svg+xml" dc:language="en"><dc:creator><rdf:Bag><rdf:li></rdf:li></rdf:Bag></dc:creator></rdf:Description></rdf:RDF></metadata></svg>
+                                                @if ($page->links->soundcloud_url)
+                                                    <a href="{{ $page->links->soundcloud_url }}" target="_blank"><svg style="{{ isset($_GET['lang']) ? 'float: right; margin-left:10px;' : 'float: left;' }} display: block" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="25px" id="Layer_1" version="1.1" viewBox="0 0 100 100" width="25px" xml:space="preserve"><defs><path id="SVGID_1_" d="M0 0h100v100H0z"/></defs><path d="M5 59.023c0 3.044 1.385 5.764 3.568 7.598V51.43C6.385 53.259 5 55.982 5 59.023m7.342-9.591v19.183c.891.246 1.832.385 2.801.385h.974V49.094a10.365 10.365 0 0 0-3.775.338m8.336 1.245a9.632 9.632 0 0 0-.789-.457V69h3.773V43.881a15.49 15.49 0 0 0-2.984 6.796m6.759-10.328V69h3.774V38.491a16.044 16.044 0 0 0-3.774 1.858m7.547-2.639V69h3.774V37.825a16.18 16.18 0 0 0-3.774-.115m9.628 2.206a16.068 16.068 0 0 0-3.966-1.69V69h5.66V37.646a19.432 19.432 0 0 0-1.694 2.27m3.583-4.162V69h35.852v-.044C91.596 68.473 95 63.79 95 58.075c0-6.035-4.562-10.925-10.703-10.925-1.576 0-2.874.325-4.245.913C79.069 38.481 70.941 31 60.932 31c-4.896 0-9.346 1.793-12.737 4.754"/><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description about="https://iconscout.com/legal#licenses" dc:title="soundcloud" dc:description="soundcloud" dc:publisher="Iconscout" dc:date="2017-09-19" dc:format="image/svg+xml" dc:language="en"><dc:creator><rdf:Bag><rdf:li></rdf:li></rdf:Bag></dc:creator></rdf:Description></rdf:RDF></metadata></svg>
                                                         <span style="    display: block;
                                                         {{ isset($_GET['lang']) ? 'float: right;' : 'float: left;' }}
                                                                 height: 25px;
                                                                 line-height: 28px !important;
                                                                 margin-left: 10px;">SoundCloud</span></a>
                                                 @endif
-                                                @if($page->links->apple_url)
-                                                    <a href="{{$page->links->apple_url}}" target="_blank">
+                                                @if ($page->links->apple_url)
+                                                    <a href="{{ $page->links->apple_url }}" target="_blank">
                                                         <svg  style="{{ isset($_GET['lang']) ? 'float: right; margin-left:30px;' : 'float: left;margin-left:30px;' }} display: block" width="25" height="25" viewBox="0 0 18 20" class="podcast__meta-icon__svg podcast__section-icon__svg inline-apple-podcasts__svg inline-journalism/audio__svg">
                                                             <g fill="#000">
                                                                 <path d="M11.84 17.624c.027-.282.066-.522.07-.763.006-.38.223-.543.54-.705 2.289-1.172 3.742-3.018 4.25-5.56.489-2.453-.091-4.672-1.666-6.596-1.241-1.515-2.85-2.442-4.793-2.744-2.364-.366-4.48.23-6.3 1.77-1.477 1.25-2.4 2.851-2.69 4.788-.366 2.435.261 4.585 1.85 6.457a7.615 7.615 0 0 0 2.497 1.915c.272.133.49.252.475.608-.009.204.055.41.08.617.022.18-.05.215-.217.153a8.877 8.877 0 0 1-2.486-1.392C1.783 14.84.7 13.128.228 11.037a8.801 8.801 0 0 1-.143-3.133c.215-1.613.8-3.062 1.789-4.346C3.181 1.861 4.873.76 6.95.252A8.436 8.436 0 0 1 9.94.053c1.74.202 3.308.837 4.678 1.948 1.639 1.331 2.71 3.03 3.155 5.093.575 2.667.047 5.127-1.55 7.336-1.077 1.492-2.507 2.526-4.228 3.155-.021.01-.045.014-.155.04z"></path>
@@ -529,8 +530,8 @@
                                                                 line-height: 28px !important;
                                                                 margin-left: 10px;">Apple iTunes</span></a>
                                                 @endif
-                                                @if($page->links->google_url)
-                                                    <a href="{{$page->links->google_url}}" target="_blank"><svg style="{{ isset($_GET['lang']) ? 'float: right;margin-left:30px;' : 'margin-left: 30px;float: left;' }} display: block" width="25" height="25" viewBox="0 0 17 17" class="podcast__meta-icon__svg podcast__section-icon__svg inline-google-podcasts__svg inline-journalism/audio__svg">
+                                                @if ($page->links->google_url)
+                                                    <a href="{{ $page->links->google_url }}" target="_blank"><svg style="{{ isset($_GET['lang']) ? 'float: right;margin-left:30px;' : 'margin-left: 30px;float: left;' }} display: block" width="25" height="25" viewBox="0 0 17 17" class="podcast__meta-icon__svg podcast__section-icon__svg inline-google-podcasts__svg inline-journalism/audio__svg">
                                                             <g style="" fill="#000">
                                                                 <path d="M7.299 5.308v6.067h2.085V5.308z"></path>
                                                                 <circle cx="1.043" cy="7.773" r="1.043"></circle>
@@ -574,14 +575,14 @@
                                         <br/>
                                     </div>
 
-                                    {{--<div class="col-md-12">--}}
-                                        {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->speaker_ar : $post->speaker !!}</h5>--}}
-                                        {{--<h5 class="ar">{!! isset($_GET['lang']) ? $post->series_ar : $post->series !!}</h5>--}}
-                                        {{--<br/>--}}
-                                    {{--</div>--}}
+                                    {{-- <div class="col-md-12"> --}}
+                                        {{-- <h5 class="ar">{!! isset($_GET['lang']) ? $post->speaker_ar : $post->speaker !!}</h5> --}}
+                                        {{-- <h5 class="ar">{!! isset($_GET['lang']) ? $post->series_ar : $post->series !!}</h5> --}}
+                                        {{-- <br/> --}}
+                                    {{-- </div> --}}
 
-                                    @if(isset($_GET['lang']))
-                                        @if($_GET['lang']=='ar')
+                                    @if (isset($_GET['lang']))
+                                        @if ($_GET['lang'] == 'ar')
                                             <div class="col-md-12 text-right">
                                                 {!! $page->content_ar !!}
                                                 <br>
@@ -598,7 +599,7 @@
 
 
 
-                        @if($formdata)
+                        @if (isset($formdata) && $formdata)
                             <div class="container text-center">
                                 <div class="body-section contents">
                                     @include('partials.form')
@@ -606,18 +607,18 @@
                             </div>
                         @endif
 
-                        @if($post->buttonLinks)
+                        @if (isset($post->buttonLinks) && $post->buttonLinks)
                             <div class="container text-center">
                                 <div class="body-section contents">
                                     <div class="row" dir="rtl">
                                         <div class="col-md-6 text-right">
-                                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                                                <a href="{{$post->buttonLinks->value_ar}}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
+                                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                                <a href="{{ $post->buttonLinks->value_ar }}"><input type="submit" class="ar" value="{{ $post->buttonLinks->title_ar }}"></a>
                                             @endif
                                         </div>
                                         <div class="col-md-6 text-left">
-                                            @if($post->buttonLinks->title && $post->buttonLinks->value)
-                                                <a href="{{$post->buttonLinks->value}}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
+                                            @if ($post->buttonLinks->title && $post->buttonLinks->value)
+                                                <a href="{{ $post->buttonLinks->value }}"><input type="submit" class="en" value="{{ $post->buttonLinks->title }}"></a>
                                             @endif
                                         </div>
                                     </div>
@@ -654,30 +655,35 @@
     <script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><script type='text/javascript'>(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='MMERGE5';ftypes[5]='text';fnames[6]='MMERGE6';ftypes[6]='dropdown';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
     <!--End mc_embed_signup-->
 
-    @if(\Request::path()=="/")
+    @if (\Request::path() == '/')
         <script src="{{ asset('public/js/home.js') }}"></script>
     @else
-        <script src="{{ asset('public/js/inner.js') }}"></script>
-    @endif
+        <script src="{{ asset('public/js/inner.js') }}"></script> @endif
 
     <script>
         var owl = $('.owl-carousel').owlCarousel({
-            loop:true,
-            margin:0,
-            nav:false,
-            items:1,
-            dotsContainer:'#owl-dots',
-            onChange: function (elem) {
-                setTimeout(function(){
-                    html = '<span class="imgcap"><span class="en float-left">'+$('.owl-item.active img').attr('data-en')+'</span><span dir="rtl" class="ar float-right">'+$('.owl-item.active img').attr('data-ar')+'</span></span>';
+            loop: true,
+            margin: 0,
+            nav: false,
+            items: 1,
+            dotsContainer: '#owl-dots',
+            onChange: function(elem) {
+                setTimeout(function() {
+                    html = '<span class="imgcap"><span class="en float-left">' + $(
+                            '.owl-item.active img').attr('data-en') +
+                        '</span><span dir="rtl" class="ar float-right">' + $('.owl-item.active img')
+                        .attr('data-ar') + '</span></span>';
                     $('#owl-caption').html(html);
-                },300);
+                }, 300);
             },
-            onInitialize: function (elem) {
-                setTimeout(function(){
-                    html = '<span class="imgcap"><span class="en float-left">'+$('.owl-item.active img').attr('data-en')+'</span><span dir="rtl" class="ar float-right">'+$('.owl-item.active img').attr('data-ar')+'</span></span>';
+            onInitialize: function(elem) {
+                setTimeout(function() {
+                    html = '<span class="imgcap"><span class="en float-left">' + $(
+                            '.owl-item.active img').attr('data-en') +
+                        '</span><span dir="rtl" class="ar float-right">' + $('.owl-item.active img')
+                        .attr('data-ar') + '</span></span>';
                     $('#owl-caption').html(html);
-                },500);
+                }, 500);
             }
         });
 
@@ -690,7 +696,6 @@
             // Parameters has to be in square bracket '[]'
             owl.trigger('prev.owl.carousel');
         });
-
     </script>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/amplitudejs@v5.0.3/dist/amplitude.js"></script>
@@ -701,13 +706,11 @@
                 39: 'next',
                 32: 'play_pause'
             },
-            "songs": [
-                {
-                    "name": "{{ isset($_GET['lang']) ? $post->title_ar : $post->title }}",
-                    "artist": "{{ isset($_GET['lang']) ? $post->speaker_ar : $post->speaker }}",
-                    "url": "{{ asset('public/'.$post->audio_file) }}",
-                }
-            ]
+            "songs": [{
+                "name": "{{ isset($_GET['lang']) ? $post->title_ar : $post->title }}",
+                "artist": "{{ isset($_GET['lang']) ? $post->speaker_ar : $post->speaker }}",
+                "url": "{{ asset('public/' . $post->audio_file) }}",
+            }]
         });
 
         window.onkeydown = function(e) {
@@ -717,17 +720,12 @@
         /*
           Handles a click on the song played progress bar.
         */
-        document.getElementById('song-played-progress').addEventListener('click', function( e ){
+        document.getElementById('song-played-progress').addEventListener('click', function(e) {
             var offset = this.getBoundingClientRect();
             var x = e.pageX - offset.left;
 
-            Amplitude.setSongPlayedPercentage( ( parseFloat( x ) / parseFloat( this.offsetWidth) ) * 100 );
+            Amplitude.setSongPlayedPercentage((parseFloat(x) / parseFloat(this.offsetWidth)) * 100);
         });
-
-
     </script>
 </body>
 </html>
-
-
-
