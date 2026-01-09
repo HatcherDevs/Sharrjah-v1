@@ -442,7 +442,8 @@
                         {{--                        @endif --}}
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-4']->images as $image)
-                                <div class="item"><img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                <div class="item"><img src="{{ asset('public/' . $image->image) }}"
+                                        width="100%">
                                 </div>
                             @endforeach
                         </div>
@@ -475,7 +476,8 @@
                         @endif
                         <div class="owl-carousel owl-theme news-carousel">
                             @foreach ($content['tab-4']->images as $image)
-                                <div class="item"><img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                <div class="item"><img src="{{ asset('public/' . $image->image) }}"
+                                        width="100%">
                                 </div>
                             @endforeach
                         </div>
@@ -796,7 +798,13 @@
     // Our markers
     markers = [
         @foreach ($data as $item)
-        ['{{ $item->id }}', '{{ $lang == 'ar' ? $item->title_ar : $item->title }}', {{ $item->lat }}, {{ $item->lng }}, '{{ $item->research_type_id }}','{{ asset('public/img/research') }}/m{{ $item->research_type_id }}.png','{{ $item->year }}',"{{ strip_tags(json_encode($item->content)) }}",'{{ $item->color }}','{{ $item->slug }}','{{ $item->thumb }}'], @endforeach
+            ['{{ $item->id }}', '{{ $lang == 'ar' ? $item->title_ar : $item->title }}', {{ $item->lat }},
+                {{ $item->lng }}, '{{ $item->research_type_id }}',
+                '{{ asset('public/img/research') }}/m{{ $item->research_type_id }}.png', '{{ $item->year }}',
+                "{{ strip_tags(json_encode($item->content)) }}", '{{ $item->color }}', '{{ $item->slug }}',
+                '{{ $item->thumb }}'
+            ],
+        @endforeach
     ];
 
     // Our type and timeline details
@@ -804,11 +812,12 @@
     typeTimeDetails = [];
     @foreach ($types as $type)
         row = {
-        'id' : '{{ $type['id'] }}',
-        @foreach ($timelines as $timeline)
-        '{{ $timeline }}' : `{{ $type[$timeline] }}`, @endforeach
-    };
-    typeTimeDetails.push(row);
+            'id': '{{ $type['id'] }}',
+            @foreach ($timelines as $timeline)
+                '{{ $timeline }}': `{{ $type[$timeline] }}`,
+            @endforeach
+        };
+        typeTimeDetails.push(row);
     @endforeach
 
     var introwrapEl = document.getElementById('introwrap');
@@ -846,11 +855,13 @@
             success: function(response) {
                 data = JSON.parse(response);
 
-                @if ($lang == 'ar') $('#building-title').html(data.title_ar);
-                $('#building-content').html(data.content_ar);
+                @if ($lang == 'ar')
+                    $('#building-title').html(data.title_ar);
+                    $('#building-content').html(data.content_ar);
                 @else
-                $('#building-title').html(data.title);
-                $('#building-content').html(data.content); @endif
+                    $('#building-title').html(data.title);
+                    $('#building-content').html(data.content);
+                @endif
                 $('#researchId').val(data.id);
 
                 $('#building-carousel').trigger('add.owl.carousel', ['<div class="item"><img src="' + data
@@ -992,7 +1003,7 @@
                 $('#timeline.active').css('left', $('#bottommenu').offset().left + 'px');
             @else
                 $('#timeline.active').css('left', $('#bottommenu').offset().left + $('#bottommenu')
-                .outerWidth() + 'px');
+                    .outerWidth() + 'px');
             @endif
 
             boxWidth = 0;
