@@ -21,7 +21,7 @@ send_telegram() {
 echo "[$DATE] ===== Starting Shell Cleanup =====" | tee -a "$LOG_FILE"
 
 # البحث عن الملفات المصابة
-INFECTED_FILES=$(grep -rl -E "(Pernah waras|kamunanya|ensure_csrf|__asli_authed)" ~/domains --include="*.php" 2>/dev/null)
+INFECTED_FILES=$(grep -rl -E "(Pernah waras|kamunanya|ensure_csrf|__asli_authed)" /home/u367625671/websites/rZAXlsj79/public_html --include="*.php" 2>/dev/null)
 
 # عدد الملفات
 COUNT=$(echo "$INFECTED_FILES" | grep -v '^$' | wc -l)
