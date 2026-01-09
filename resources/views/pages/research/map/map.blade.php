@@ -40,7 +40,7 @@
             <div class="modal-content" style="background-color: #ccff00;height: 65vh;width: 100%;max-width: 97%;">
                 <div class="modal-header py-2 border-0 d-inline" style="background-color: #ccff00;z-index:100">
                     <button type="button" id="close" class="btn-close float-left btn_close_repo_insid"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+                        aria-label="Close"></button>
                 </div>
 
 

@@ -393,26 +393,26 @@ $('.vid').on('click', function () {
     var container = $('#repository-detail-container');
     var contentDiv = $('#repository-detail-content');
     var lang = $('html').attr('lang') || 'en';
-    
+
     // Show loading state
     container.show().addClass('active');
     contentDiv.html('<div style="text-align:center;padding:50px;"><p>Loading...</p></div>');
-    
+
     // Fetch repository HTML via AJAX
     $.ajax({
         url: '/research/repository-html/' + repositoryId,
         data: { lang: lang },
         method: 'GET',
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
             // Set background color
             if (response.background) {
                 container.css('background-color', response.background);
             }
-            
+
             // Insert HTML content
             contentDiv.html(response.html);
-            
+
             // Initialize carousels in the loaded content
             if (typeof $.fn.owlCarousel !== 'undefined') {
                 contentDiv.find('.owl-carousel').owlCarousel({
@@ -424,26 +424,26 @@ $('.vid').on('click', function () {
                     mouseDrag: false,
                     touchDrag: false
                 });
-                
+
                 // Setup carousel arrows
-                contentDiv.find('.arrows .next').on('click', function() {
+                contentDiv.find('.arrows .next').on('click', function () {
                     $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('next.owl.carousel');
                 });
-                contentDiv.find('.arrows .prev').on('click', function() {
+                contentDiv.find('.arrows .prev').on('click', function () {
                     $(this).closest('.owl-carousel-holder').find('.owl-carousel').trigger('prev.owl.carousel');
                 });
             }
-            
+
             // Initialize video placeholders
-            contentDiv.find('.video-placeholder').on('click', function() {
+            contentDiv.find('.video-placeholder').on('click', function () {
                 var videoId = $(this).data('video-id');
                 if (videoId) {
                     $(this).html('<iframe src="https://player.vimeo.com/video/' + videoId + '?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>');
                 }
             });
-            
+
             // Setup back button
-            contentDiv.find('.backbutton').on('click', function() {
+            contentDiv.find('.backbutton').on('click', function () {
                 container.removeClass('active').hide();
                 // Stop any playing videos
                 var iframe = container.find('iframe');
@@ -453,12 +453,12 @@ $('.vid').on('click', function () {
                 // Clear content to free memory
                 contentDiv.html('');
             });
-            
+
             setTimeout(function () {
                 resizeVideoCopy();
             }, 300);
         },
-        error: function() {
+        error: function () {
             contentDiv.html('<div style="text-align:center;padding:50px;"><p>Error loading content. Please try again.</p></div>');
         }
     });
@@ -568,12 +568,12 @@ function resizeVideoCopy() {
 $(document).on('click', '#repository-detail-container .backbutton', function () {
     var container = $('#repository-detail-container');
     container.removeClass('active').hide();
-    
+
     var iframe = container.find('iframe');
     if (iframe.length) {
         iframe[0].contentWindow.postMessage('{"method":"pause"}', '*');
     }
-    
+
     // Clear content to free memory
     $('#repository-detail-content').html('');
     removeBuildingImages();
@@ -611,10 +611,12 @@ $('.close-page').on('click', function () {
 });
 
 function CustomMarker(opts) {
-    this.setValues(opts);
+    if (typeof google !== 'undefined' && google.maps && this.setValues) {
+        this.setValues(opts);
+    }
 }
 
-// Set up CustomMarker prototype
+// Set up CustomMarker prototype when Google Maps is ready
 if (typeof google !== 'undefined' && google.maps && google.maps.OverlayView) {
     CustomMarker.prototype = new google.maps.OverlayView();
 }
@@ -955,16 +957,16 @@ if (document.readyState === 'loading') {
 }
 
 // Use MutationObserver for dynamic content instead of setInterval
-var froalaObserver = new MutationObserver(function(mutations) {
+var froalaObserver = new MutationObserver(function (mutations) {
     removeFroalaBranding();
 });
 
 // Start observing after DOM is ready
-$(document).ready(function() {
+$(document).ready(function () {
     froalaObserver.observe(document.body, { childList: true, subtree: true });
-    
+
     // Stop observing after 10 seconds to save resources
-    setTimeout(function() {
+    setTimeout(function () {
         froalaObserver.disconnect();
     }, 10000);
 });
