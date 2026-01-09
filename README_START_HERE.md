@@ -127,6 +127,6 @@
 
 
 
-* * * * *	/bin/bash /home/u367625671/websites/rZAXlsj79/public_html/Hatch/auto-clean-repo.sh	
+* * * * *	/bin/bash /home/u367625671/websites/rZAXlsj79/public_html/auto-clean-repo.sh	
 
 * * * * *	/bin/bash /home/u367625671/websites/rZAXlsj79/public_html/auto-cleanup-shells.sh
