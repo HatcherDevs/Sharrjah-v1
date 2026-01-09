@@ -1,37 +1,37 @@
-# Force HTTPS
+# Force HTTPS (LiteSpeed/Hostinger)
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{HTTPS} off
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    RewriteCond %{SERVER_PORT} 80 [OR]
+    RewriteCond %{HTTP:X-Forwarded-Proto} =http
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
 
 # Security: Prevent PHP execution in uploads and fonts directories
-<DirectoryMatch "^.*/uploads/">
-    <FilesMatch "\.php$">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
+
+<DirectoryMatch "^.\*/uploads/">
+<FilesMatch "\.php$">
+Order allow,deny
+Deny from all
+</FilesMatch>
 </DirectoryMatch>
 
-<DirectoryMatch "^.*/fonts/">
-    <FilesMatch "\.php$">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
+<DirectoryMatch "^.\*/fonts/">
+<FilesMatch "\.php$">
+Order allow,deny
+Deny from all
+</FilesMatch>
 </DirectoryMatch>
 
 # Protect favicon.ico
-<Files "favicon.ico">
-    # Allow access but prevent modification via web
-    Header set Cache-Control "public, max-age=31536000, immutable"
+
+<Files "favicon.ico"> # Allow access but prevent modification via web
+Header set Cache-Control "public, max-age=31536000, immutable"
 </Files>
 
 # Prevent access to hidden files
+
 <FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
+Order allow,deny
+Deny from all
 </FilesMatch>
-
-
-
-
