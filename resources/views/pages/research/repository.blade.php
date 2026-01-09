@@ -811,14 +811,19 @@
     typeTimeDetails.push(row);
     @endforeach
 
-    document.getElementById('introwrap').addEventListener('mousemove', function(e) {
-        let body = document.getElementById('introwrap');
-        let circle = document.getElementById('clickstart');
-        let left = e.offsetX;
-        let top = e.offsetY;
-        circle.style.left = left + 30 + 'px';
-        circle.style.top = (top - 60) + 'px';
-    });
+    var introwrapEl = document.getElementById('introwrap');
+    if (introwrapEl) {
+        introwrapEl.addEventListener('mousemove', function(e) {
+            let body = document.getElementById('introwrap');
+            let circle = document.getElementById('clickstart');
+            if (circle) {
+                let left = e.offsetX;
+                let top = e.offsetY;
+                circle.style.left = left + 30 + 'px';
+                circle.style.top = (top - 60) + 'px';
+            }
+        });
+    }
 
     function addMarkerClick() {
         $('.show-building').on('click', function() {

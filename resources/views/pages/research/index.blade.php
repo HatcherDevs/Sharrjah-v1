@@ -189,7 +189,8 @@
                             @endif
                             <div class="owl-carousel owl-theme news-carousel">
                                 @foreach ($content['tab-3']->images as $image)
-                                    <div class="item"><img src="{{ asset('public/' . $image->image) }}" width="100%">
+                                    <div class="item"><img src="{{ asset('public/' . $image->image) }}"
+                                            width="100%">
                                     </div>
                                 @endforeach
                             </div>
@@ -681,22 +682,38 @@
 
     // POPUP repository
     // var repoCount =0;
-    document.querySelector('a[data-id="page-1"]').addEventListener("click", function(e) {
-        // repoCount++;
-        // if(!(repoCount > 1)){
-        document.querySelector(".popuprepository").style.display = "block";
-        document.querySelector(".overlay2").style.display = "block";
-        // }
-    })
+    var repoLink = document.querySelector('a[data-id="page-1"]');
+    if (repoLink) {
+        repoLink.addEventListener("click", function(e) {
+            // repoCount++;
+            // if(!(repoCount > 1)){
+            var popupRepo = document.querySelector(".popuprepository");
+            var overlay2 = document.querySelector(".overlay2");
+            if (popupRepo) popupRepo.style.display = "block";
+            if (overlay2) overlay2.style.display = "block";
+            // }
+        });
+    }
 
-    document.querySelector("#close").addEventListener("click", function() {
-        document.querySelector(".popuprepository").style.display = "none";
-        document.querySelector(".overlay2").style.display = "none";
-    })
-    document.querySelector(".overlay2").addEventListener("click", function() {
-        document.querySelector(".popuprepository").style.display = "none";
-        document.querySelector(".overlay2").style.display = "none";
-    })
+    var closeBtn2 = document.querySelector("#close");
+    if (closeBtn2) {
+        closeBtn2.addEventListener("click", function() {
+            var popupRepo = document.querySelector(".popuprepository");
+            var overlay2 = document.querySelector(".overlay2");
+            if (popupRepo) popupRepo.style.display = "none";
+            if (overlay2) overlay2.style.display = "none";
+        });
+    }
+
+    var overlay2El = document.querySelector(".overlay2");
+    if (overlay2El) {
+        overlay2El.addEventListener("click", function() {
+            var popupRepo = document.querySelector(".popuprepository");
+            var overlay2 = document.querySelector(".overlay2");
+            if (popupRepo) popupRepo.style.display = "none";
+            if (overlay2) overlay2.style.display = "none";
+        });
+    }
 </script>
 
 <style>
@@ -1087,7 +1104,13 @@
     // Our markers
     markers = [
         @foreach ($data as $item)
-        ['{{ $item->id }}', '{{ $lang == 'ar' ? $item->title_ar : $item->title }}', {{ $item->lat }}, {{ $item->lng }}, '{{ $item->research_type_id }}','{{ asset('public/img/research') }}/m{{ $item->research_type_id }}.png','{{ $item->year }}',"{{ strip_tags(json_encode($item->content)) }}",'{{ $item->color }}','{{ $item->slug }}','{{ $item->thumb }}'], @endforeach
+            ['{{ $item->id }}', '{{ $lang == 'ar' ? $item->title_ar : $item->title }}', {{ $item->lat }},
+                {{ $item->lng }}, '{{ $item->research_type_id }}',
+                '{{ asset('public/img/research') }}/m{{ $item->research_type_id }}.png', '{{ $item->year }}',
+                "{{ strip_tags(json_encode($item->content)) }}", '{{ $item->color }}', '{{ $item->slug }}',
+                '{{ $item->thumb }}'
+            ],
+        @endforeach
     ];
 
     // Our type and timeline details
@@ -1095,21 +1118,27 @@
     typeTimeDetails = [];
     @foreach ($types as $type)
         row = {
-            'id' : '{{ $type['id'] }}',
+            'id': '{{ $type['id'] }}',
             @foreach ($timelines as $timeline)
-                '{{ $timeline }}' : `{{ $type[$timeline] }}`, @endforeach
-    };
-    typeTimeDetails.push(row);
+                '{{ $timeline }}': `{{ $type[$timeline] }}`,
+            @endforeach
+        };
+        typeTimeDetails.push(row);
     @endforeach
 
-    document.getElementById('introwrap').addEventListener('mousemove', function(e) {
-        let body = document.getElementById('introwrap');
-        let circle = document.getElementById('clickstart');
-        let left = e.offsetX;
-        let top = e.offsetY;
-        circle.style.left = left + 30 + 'px';
-        circle.style.top = (top - 60) + 'px';
-    });
+    var introwrapEl = document.getElementById('introwrap');
+    if (introwrapEl) {
+        introwrapEl.addEventListener('mousemove', function(e) {
+            let body = document.getElementById('introwrap');
+            let circle = document.getElementById('clickstart');
+            if (circle) {
+                let left = e.offsetX;
+                let top = e.offsetY;
+                circle.style.left = left + 30 + 'px';
+                circle.style.top = (top - 60) + 'px';
+            }
+        });
+    }
 
     function addMarkerClick() {
         $('.show-building').on('click', function() {
@@ -1132,11 +1161,13 @@
             success: function(response) {
                 data = JSON.parse(response);
 
-                @if ($lang == 'ar') $('#building-title').html(data.title_ar);
-                $('#building-content').html(data.content_ar);
+                @if ($lang == 'ar')
+                    $('#building-title').html(data.title_ar);
+                    $('#building-content').html(data.content_ar);
                 @else
-                $('#building-title').html(data.title);
-                $('#building-content').html(data.content); @endif
+                    $('#building-title').html(data.title);
+                    $('#building-content').html(data.content);
+                @endif
                 $('#researchId').val(data.id);
 
                 $('#building-carousel').trigger('add.owl.carousel', ['<div class="item"><img src="' + data
@@ -1364,16 +1395,23 @@
     window.addEventListener("load", function() {
         setTimeout(
             function open(event) {
-                document.querySelector(".popup").style.display = "block";
-                document.getElementById("overlay-popup").style.display = "flex";
+                var popup = document.querySelector(".popup");
+                var overlay = document.getElementById("overlay-popup");
+                if (popup) popup.style.display = "block";
+                if (overlay) overlay.style.display = "flex";
             },
             1000
         )
     });
-    document.querySelector("#close").addEventListener("click", function() {
-        document.querySelector(".popup").style.display = "none";
-        document.getElementById("overlay-popup").style.display = "none";
-    });
+    var closeBtn = document.querySelector("#close");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", function() {
+            var popup = document.querySelector(".popup");
+            var overlay = document.getElementById("overlay-popup");
+            if (popup) popup.style.display = "none";
+            if (overlay) overlay.style.display = "none";
+        });
+    }
 </script>
 <?php
 if(isset($_GET['article'])){
@@ -1388,12 +1426,15 @@ if(isset($_GET['article'])){
 
 
 <script>
-    let overlay_popup = document.querySelector('#overlay-popup');
-    overlay_popup.addEventListener('click', function() {
-        document.querySelector(".popup").style.display = "none";
-        document.getElementById("overlay-popup").style.display = "none";
-
-    })
+    var overlay_popup = document.querySelector('#overlay-popup');
+    if (overlay_popup) {
+        overlay_popup.addEventListener('click', function() {
+            var popup = document.querySelector(".popup");
+            var overlayEl = document.getElementById("overlay-popup");
+            if (popup) popup.style.display = "none";
+            if (overlayEl) overlayEl.style.display = "none";
+        });
+    }
 
     document.querySelectorAll(".copy").forEach(function(ele) {
         ele.setAttribute('style', '');
@@ -1406,30 +1447,44 @@ if(isset($_GET['article'])){
     window.addEventListener("load", function() {
         this.setTimeout(
             function open(event) {
-                document.querySelector(".popupLanding").style.display = "block";
-                document.querySelector(".fullwindow").style.display = "block";
+                var popupLanding = document.querySelector(".popupLanding");
+                var fullwindow = document.querySelector(".fullwindow");
+                if (popupLanding) popupLanding.style.display = "block";
+                if (fullwindow) fullwindow.style.display = "block";
             },
             100
         )
     })
 
-    document.querySelector("#closeLanding").addEventListener("click", function() {
-        document.querySelector(".popupLanding").style.display = "none";
-        document.querySelector(".fullwindow").style.display = "none";
+    var closeLandingBtn = document.querySelector("#closeLanding");
+    if (closeLandingBtn) {
+        closeLandingBtn.addEventListener("click", function() {
+            var popupLanding = document.querySelector(".popupLanding");
+            var fullwindow = document.querySelector(".fullwindow");
+            if (popupLanding) popupLanding.style.display = "none";
+            if (fullwindow) fullwindow.style.display = "none";
+        });
+    }
 
-    })
+    var headerEl = document.querySelector("#header");
+    if (headerEl) {
+        headerEl.addEventListener("click", function() {
+            var popupLanding = document.querySelector(".popupLanding");
+            var fullwindow = document.querySelector(".fullwindow");
+            if (popupLanding) popupLanding.style.display = "none";
+            if (fullwindow) fullwindow.style.display = "none";
+        });
+    }
 
-    document.querySelector("#header").addEventListener("click", function() {
-        document.querySelector(".popupLanding").style.display = "none";
-        document.querySelector(".fullwindow").style.display = "none";
-
-    })
-
-    document.querySelector("#closewidnow").addEventListener("click", function() {
-        document.querySelector(".popupLanding").style.display = "none";
-        document.querySelector(".fullwindow").style.display = "none";
-
-    })
+    var closewindowBtn = document.querySelector("#closewidnow");
+    if (closewindowBtn) {
+        closewindowBtn.addEventListener("click", function() {
+            var popupLanding = document.querySelector(".popupLanding");
+            var fullwindow = document.querySelector(".fullwindow");
+            if (popupLanding) popupLanding.style.display = "none";
+            if (fullwindow) fullwindow.style.display = "none";
+        });
+    }
 
     {{--  
 var repos = document.querySelectorAll('.repos');
