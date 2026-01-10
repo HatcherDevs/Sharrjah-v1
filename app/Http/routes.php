@@ -268,7 +268,7 @@ Route::get('spaces/preview/{id}', 'Admin\SpacesController@preview');
 Route::get('stores/preview/{id}', 'Admin\StoreController@preview');
 Route::get('stores/workshops/preview/{id}', 'Admin\StoreWorkshopController@preview');
 Route::get('triennial-2023/preview/{id}', 'Admin\Triennial2023Controller@preview');
-Route::get('sat-tours/preview/{id}', 'Admin\SatToursController@preview');
+Route::get('sat-tours/preview/{id}', 'Admin\SatTourController@preview');
 
 
 Route::group(['prefix' => 'research'], function () {
@@ -327,9 +327,3 @@ if (version_compare(PHP_VERSION, '7.2.0', '>=')) {
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
-
-
-
-
-
-

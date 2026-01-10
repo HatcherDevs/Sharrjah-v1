@@ -499,7 +499,7 @@
                                         <script src="https://player.vimeo.com/api/player.js"></script>
 
                                     </div>
-                                @elseif(count($page->sliders) == 1)
+                                @elseif(count($page->sliders ?? []) == 1)
                                     <div class="col-md-12">
                                         @if ($page->slider && $page->slider->square)
                                             <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
@@ -521,7 +521,7 @@
                                                 </span>
                                         @endif
                                     </div>
-                                @elseif(count($page->sliders) > 1)
+                                @elseif(count($page->sliders ?? []) > 1)
                                     <div class="col-md-12">
                                         <div class="owl-carousel-holder" dir="ltr">
                                             <div class="arrows">
@@ -599,7 +599,7 @@
                             </div>
                         </div>
                         <div class="col-md-3 sideb">
-                            @if (count($similar))
+                            @if (count($similar ?? []))
                                 <b>MORE</b><br/>
                                 <br/>
                                 @foreach ($similar as $pod)

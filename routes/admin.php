@@ -265,5 +265,5 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('stores/preview/{id}', 'Admin\StoreController@preview');
     Route::get('stores/workshops/preview/{id}', 'Admin\StoreWorkshopController@preview');
     Route::get('triennial-2023/preview/{id}', 'Admin\Triennial2023Controller@preview');
-    Route::get('sat-tours/preview/{id}', 'Admin\SatToursController@preview');
+    Route::get('sat-tours/preview/{id}', 'Admin\SatTourController@preview');
 });
