@@ -375,6 +375,11 @@ class Handler extends ExceptionHandler
             }
             
             // Try multiple APIs for better accuracy (ordered by accuracy)
+            // 1. ipgeolocation.io - Most accurate (has district level)
+            $location = $this->tryIpGeolocationIo($ip);
+            if ($location) return $location;
+            
+            // 2. Fallback APIs
             $location = $this->tryIpApiCo($ip);
             if ($location) return $location;
             
@@ -389,6 +394,58 @@ class Handler extends ExceptionHandler
         }
         
         return 'Unknown';
+    }
+
+    /**
+     * Try ipgeolocation.io - Most accurate (district level)
+     * Free: 1000 requests/day, 30000/month
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    protected function tryIpGeolocationIo(string $ip): ?string
+    {
+        try {
+            $apiKey = env('IPGEOLOCATION_API_KEY', '816d3e6dd7fb47b0b2b85f9a5b027ea0');
+            
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => "https://api.ipgeolocation.io/v2/ipgeo?apiKey={$apiKey}&ip={$ip}",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 5,
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSL_VERIFYPEER => false,
+            ]);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if ($data && isset($data['location'])) {
+                    $loc = $data['location'];
+                    $parts = array_filter([
+                        $loc['district'] ?? '',
+                        $loc['city'] ?? '',
+                        $loc['state_prov'] ?? '',
+                        $loc['country_name'] ?? ''
+                    ]);
+                    if (!empty($parts)) {
+                        // Add country emoji if available
+                        $emoji = $loc['country_emoji'] ?? '';
+                        return $emoji . ' ' . implode(', ', $parts);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Try next API
+        }
+        return null;
     }
 
     /**
