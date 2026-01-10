@@ -14,7 +14,7 @@
                         @else
                             <h1 class="en">{!! $post->title !!}</h1>
                         @endif
-                        @if (!count($post->sliders))
+                        @if (!count($post->sliders ?? []))
                             {!! $post->content !!}
                         @endif
                     </div>
@@ -29,7 +29,7 @@
                             <h1>{!! $post->title_ar !!}</h1>
                         @endif
 
-                        @if (!count($post->sliders))
+                        @if (!count($post->sliders ?? []))
                             @if ($post->parent->slug == 'open-call-exhibition-designer')
                                 <style>
                                     .innerpage .contents .text-right span {
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        @if (count($post->sliders))
+        @if (count($post->sliders ?? []))
             <?php $page = $post; ?>
             @include('partials.slide-images')
         @endif

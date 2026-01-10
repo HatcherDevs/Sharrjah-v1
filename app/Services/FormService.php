@@ -7,7 +7,7 @@ class FormService {
     function getForm($page){
 
         $formdata = [];
-        if($page->forms()->count())
+        if($page && $page->forms()->count())
             $formdata = $page->forms()->first()->form;
 
         if($formdata)
