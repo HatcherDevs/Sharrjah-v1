@@ -225,10 +225,21 @@ class Handler extends ExceptionHandler
             $errorCode = $this->getErrorCode($exception);
             $emoji = $this->getErrorEmoji($errorCode);
             
+            // جمع معلومات الزائر
+            $ip = $this->getClientIp();
+            $location = $this->getIpLocation($ip);
+            $deviceInfo = $this->getDeviceInfo();
+            
             // رسالة مختصرة ومفيدة
             $message = "{$emoji} *{$appName}*\n\n";
             $message .= "📄 *Page:* `/{$path}`\n";
             $message .= "❌ *Error {$errorCode}:*\n`" . $this->truncate($exception->getMessage(), 200) . "`\n\n";
+            $message .= "👤 *Visitor Info:*\n";
+            $message .= "🌐 *IP:* `{$ip}`\n";
+            $message .= "📍 *Location:* `{$location}`\n";
+            $message .= "💻 *Device:* `{$deviceInfo['device']}`\n";
+            $message .= "🖥️ *OS:* `{$deviceInfo['os']}`\n";
+            $message .= "🌍 *Browser:* `{$deviceInfo['browser']}`\n\n";
             $message .= "⏰ `{$date}`";
 
             // إرسال الرسالة
@@ -312,6 +323,228 @@ class Handler extends ExceptionHandler
             return $text;
         }
         return substr($text, 0, $length) . '...';
+    }
+
+    /**
+     * Get the real client IP address
+     *
+     * @return string
+     */
+    protected function getClientIp(): string
+    {
+        $request = request();
+        
+        // Check for proxied IP addresses
+        $headers = [
+            'HTTP_CF_CONNECTING_IP',     // Cloudflare
+            'HTTP_X_FORWARDED_FOR',      // Most proxies
+            'HTTP_X_REAL_IP',            // Nginx proxy
+            'HTTP_CLIENT_IP',            // Some proxies
+            'REMOTE_ADDR',               // Direct connection
+        ];
+        
+        foreach ($headers as $header) {
+            $ip = $request->server($header);
+            if ($ip) {
+                // X-Forwarded-For may contain multiple IPs, take the first one
+                $ips = explode(',', $ip);
+                $ip = trim($ips[0]);
+                
+                // Validate IP
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+        
+        return $request->ip() ?? 'Unknown';
+    }
+
+    /**
+     * Get location info from IP using free API
+     *
+     * @param string $ip
+     * @return string
+     */
+    protected function getIpLocation(string $ip): string
+    {
+        try {
+            // Skip for local/private IPs
+            if ($this->isPrivateIp($ip)) {
+                return 'Local Network';
+            }
+            
+            // Use ip-api.com (free, no API key required, 45 requests/minute)
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "http://ip-api.com/json/{$ip}?fields=status,country,regionName,city");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            $response = curl_exec($ch);
+            curl_close($ch);
+            
+            if ($response) {
+                $data = json_decode($response, true);
+                if ($data && $data['status'] === 'success') {
+                    $parts = array_filter([
+                        $data['city'] ?? '',
+                        $data['regionName'] ?? '',
+                        $data['country'] ?? ''
+                    ]);
+                    return implode(', ', $parts) ?: 'Unknown';
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail
+        }
+        
+        return 'Unknown';
+    }
+
+    /**
+     * Check if IP is private/local
+     *
+     * @param string $ip
+     * @return bool
+     */
+    protected function isPrivateIp(string $ip): bool
+    {
+        return !filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+        );
+    }
+
+    /**
+     * Get device information from User Agent
+     *
+     * @return array
+     */
+    protected function getDeviceInfo(): array
+    {
+        $userAgent = request()->userAgent() ?? '';
+        
+        return [
+            'device' => $this->detectDevice($userAgent),
+            'os' => $this->detectOS($userAgent),
+            'browser' => $this->detectBrowser($userAgent),
+        ];
+    }
+
+    /**
+     * Detect device type from User Agent
+     *
+     * @param string $userAgent
+     * @return string
+     */
+    protected function detectDevice(string $userAgent): string
+    {
+        $userAgent = strtolower($userAgent);
+        
+        // Check for tablets first (before mobile)
+        if (preg_match('/tablet|ipad|playbook|silk/i', $userAgent)) {
+            return '📱 Tablet';
+        }
+        
+        // Check for mobile devices
+        if (preg_match('/mobile|android|iphone|ipod|blackberry|opera mini|iemobile|wpdesktop/i', $userAgent)) {
+            return '📱 Mobile';
+        }
+        
+        // Check for bots/crawlers
+        if (preg_match('/bot|crawl|spider|slurp|googlebot|bingbot|yandex/i', $userAgent)) {
+            return '🤖 Bot/Crawler';
+        }
+        
+        return '🖥️ Desktop';
+    }
+
+    /**
+     * Detect operating system from User Agent
+     *
+     * @param string $userAgent
+     * @return string
+     */
+    protected function detectOS(string $userAgent): string
+    {
+        $osList = [
+            '/windows nt 10/i'      => 'Windows 10/11',
+            '/windows nt 6.3/i'     => 'Windows 8.1',
+            '/windows nt 6.2/i'     => 'Windows 8',
+            '/windows nt 6.1/i'     => 'Windows 7',
+            '/windows nt 6.0/i'     => 'Windows Vista',
+            '/windows phone/i'      => 'Windows Phone',
+            '/macintosh|mac os x/i' => 'macOS',
+            '/mac_powerpc/i'        => 'Mac OS 9',
+            '/iphone/i'             => 'iOS (iPhone)',
+            '/ipad/i'               => 'iOS (iPad)',
+            '/ipod/i'               => 'iOS (iPod)',
+            '/android/i'            => 'Android',
+            '/linux/i'              => 'Linux',
+            '/ubuntu/i'             => 'Ubuntu',
+            '/blackberry/i'         => 'BlackBerry',
+            '/webos/i'              => 'webOS',
+        ];
+        
+        foreach ($osList as $pattern => $os) {
+            if (preg_match($pattern, $userAgent)) {
+                // Try to get version for Android
+                if ($os === 'Android' && preg_match('/android\s([\d.]+)/i', $userAgent, $matches)) {
+                    return "Android {$matches[1]}";
+                }
+                // Try to get version for iOS
+                if (strpos($os, 'iOS') !== false && preg_match('/os\s([\d_]+)/i', $userAgent, $matches)) {
+                    return str_replace('_', '.', $os . ' ' . $matches[1]);
+                }
+                return $os;
+            }
+        }
+        
+        return 'Unknown OS';
+    }
+
+    /**
+     * Detect browser from User Agent
+     *
+     * @param string $userAgent
+     * @return string
+     */
+    protected function detectBrowser(string $userAgent): string
+    {
+        $browserList = [
+            '/edge|edg/i'           => 'Microsoft Edge',
+            '/opr|opera/i'          => 'Opera',
+            '/chrome|crios/i'       => 'Chrome',
+            '/firefox|fxios/i'      => 'Firefox',
+            '/safari/i'             => 'Safari',
+            '/msie|trident/i'       => 'Internet Explorer',
+            '/samsung/i'            => 'Samsung Browser',
+            '/ucbrowser/i'          => 'UC Browser',
+        ];
+        
+        foreach ($browserList as $pattern => $browser) {
+            if (preg_match($pattern, $userAgent)) {
+                // Try to get version
+                $versionPatterns = [
+                    'Edge' => '/edge?\/([\d.]+)/i',
+                    'Chrome' => '/chrome\/([\d.]+)/i',
+                    'Firefox' => '/firefox\/([\d.]+)/i',
+                    'Safari' => '/version\/([\d.]+)/i',
+                    'Opera' => '/(?:opr|opera)[\/\s]([\d.]+)/i',
+                ];
+                
+                foreach ($versionPatterns as $name => $vPattern) {
+                    if (stripos($browser, $name) !== false && preg_match($vPattern, $userAgent, $matches)) {
+                        return "{$browser} {$matches[1]}";
+                    }
+                }
+                
+                return $browser;
+            }
+        }
+        
+        return 'Unknown Browser';
     }
 
     /**
