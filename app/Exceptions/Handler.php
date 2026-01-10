@@ -361,7 +361,7 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Get location info from IP using free API
+     * Get location info from IP using multiple free APIs for better accuracy
      *
      * @param string $ip
      * @return string
@@ -374,7 +374,112 @@ class Handler extends ExceptionHandler
                 return 'Local Network';
             }
             
-            // Use ip-api.com (free, no API key required, 45 requests/minute)
+            // Try multiple APIs for better accuracy (ordered by accuracy)
+            $location = $this->tryIpApiCo($ip);
+            if ($location) return $location;
+            
+            $location = $this->tryIpWhois($ip);
+            if ($location) return $location;
+            
+            $location = $this->tryIpApi($ip);
+            if ($location) return $location;
+            
+        } catch (\Exception $e) {
+            // Silently fail
+        }
+        
+        return 'Unknown';
+    }
+
+    /**
+     * Try ipapi.co - More accurate for Middle East/Africa
+     * Free: 1000 requests/day
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    protected function tryIpApiCo(string $ip): ?string
+    {
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://ipapi.co/{$ip}/json/");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: Mozilla/5.0']);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if ($data && !isset($data['error'])) {
+                    $parts = array_filter([
+                        $data['city'] ?? '',
+                        $data['region'] ?? '',
+                        $data['country_name'] ?? ''
+                    ]);
+                    if (!empty($parts)) {
+                        return implode(', ', $parts);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Try next API
+        }
+        return null;
+    }
+
+    /**
+     * Try ipwhois.io - Good accuracy, includes ISP info
+     * Free: 10000 requests/month
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    protected function tryIpWhois(string $ip): ?string
+    {
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://ipwhois.app/json/{$ip}");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if ($data && ($data['success'] ?? true) !== false) {
+                    $parts = array_filter([
+                        $data['city'] ?? '',
+                        $data['region'] ?? '',
+                        $data['country'] ?? ''
+                    ]);
+                    if (!empty($parts)) {
+                        return implode(', ', $parts);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Try next API
+        }
+        return null;
+    }
+
+    /**
+     * Try ip-api.com - Fallback option
+     * Free: 45 requests/minute
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    protected function tryIpApi(string $ip): ?string
+    {
+        try {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "http://ip-api.com/json/{$ip}?fields=status,country,regionName,city");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -391,14 +496,15 @@ class Handler extends ExceptionHandler
                         $data['regionName'] ?? '',
                         $data['country'] ?? ''
                     ]);
-                    return implode(', ', $parts) ?: 'Unknown';
+                    if (!empty($parts)) {
+                        return implode(', ', $parts);
+                    }
                 }
             }
         } catch (\Exception $e) {
-            // Silently fail
+            // All APIs failed
         }
-        
-        return 'Unknown';
+        return null;
     }
 
     /**
