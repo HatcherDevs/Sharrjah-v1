@@ -227,7 +227,7 @@ class Handler extends ExceptionHandler
             
             // جمع معلومات الزائر
             $ip = $this->getClientIp();
-            $location = $this->getIpLocation($ip);
+            $locationData = $this->getIpLocationWithCoords($ip);
             $deviceInfo = $this->getDeviceInfo();
             
             // رسالة مختصرة ومفيدة
@@ -236,7 +236,13 @@ class Handler extends ExceptionHandler
             $message .= "❌ *Error {$errorCode}:*\n`" . $this->truncate($exception->getMessage(), 200) . "`\n\n";
             $message .= "👤 *Visitor Info:*\n";
             $message .= "🌐 *IP:* `{$ip}`\n";
-            $message .= "📍 *Location:* `{$location}`\n";
+            $message .= "📍 *Location:* {$locationData['location']}\n";
+            
+            // إضافة رابط Google Maps لو في إحداثيات
+            if (!empty($locationData['maps_link'])) {
+                $message .= "🗺️ *Map:* [Open in Google Maps]({$locationData['maps_link']})\n";
+            }
+            
             $message .= "💻 *Device:* `{$deviceInfo['device']}`\n";
             $message .= "🖥️ *OS:* `{$deviceInfo['os']}`\n";
             $message .= "🌍 *Browser:* `{$deviceInfo['browser']}`\n\n";
@@ -368,42 +374,55 @@ class Handler extends ExceptionHandler
      */
     protected function getIpLocation(string $ip): string
     {
+        $data = $this->getIpLocationWithCoords($ip);
+        return $data['location'];
+    }
+
+    /**
+     * Get location info with coordinates from IP
+     *
+     * @param string $ip
+     * @return array ['location' => string, 'maps_link' => string|null]
+     */
+    protected function getIpLocationWithCoords(string $ip): array
+    {
+        $default = ['location' => 'Unknown', 'maps_link' => null];
+        
         try {
             // Skip for local/private IPs
             if ($this->isPrivateIp($ip)) {
-                return 'Local Network';
+                return ['location' => 'Local Network', 'maps_link' => null];
             }
             
-            // Try multiple APIs for better accuracy (ordered by accuracy)
-            // 1. ipgeolocation.io - Most accurate (has district level)
-            $location = $this->tryIpGeolocationIo($ip);
-            if ($location) return $location;
+            // Try ipgeolocation.io first (most accurate with coordinates)
+            $result = $this->tryIpGeolocationIoWithCoords($ip);
+            if ($result) return $result;
             
-            // 2. Fallback APIs
+            // Fallback APIs (without coordinates)
             $location = $this->tryIpApiCo($ip);
-            if ($location) return $location;
+            if ($location) return ['location' => $location, 'maps_link' => null];
             
             $location = $this->tryIpWhois($ip);
-            if ($location) return $location;
+            if ($location) return ['location' => $location, 'maps_link' => null];
             
             $location = $this->tryIpApi($ip);
-            if ($location) return $location;
+            if ($location) return ['location' => $location, 'maps_link' => null];
             
         } catch (\Exception $e) {
             // Silently fail
         }
         
-        return 'Unknown';
+        return $default;
     }
 
     /**
-     * Try ipgeolocation.io - Most accurate (district level)
+     * Try ipgeolocation.io with coordinates - Most accurate (district level)
      * Free: 1000 requests/day, 30000/month
      *
      * @param string $ip
-     * @return string|null
+     * @return array|null
      */
-    protected function tryIpGeolocationIo(string $ip): ?string
+    protected function tryIpGeolocationIoWithCoords(string $ip): ?array
     {
         try {
             $apiKey = env('IPGEOLOCATION_API_KEY', '816d3e6dd7fb47b0b2b85f9a5b027ea0');
@@ -435,10 +454,23 @@ class Handler extends ExceptionHandler
                         $loc['state_prov'] ?? '',
                         $loc['country_name'] ?? ''
                     ]);
+                    
                     if (!empty($parts)) {
-                        // Add country emoji if available
                         $emoji = $loc['country_emoji'] ?? '';
-                        return $emoji . ' ' . implode(', ', $parts);
+                        $locationStr = $emoji . ' ' . implode(', ', $parts);
+                        
+                        // Build Google Maps link if coordinates available
+                        $mapsLink = null;
+                        if (!empty($loc['latitude']) && !empty($loc['longitude'])) {
+                            $lat = $loc['latitude'];
+                            $lng = $loc['longitude'];
+                            $mapsLink = "https://www.google.com/maps?q={$lat},{$lng}";
+                        }
+                        
+                        return [
+                            'location' => $locationStr,
+                            'maps_link' => $mapsLink
+                        ];
                     }
                 }
             }
@@ -446,6 +478,19 @@ class Handler extends ExceptionHandler
             // Try next API
         }
         return null;
+    }
+
+    /**
+     * Try ipgeolocation.io - Most accurate (district level)
+     * Free: 1000 requests/day, 30000/month
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    protected function tryIpGeolocationIo(string $ip): ?string
+    {
+        $result = $this->tryIpGeolocationIoWithCoords($ip);
+        return $result ? $result['location'] : null;
     }
 
     /**
