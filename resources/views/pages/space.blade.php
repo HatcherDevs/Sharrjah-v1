@@ -436,7 +436,7 @@
                         <div class="col-md-9">
                             <div class="row">
                             <?php $page = $post; ?>
-                                    @if (count($page->sliders) == 1)
+                                    @if (count($page->sliders ?? []) == 1)
                                         <div class="col-md-12">
                                             @if ($page->slider->square)
                                                 <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
@@ -458,7 +458,7 @@
                                                 </span>
                                             @endif
                                         </div>
-                                    @elseif(count($page->sliders) > 1)
+                                    @elseif(count($page->sliders ?? []) > 1)
                                         <div class="col-md-12">
                                             <div class="owl-carousel-holder" dir="ltr">
                                                 <div class="arrows">
