@@ -123,7 +123,9 @@
                     <ul class="figure-list">
                         @include('partials.lists.no-img')
                     </ul>
-                    {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @if ($data)
+                        {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @endif
                 </div>
             </div>
         @elseif($page->page_type == 'list-one-lang')
@@ -165,7 +167,9 @@
                             </li>
                         @endforeach
                     </ul>
-                    {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @if ($data)
+                        {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @endif
                 </div>
             </div>
         @elseif($page->page_type == 'list-image')
@@ -174,13 +178,15 @@
                     <ul class="figure-list">
                         @include('partials.lists.with-img')
                     </ul>
-                    {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @if ($data)
+                        {{ $data->links('vendor.pagination.bootstrap-3') }}
+                    @endif
                 </div>
             </div>
         @endif
 
 
-         @if (isset($formdata) && $formdata)
+        @if (isset($formdata) && $formdata)
             <div class="container text-center">
                 <div class="body-section contents">
                     @include('partials.form')
