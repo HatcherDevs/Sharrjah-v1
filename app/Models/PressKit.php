@@ -8,7 +8,9 @@ class PressKit extends Model
 {
     protected $fillable = ['username','password','publish_date','title','title_ar','description','description_ar','slug'];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
 
     public function items(){
         return $this->hasMany('App\Models\PressKitItem');
