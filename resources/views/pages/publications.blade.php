@@ -187,12 +187,16 @@
     height: 430px; margin-bottom: 15px !important;;">
                         @endif
 
+                        @php
+                            $pageType = $item->pageType;
+                            $pageTypeType = is_array($pageType) ? $pageType['type'] ?? 'page' : 'page';
+                        @endphp
                         @if (isset($_GET['lang']))
                             @if ($_GET['lang'] == 'ar')
-                                <a href="{{ $item->linkAr }}" {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                <a href="{{ $item->linkAr }}" {!! $pageTypeType == 'file' && $item->fileDataAr ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $pageTypeType == 'url' || $pageTypeType == 'file' ? 'target="_blank"' : '' !!}>
                             @endif
                         @else
-                            <a href="{{ $item->link }}" {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                            <a href="{{ $item->link }}" {!! $pageTypeType == 'file' && $item->fileData ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $pageTypeType == 'url' || $pageTypeType == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
 
                         @if (count($item->sliders[0]))
