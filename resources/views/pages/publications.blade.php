@@ -199,7 +199,7 @@
                             <a href="{{ $item->link }}" {!! $pageTypeType == 'file' && $item->fileData ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $pageTypeType == 'url' || $pageTypeType == 'file' ? 'target="_blank"' : '' !!}>
                         @endif
 
-                        @if (count($item->sliders[0]))
+                        @if (count($item->sliders) && $item->sliders[0])
                             @if ($item->sliders[0]->landscape)
                                 <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
                             @else
