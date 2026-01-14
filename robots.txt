@@ -1,6 +1,17 @@
-User-agent: *
+# السماح لبوت جوجل بالوصول الكامل
+User-agent: Googlebot
+Allow: /
 Disallow: /cgi-bin/
 Disallow: /admin/
 Disallow: /public/
+
+# السماح لبوت صور جوجل
+User-agent: Googlebot-Image
+Allow: /
+
+# منع جميع البوتات الأخرى
+User-agent: *
+Disallow: /
+
 Sitemap: https://sharjaharchitecture.org/sitemap.xml
 Sitemap: https://sharjaharchitecture.org/site-map.xml

@@ -7,6 +7,48 @@
 
     RewriteEngine On
 
+    # ============================================
+    # منع البوتات الخبيثة والسكرابرز
+    # ============================================
+    
+    # منع البوتات الخبيثة المعروفة
+    RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|linkdexbot|Sogou|YandexBot|BingBot|Baiduspider|Exabot|ia_archiver|MegaIndex|Majestic|SEOkicks|meanpathbot|sistrix|BacklinkCrawler|Screaming|spbot|TurnitinBot|magpie|Nutch|AspiegelBot|ZoominfoBot|Dataprovider|MauiBot|ClaudeBot|anthropic-ai|GPTBot|ChatGPT-User|CCBot|Google-Extended|PerplexityBot|Bytespider|PetalBot) [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} (wget|curl|libwww|Python|perl|nikto|scan|HTTrack|clshttp|harvest|extract|grab|miner|fetch|parser|loader|postman|httpie) [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} (bot|crawl|spider|slurp|mediapartners) [NC]
+    RewriteCond %{HTTP_USER_AGENT} !Googlebot [NC]
+    RewriteCond %{HTTP_USER_AGENT} !Googlebot-Image [NC]
+    RewriteCond %{HTTP_USER_AGENT} !Googlebot-News [NC]
+    RewriteCond %{HTTP_USER_AGENT} !Googlebot-Video [NC]
+    RewriteCond %{HTTP_USER_AGENT} !Google-InspectionTool [NC]
+    RewriteCond %{HTTP_USER_AGENT} !AdsBot-Google [NC]
+    RewriteRule .* - [F,L]
+
+    # منع الطلبات بدون User-Agent
+    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^-$ 
+    RewriteRule .* - [F,L]
+
+    # منع طرق HTTP المشبوهة
+    RewriteCond %{REQUEST_METHOD} ^(TRACE|DELETE|TRACK|DEBUG|CONNECT) [NC]
+    RewriteRule .* - [F,L]
+
+    # منع محاولات حقن SQL في URL
+    RewriteCond %{QUERY_STRING} (union|select|insert|drop|delete|update|alter|create|truncate|exec|execute|xp_|sp_|0x|cast|declare|nvarchar|varchar) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\.\./|\.\.\\|;|'|"|<|>|\[|\]|\{|\}|\\x00|\\x1a) [NC]
+    RewriteRule .* - [F,L]
+
+    # Rate Limiting - منع الطلبات السريعة جداً (يحتاج mod_evasive)
+    # <IfModule mod_evasive20.c>
+    #     DOSHashTableSize 3097
+    #     DOSPageCount 2
+    #     DOSSiteCount 50
+    #     DOSPageInterval 1
+    #     DOSSiteInterval 1
+    #     DOSBlockingPeriod 10
+    # </IfModule>
+
+    # ============================================
+
     # Force HTTPS (LiteSpeed/Hostinger)
     RewriteCond %{HTTPS} !=on
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
