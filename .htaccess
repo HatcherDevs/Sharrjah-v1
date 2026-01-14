@@ -11,41 +11,48 @@
     # منع البوتات الخبيثة والسكرابرز
     # ============================================
     
-    # منع البوتات الخبيثة المعروفة
-    RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|linkdexbot|Sogou|YandexBot|BingBot|Baiduspider|Exabot|ia_archiver|MegaIndex|Majestic|SEOkicks|meanpathbot|sistrix|BacklinkCrawler|Screaming|spbot|TurnitinBot|magpie|Nutch|AspiegelBot|ZoominfoBot|Dataprovider|MauiBot|ClaudeBot|anthropic-ai|GPTBot|ChatGPT-User|CCBot|Google-Extended|PerplexityBot|Bytespider|PetalBot) [NC,OR]
-    RewriteCond %{HTTP_USER_AGENT} (wget|curl|libwww|Python|perl|nikto|scan|HTTrack|clshttp|harvest|extract|grab|miner|fetch|parser|loader|postman|httpie) [NC,OR]
-    RewriteCond %{HTTP_USER_AGENT} (bot|crawl|spider|slurp|mediapartners) [NC]
-    RewriteCond %{HTTP_USER_AGENT} !Googlebot [NC]
-    RewriteCond %{HTTP_USER_AGENT} !Googlebot-Image [NC]
-    RewriteCond %{HTTP_USER_AGENT} !Googlebot-News [NC]
-    RewriteCond %{HTTP_USER_AGENT} !Googlebot-Video [NC]
-    RewriteCond %{HTTP_USER_AGENT} !Google-InspectionTool [NC]
-    RewriteCond %{HTTP_USER_AGENT} !AdsBot-Google [NC]
-    RewriteRule .* - [F,L]
+    # منع البوتات الخبيثة المعروفة (بدون جوجل)
+    RewriteCond %{HTTP_USER_AGENT} AhrefsBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} SemrushBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} MJ12bot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} DotBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} BLEXBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} YandexBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} BingBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Baiduspider [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} GPTBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ChatGPT-User [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ClaudeBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} CCBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} PerplexityBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Bytespider [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} PetalBot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} anthropic-ai [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Sogou [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Exabot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} MegaIndex [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Majestic [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} SEOkicks [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} sistrix [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} BacklinkCrawler [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Screaming [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} spbot [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Nutch [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} HTTrack [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} wget [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} Python-urllib [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} python-requests [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} libwww-perl [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} nikto [NC]
+    RewriteRule ^(.*)$ - [F,L]
 
     # منع الطلبات بدون User-Agent
-    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
-    RewriteCond %{HTTP_USER_AGENT} ^-$ 
-    RewriteRule .* - [F,L]
+    RewriteCond %{HTTP_USER_AGENT} ^-?$
+    RewriteRule ^(.*)$ - [F,L]
 
     # منع طرق HTTP المشبوهة
     RewriteCond %{REQUEST_METHOD} ^(TRACE|DELETE|TRACK|DEBUG|CONNECT) [NC]
-    RewriteRule .* - [F,L]
-
-    # منع محاولات حقن SQL في URL
-    RewriteCond %{QUERY_STRING} (union|select|insert|drop|delete|update|alter|create|truncate|exec|execute|xp_|sp_|0x|cast|declare|nvarchar|varchar) [NC,OR]
-    RewriteCond %{QUERY_STRING} (\.\./|\.\.\\|;|'|"|<|>|\[|\]|\{|\}|\\x00|\\x1a) [NC]
-    RewriteRule .* - [F,L]
-
-    # Rate Limiting - منع الطلبات السريعة جداً (يحتاج mod_evasive)
-    # <IfModule mod_evasive20.c>
-    #     DOSHashTableSize 3097
-    #     DOSPageCount 2
-    #     DOSSiteCount 50
-    #     DOSPageInterval 1
-    #     DOSSiteInterval 1
-    #     DOSBlockingPeriod 10
-    # </IfModule>
+    RewriteRule ^(.*)$ - [F,L]
 
     # ============================================
 
