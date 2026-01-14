@@ -16,6 +16,18 @@
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $requestPath = parse_url($requestUri, PHP_URL_PATH) ?? '/';
+$queryString = $_SERVER['QUERY_STRING'] ?? '';
+
+// ============================================
+// تصحيح الروابط المكررة (مثل /contributors/contributors/)
+// ============================================
+
+$fixedPath = preg_replace('#/([^/]+)/\1(/|$)#i', '/$1$2', $requestPath);
+if ($fixedPath !== $requestPath) {
+    $redirectUrl = $fixedPath . ($queryString ? '?' . $queryString : '');
+    header("Location: $redirectUrl", true, 301);
+    exit;
+}
 
 // ============================================
 // منع أي امتداد ملف مشبوه
