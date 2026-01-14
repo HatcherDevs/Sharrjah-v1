@@ -14,6 +14,38 @@
 */
 
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+$blockedPaths = [
+    '/autodiscover',
+    '/AutoDiscover', 
+    '/.env',
+    '/.git',
+    '/wp-admin',
+    '/wp-login',
+    '/wp-content',
+    '/xmlrpc.php',
+    '/phpmyadmin',
+    '/admin.php',
+    '/shell',
+    '/cmd',
+    '/eval-stdin',
+    '/.well-known/security.txt',
+    '/vendor/',
+    '/config/',
+    '/backup',
+    '/debug',
+    '/test.php',
+    '/info.php',
+    '/phpinfo',
+];
+
+foreach ($blockedPaths as $path) {
+    if (stripos($requestUri, $path) !== false) {
+        http_response_code(403);
+        exit('Access Denied');
+    }
+}
 
 // البوتات المحظورة
 $blockedBots = [
