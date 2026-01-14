@@ -1,4 +1,3 @@
-
 <?php
 
 /**
@@ -7,6 +6,47 @@
  * @package  Laravel
  * @author   Taylor Otwell <taylorotwell@gmail.com>
  */
+
+/*
+|--------------------------------------------------------------------------
+| Block Bad Bots (Before Laravel Loads)
+|--------------------------------------------------------------------------
+*/
+
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+// البوتات المحظورة
+$blockedBots = [
+    'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'BLEXBot', 'YandexBot',
+    'BingBot', 'Baiduspider', 'GPTBot', 'ChatGPT-User', 'ClaudeBot', 'CCBot',
+    'PerplexityBot', 'Bytespider', 'PetalBot', 'anthropic-ai', 'Sogou',
+    'Exabot', 'MegaIndex', 'Majestic', 'SEOkicks', 'sistrix', 'BacklinkCrawler',
+    'Screaming', 'spbot', 'Nutch', 'HTTrack', 'wget/', 'Python-urllib',
+    'python-requests', 'libwww-perl', 'nikto', 'Go-http-client', 'Java/',
+    'Apache-HttpClient', 'curl/', 'Scrapy', 'DataForSeoBot', 'Applebot'
+];
+
+// السماح لبوتات جوجل فقط
+$isGoogleBot = stripos($userAgent, 'Googlebot') !== false 
+            || stripos($userAgent, 'Google-InspectionTool') !== false
+            || stripos($userAgent, 'AdsBot-Google') !== false
+            || stripos($userAgent, 'Mediapartners-Google') !== false;
+
+if (!$isGoogleBot) {
+    // منع بدون User-Agent
+    if (empty($userAgent) || $userAgent === '-') {
+        http_response_code(403);
+        exit('Access Denied');
+    }
+    
+    // منع البوتات الخبيثة
+    foreach ($blockedBots as $bot) {
+        if (stripos($userAgent, $bot) !== false) {
+            http_response_code(403);
+            exit('Access Denied');
+        }
+    }
+}
 
 /*
 |--------------------------------------------------------------------------
