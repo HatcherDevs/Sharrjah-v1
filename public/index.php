@@ -24,6 +24,8 @@ $blockedPaths = [
     '/wp-admin',
     '/wp-login',
     '/wp-content',
+    '/wp-includes',
+    '/wlwmanifest',
     '/xmlrpc.php',
     '/phpmyadmin',
     '/admin.php',
