@@ -15,31 +15,52 @@
 
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$requestPath = parse_url($requestUri, PHP_URL_PATH) ?? '/';
+
+// ============================================
+// منع أي امتداد ملف مشبوه
+// ============================================
+
+// الامتدادات المسموحة فقط
+$allowedExtensions = ['', 'html', 'htm', 'css', 'js', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'otf', 'pdf', 'mp4', 'webm', 'mp3', 'json', 'xml', 'txt', 'map'];
+
+// الامتدادات الخطيرة (نحظرها مباشرة)
+$dangerousExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'phar', 'asp', 'aspx', 'jsp', 'cgi', 'pl', 'py', 'rb', 'sh', 'bash', 'exe', 'dll', 'bat', 'sql', 'bak', 'old', 'orig', 'swp', 'env', 'log', 'ini', 'conf', 'config', 'yml', 'yaml', 'lock', 'md', 'htaccess', 'htpasswd', 'git', 'svn'];
+
+$extension = strtolower(pathinfo($requestPath, PATHINFO_EXTENSION));
+
+// لو الامتداد خطير ومش من الموقع الأساسي
+if (in_array($extension, $dangerousExtensions) && $requestPath !== '/index.php') {
+    http_response_code(403);
+    exit('Access Denied');
+}
+
+// ============================================
+// منع المسارات المشبوهة
+// ============================================
 
 $blockedPaths = [
-    '/autodiscover',
-    '/AutoDiscover', 
-    '/.env',
-    '/.git',
-    '/wp-admin',
-    '/wp-login',
-    '/wp-content',
-    '/wp-includes',
-    '/wlwmanifest',
-    '/xmlrpc.php',
-    '/phpmyadmin',
-    '/admin.php',
-    '/shell',
-    '/cmd',
-    '/eval-stdin',
-    '/.well-known/security.txt',
-    '/vendor/',
-    '/config/',
-    '/backup',
-    '/debug',
-    '/test.php',
-    '/info.php',
-    '/phpinfo',
+    // WordPress
+    '/wp-', '/wordpress', '/wlwmanifest', '/xmlrpc',
+    // Exchange/Microsoft
+    '/autodiscover', '/owa/', '/ecp/', '/ews/',
+    // Config files
+    '/.env', '/.git', '/.svn', '/.htaccess', '/.htpasswd',
+    // Admin panels
+    '/phpmyadmin', '/pma/', '/myadmin', '/mysql', '/adminer',
+    '/cpanel', '/plesk', '/webmail', '/roundcube',
+    // Shell/Backdoor
+    '/shell', '/cmd', '/eval', '/exec', '/system',
+    '/c99', '/r57', '/webshell', '/backdoor',
+    // Laravel internals (من برا)
+    '/vendor/', '/storage/', '/bootstrap/', '/config/',
+    '/database/', '/resources/', '/app/',
+    // Common exploits
+    '/cgi-bin', '/scripts/', '/.well-known/security',
+    '/backup', '/dump', '/debug', '/test', '/temp/', '/tmp/',
+    '/info.php', '/phpinfo', '/php-info',
+    // Other CMS
+    '/joomla', '/drupal', '/magento', '/typo3',
 ];
 
 foreach ($blockedPaths as $path) {
@@ -49,7 +70,9 @@ foreach ($blockedPaths as $path) {
     }
 }
 
-// البوتات المحظورة
+// ============================================
+// منع البوتات الخبيثة
+// ============================================
 $blockedBots = [
     'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'BLEXBot', 'YandexBot',
     'BingBot', 'Baiduspider', 'GPTBot', 'ChatGPT-User', 'ClaudeBot', 'CCBot',
