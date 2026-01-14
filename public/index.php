@@ -53,7 +53,9 @@ if (in_array($extension, $dangerousExtensions) && $requestPath !== '/index.php')
 
 $blockedPaths = [
     // WordPress
-    '/wp-', '/wordpress', '/wlwmanifest', '/xmlrpc',
+    '/wp-', '/wp/', '/wp', '/wordpress', '/wlwmanifest', '/xmlrpc',
+    // Blog/Old/New paths
+    '/blog', '/old', '/new',
     // Exchange/Microsoft
     '/autodiscover', '/owa/', '/ecp/', '/ews/',
     // Config files
