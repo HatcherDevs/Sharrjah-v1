@@ -270,7 +270,7 @@
                 @endif
 
                 <div class="row" dir="">
-                    @if (count($page->sliders) == 1)
+                    @if ($page->sliders && count($page->sliders) == 1)
                         <div class="col-md-12">
                             @if ($page->parent->slug == 'partners')
                                 @if ($page->slider->original)
@@ -313,9 +313,9 @@
                     </div>
 
                     <!--   <div class="col-md-6 </?php echo isset($_GET['lang']) ? 'text-right cairo' : 'text-left'; ?>" </?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                                                    {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
-                                                    </div>
-                                -->
+                                                        {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
+                                                        </div>
+                                    -->
                 </div>
             </div>
         </div>
@@ -328,10 +328,10 @@
                     </div>
                     <br />
                     <!--
-                // ! ||--------------------------------------------------------------------------------||
-                // ! ||                  this comment to hide bottom for opportunities                 ||
-                // ! ||--------------------------------------------------------------------------------||
-                -->
+                    // ! ||--------------------------------------------------------------------------------||
+                    // ! ||                  this comment to hide bottom for opportunities                 ||
+                    // ! ||--------------------------------------------------------------------------------||
+                    -->
                     {{-- <div class="row"> --}}
                     {{-- @foreach ($data as $item) --}}
                     {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
