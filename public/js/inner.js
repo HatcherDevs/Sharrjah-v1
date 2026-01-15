@@ -53,7 +53,7 @@ function resizeHeaders(){
             currentHeight = parseInt($(this).css('height'));
     });
 
-    console.log(currentHeight);
+    // console.log(currentHeight);
     $('.innerpage h1').css('height',currentHeight+'px');
 
     currentHeight=0;
