@@ -43,7 +43,9 @@
                                 <ul class="en" id="{{ $letter }}">
                                     @if (isset($data_en[$letter]))
                                         @foreach ($data_en[$letter] as $item)
-                                            <li><a href="{{ $item['link'] }}">{{ $item['name'] }}</a></li>
+                                            <a href="{{ $item['link'] }}">
+                                                <li>{{ $item['name'] }}</li>
+                                            </a>
                                         @endforeach
                                     @endif
                                 </ul>
