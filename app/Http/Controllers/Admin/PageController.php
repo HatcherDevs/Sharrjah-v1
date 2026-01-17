@@ -167,13 +167,15 @@ class PageController extends Controller
         $additional2_imgs_page = [];
 
         $currentImgs = json_decode($page->additional2_content_img);
-        foreach ($currentImgs as $img) {
-            if ($img != null) {
-                if (in_array($img, $request->input('additional2_content_img'))) {
-                    array_push($additional2_imgs_page, $img);
-                } else {
-                    if (File::exists(public_path($img))) {
-                        File::delete(public_path($img));
+        if ($currentImgs) {
+            foreach ($currentImgs as $img) {
+                if ($img != null) {
+                    if (in_array($img, $request->input('additional2_content_img') ?? [])) {
+                        array_push($additional2_imgs_page, $img);
+                    } else {
+                        if (File::exists(public_path($img))) {
+                            File::delete(public_path($img));
+                        }
                     }
                 }
             }
@@ -195,7 +197,7 @@ class PageController extends Controller
             dd('Page does not exist');
 
         $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads');
-        if ($data['name'] != $page->name) {
+        if (isset($data['name']) && $data['name'] != $page->name) {
             if ($request->input('id') != 15)
                 $data['slug'] = $this->generateSlug($request->input('name'));
         }
@@ -250,63 +252,81 @@ class PageController extends Controller
                             $targetSlide = PageImageSlide::find($target->uploadable_id);
 
                             if ($target->template == "square")
-                                $photo = ($files != null ? $this->uploader->upload($upload) : false);
+                                $photo = $this->uploader->upload($upload);
                             else
-                                $photo = ($files != null ? $this->luploader->upload($upload) : false);
+                                $photo = $this->luploader->upload($upload);
 
-                            $newUpload = $targetSlide->uploads()->create($photo[0]);
+                            if ($photo) {
+                                $newUpload = $targetSlide->uploads()->create($photo[0]);
 
-                            $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-
-                            unset($uploadCaptions[$target->id]);
-                            $target->delete();
+                                if (isset($uploadCaptions[$target->id])) {
+                                    $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                    unset($uploadCaptions[$target->id]);
+                                }
+                                $target->delete();
+                            }
                         }
                     }
                 }
             }
 
-            foreach ($files as $index => $file) {
-                if ($file['square'] || $file['landscape']) {
-                    $slide = $page->sliders()->create([]);
+            if ($files) {
+                foreach ($files as $index => $file) {
+                    $hasSquare = isset($file['square']) && $file['square'];
+                    $hasLandscape = isset($file['landscape']) && $file['landscape'];
+                    
+                    if ($hasSquare || $hasLandscape) {
+                        $slide = $page->sliders()->create([]);
 
-                    if ($file['square']) {
-                        // Square Image
-                        $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
+                        if ($hasSquare) {
+                            // Square Image
+                            $photo = $this->uploader->upload($file['square']);
 
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            if ($photo) {
+                                $photo[0]['caption'] = isset($captions[$index]['EN']) ? $captions[$index]['EN'] : '';
+                                $photo[0]['caption_ar'] = isset($captions[$index]['AR']) ? $captions[$index]['AR'] : '';
 
-                        $slide->uploads()->create($photo[0]);
-                    }
+                                $slide->uploads()->create($photo[0]);
+                            }
+                        }
 
-                    if ($file['landscape']) {
-                        // Landscape Image
-                        $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
+                        if ($hasLandscape) {
+                            // Landscape Image
+                            $photo = $this->luploader->upload($file['landscape']);
 
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            if ($photo) {
+                                $photo[0]['caption'] = isset($captions[$index]['EN']) ? $captions[$index]['EN'] : '';
+                                $photo[0]['caption_ar'] = isset($captions[$index]['AR']) ? $captions[$index]['AR'] : '';
 
-                        $slide->uploads()->create($photo[0]);
+                                $slide->uploads()->create($photo[0]);
+                            }
+                        }
                     }
                 }
             }
 
             $newUploads = $request->file('newUploads');
+            $hasNewSquare = $newUploads && isset($newUploads['square']) && $newUploads['square'];
+            $hasNewLandscape = $newUploads && isset($newUploads['landscape']) && $newUploads['landscape'];
 
-            if ($newUploads['square'] || $newUploads['landscape']) {
+            if ($hasNewSquare || $hasNewLandscape) {
 
                 $slide = PageImageSlide::find($request->input('newUploads')['slide_id']);
 
-                if ($newUploads['square']) {
+                if ($hasNewSquare) {
                     // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
-                    $slide->uploads()->create($photo[0]);
+                    $photo = $this->uploader->upload($newUploads['square']);
+                    if ($photo) {
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
 
-                if ($newUploads['landscape']) {
+                if ($hasNewLandscape) {
                     // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
-                    $slide->uploads()->create($photo[0]);
+                    $photo = $this->luploader->upload($newUploads['landscape']);
+                    if ($photo) {
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
             }
 

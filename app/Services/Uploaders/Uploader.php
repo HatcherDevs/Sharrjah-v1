@@ -117,7 +117,7 @@ abstract class Uploader {
      */
     protected function createPayLoad($original_name, $file_name, $path, $mime_type, $template = '')
     {
-        return compact('original_name', 'file_name', 'path', 'mime_type', 'template','real_path');
+        return compact('original_name', 'file_name', 'path', 'mime_type', 'template');
     }
 
     /**
