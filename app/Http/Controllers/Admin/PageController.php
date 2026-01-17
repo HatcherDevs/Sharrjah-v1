@@ -93,7 +93,11 @@ class PageController extends Controller
     public function previewPost($id)
     {
         $post = Post::find($id);
-        return view('pages.post-preview', compact('post'));
+        if (!$post) {
+            abort(404);
+        }
+        $relatedPages = ['pages' => [], 'posts' => []];
+        return view('pages.post-preview', compact('post', 'relatedPages'));
     }
 
     public function previewPublication($id)

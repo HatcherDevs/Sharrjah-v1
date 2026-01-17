@@ -96,6 +96,7 @@ Route::get('pages/triennial-2023/{slug}', 'Admin\Triennial2023Controller@single'
 Route::get('pages/publications/{slug}', 'Admin\PublicationController@single');
 Route::get('pages/sat-tours/{slug}', 'Admin\SatTourController@single');
 Route::get('pages/preview/{id}', 'Admin\PageController@preview');
+Route::get('posts/preview/{id}', 'Admin\PageController@previewPost');
 
 Route::get('pages/{page}/{slug}', 'PageController@goToPageSlug');
 Route::get('pages/{page}/{cat}/{slug}', 'PageController@goToPageCatSlug');
