@@ -21,7 +21,7 @@ Route::get('admin/posts', function () {
     return view('admin.posts');
 });
 
-Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents');
+Route::get('api/calendar/get-all-events', 'CalendarController@getCalendarEvents')->middleware('throttle:60,1');
 
 // Test Error Pages (Remove in production)
 if (env('ENABLE_ERROR_TEST_ROUTES', false)) {
@@ -108,15 +108,13 @@ Route::post('search', 'SearchController@searchPost');
 
 Route::post('subscribe', 'SubscribeController@subscribe');
 
-Route::get('show-pages', 'PageController@showAllPages');
+// Protected: requires authentication (for debugging purposes only)
+Route::get('show-pages', 'PageController@showAllPages')->middleware('auth');
 
 Route::get('pages/{any}', 'PageController@goToPage');
 
-if (version_compare(PHP_VERSION, '7.2.0', '>=')) {
-    // Ignores notices and reports all other kinds... and warnings
-    error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
-    // error_reporting(E_ALL ^ E_WARNING); // Maybe this is enough
-}
+// Note: Error reporting is now handled in config/app.php and .env
+// Do not modify error_reporting here in production
 
 // Route::auth();
 

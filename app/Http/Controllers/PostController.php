@@ -86,7 +86,7 @@ class PostController extends Controller
         $page = Page::where('slug',$slug)->first();
 
         if(!$page)
-            dd('Post type does not exist.');
+            abort(404, 'Post type does not exist.');
 
         $page_id = $page->id;
         $forms = Form::select('id','title')->get();
@@ -173,7 +173,7 @@ class PostController extends Controller
         $page = $this->model->find($request->input('id'));
 
         if(!$page)
-            dd('Page does not exist');
+            abort(404, 'Page does not exist');
 
         $data = $request->except('images','id','buttonLink');
 

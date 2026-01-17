@@ -51,7 +51,7 @@ class ContributorController extends Controller
         $page = Page::where('slug','contributors')->first();
 
         if(!$page)
-            dd('Post type does not exist.');
+            abort(404, 'Post type does not exist.');
 
         $page_id = $page->id;
 
@@ -136,7 +136,7 @@ class ContributorController extends Controller
         $page = Post::find($request->input('id'));
 
         if(!$page)
-            dd('Page does not exist');
+            abort(404, 'Page does not exist');
 
         $data = $request->except('images','id');
 

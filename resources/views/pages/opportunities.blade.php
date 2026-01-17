@@ -214,7 +214,7 @@
                         </div>
                         <div class="owl-carousel owl-theme">
                             @foreach ($page->sliders as $slide)
-                                @if ($page->parent->slug == 'partners')
+                                @if (optional($page->parent)->slug == 'partners')
                                     @if ($slide->original)
                                         <div class="item">
                                             <img src="{{ url('public/' . $slide->original->url) }}"
@@ -241,12 +241,12 @@
                 <div class="row" dir="">
                     @if (count($page->sliders) == 1)
                         <div class="col-md-12">
-                            @if ($page->parent->slug == 'partners')
+                            @if (optional($page->parent)->slug == 'partners')
                                 @if ($page->slider->original)
                                     <img src="{{ url('public/' . $page->slider->original->url) }}" width="100%">
                                     <span class="imgcap">
 
-                                        @if ($_GET['lang'] == 'ar')
+                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                             <span dir="rtl"
                                                 class="">{{ $page->slider->original->caption_ar }}</span>
                                         @else
@@ -260,7 +260,7 @@
                                         class="featured-img">
                                     <span class="imgcap">
 
-                                        @if ($_GET['lang'] == 'ar')
+                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                             <span dir="rtl"
                                                 class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
                                         @else
@@ -289,7 +289,7 @@
                     <br />
                     <div class="row">
                         @foreach ($data as $item)
-                            @if ($_GET['lang'] == 'ar')
+                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <div class="col-md-4 col-sm-6 text-right column-box"
                                     style="margin-bottom: 15px !important;">
                                 @else
@@ -367,7 +367,8 @@
 
                                 @if (count($item->sliders[0]))
                                     @if ($item->sliders[0]->landscape)
-                                        <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
+                                        <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}"
+                                            width="100%">
                                     @else
                                         <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                     @endif
