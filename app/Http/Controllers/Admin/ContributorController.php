@@ -194,34 +194,36 @@ class ContributorController extends Controller
                 }
             }
 
-            foreach ($files as $index=>$file){
+            if ($files) {
+                foreach ($files as $index=>$file){
 
-                if($file['square'] || $file['landscape']){
-                    $slide = $page->sliders()->create([]);
+                    if($file['square'] || $file['landscape']){
+                        $slide = $page->sliders()->create([]);
 
-                    if($file['square']){
-                        // Square Image
-                        $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
+                        if($file['square']){
+                            // Square Image
+                            $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
 
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            $photo[0]['caption'] = $captions[$index]['EN'];
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
 
-                        $slide->uploads()->create($photo[0]);
-                    }
+                            $slide->uploads()->create($photo[0]);
+                        }
 
-                    if($file['landscape']) {
-                        // Landscape Image
-                        $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
+                        if($file['landscape']) {
+                            // Landscape Image
+                            $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
 
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            $photo[0]['caption'] = $captions[$index]['EN'];
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
 
-                        $slide->uploads()->create($photo[0]);
-                    }
+                            $slide->uploads()->create($photo[0]);
+                        }
                 }
             }
+            }
 
-            if($newUploads['square'] || $newUploads['landscape']){
+            if($newUploads && ($newUploads['square'] || $newUploads['landscape'])){
 
 
                 $slide = PostImageSlide::find($request->input('newUploads')['slide_id']);
