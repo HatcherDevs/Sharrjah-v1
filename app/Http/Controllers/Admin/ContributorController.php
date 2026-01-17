@@ -322,7 +322,29 @@ class ContributorController extends Controller
         $letters['en'] = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
         $letters['ar'] = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
 
-        return view('admin.contributors.edit',compact('page','letters'));
+        // Initialize with default values
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => (object)['url' => '#']],
+            'ar' => ['type' => 'page', 'value' => (object)['url' => '#']]
+        ];
+
+        if ($page->externalFiles()->where('language', 'en')->count()) {
+            $pageType['en']['type'] = "file";
+            $pageType['en']['value'] = $page->externalFiles()->where('language', 'en')->first()->uploads()->first();
+        } elseif ($page->externalLinks()->where('language', 'en')->count()) {
+            $pageType['en']['type'] = "url";
+            $pageType['en']['value'] = $page->externalLinks()->where('language', 'en')->first();
+        }
+
+        if ($page->externalFiles()->where('language', 'ar')->count()) {
+            $pageType['ar']['type'] = "file";
+            $pageType['ar']['value'] = $page->externalFiles()->where('language', 'ar')->first()->uploads()->first();
+        } elseif ($page->externalLinks()->where('language', 'ar')->count()) {
+            $pageType['ar']['type'] = "url";
+            $pageType['ar']['value'] = $page->externalLinks()->where('language', 'ar')->first();
+        }
+
+        return view('admin.contributors.edit',compact('page','letters','pageType'));
     }
 
     public function orderUpdate(Request $request){
