@@ -19,6 +19,7 @@ class RateLimitProtection
      */
     protected $permanentlyBlockedIps = [
         '69.58.12.239', // DoS attacker - 2026-01-17
+        '1.2.3.4', // DoS attack - 2026-01-17
     ];
 
     /**

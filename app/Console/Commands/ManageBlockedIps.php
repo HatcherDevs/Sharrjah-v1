@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class ManageBlockedIps extends Command
 {
@@ -16,7 +17,8 @@ class ManageBlockedIps extends Command
                             {action : Action to perform (block|unblock|list|clear)}
                             {ip? : IP address to block/unblock}
                             {--duration=60 : Duration in minutes for temporary block}
-                            {--reason=manual : Reason for blocking}';
+                            {--reason=manual : Reason for blocking}
+                            {--permanent : Block IP permanently (adds to code)}';
 
     /**
      * The console command description.
@@ -24,6 +26,17 @@ class ManageBlockedIps extends Command
      * @var string
      */
     protected $description = 'Manage blocked IP addresses (block, unblock, list, clear)';
+
+    /**
+     * Path to the middleware file
+     */
+    protected $middlewarePath;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middlewarePath = app_path('Http/Middleware/RateLimitProtection.php');
+    }
 
     /**
      * Execute the console command.
@@ -59,8 +72,16 @@ class ManageBlockedIps extends Command
             return 1;
         }
 
-        $duration = (int) $this->option('duration');
         $reason = $this->option('reason');
+        $permanent = $this->option('permanent');
+
+        // حظر دائم - إضافة للكود
+        if ($permanent) {
+            return $this->addPermanentBlock($ip, $reason);
+        }
+
+        // حظر مؤقت - Cache
+        $duration = (int) $this->option('duration');
 
         Cache::put(
             "blocked_ip:{$ip}",
@@ -78,6 +99,7 @@ class ManageBlockedIps extends Command
             'blocked_at' => now()->toIso8601String(),
             'reason' => $reason,
             'expires_at' => now()->addMinutes($duration)->toIso8601String(),
+            'permanent' => false,
         ];
         Cache::put('blocked_ips_list', $blockedList, now()->addDays(7));
 
@@ -85,6 +107,60 @@ class ManageBlockedIps extends Command
         $this->info("   Reason: {$reason}");
         
         return 0;
+    }
+
+    /**
+     * Add permanent block to middleware file
+     */
+    protected function addPermanentBlock(string $ip, string $reason): int
+    {
+        if (!File::exists($this->middlewarePath)) {
+            $this->error('Middleware file not found: ' . $this->middlewarePath);
+            return 1;
+        }
+
+        $content = File::get($this->middlewarePath);
+
+        // تحقق إذا IP موجود مسبقاً
+        if (str_contains($content, "'{$ip}'")) {
+            $this->warn("⚠️  IP {$ip} is already permanently blocked");
+            return 0;
+        }
+
+        // إيجاد مكان array المحظورة وإضافة IP جديد
+        $date = now()->format('Y-m-d');
+        $newEntry = "        '{$ip}', // {$reason} - {$date}";
+
+        // البحث عن نهاية array المحظورة
+        $pattern = '/(\$permanentlyBlockedIps\s*=\s*\[[\s\S]*?)(^\s*\];)/m';
+        
+        if (preg_match($pattern, $content, $matches)) {
+            $replacement = $matches[1] . $newEntry . "\n" . $matches[2];
+            $newContent = preg_replace($pattern, $replacement, $content);
+            
+            File::put($this->middlewarePath, $newContent);
+
+            // حفظ في القائمة أيضاً
+            $blockedList = Cache::get('blocked_ips_list', []);
+            $blockedList[$ip] = [
+                'blocked_at' => now()->toIso8601String(),
+                'reason' => $reason,
+                'expires_at' => 'NEVER',
+                'permanent' => true,
+            ];
+            Cache::put('blocked_ips_list', $blockedList, now()->addYears(10));
+
+            $this->info("✅ IP {$ip} has been PERMANENTLY blocked");
+            $this->info("   Reason: {$reason}");
+            $this->info("   Added to: RateLimitProtection.php");
+            $this->newLine();
+            $this->warn("⚠️  Remember to deploy/commit the changes!");
+            
+            return 0;
+        }
+
+        $this->error('Could not find $permanentlyBlockedIps array in middleware');
+        return 1;
     }
 
     /**
@@ -115,33 +191,77 @@ class ManageBlockedIps extends Command
      */
     protected function listBlockedIps(): int
     {
+        // قراءة IPs المحظورة من الكود
+        $permanentIps = $this->getPermanentlyBlockedIps();
+        
+        // قراءة IPs المحظورة مؤقتاً
         $blockedList = Cache::get('blocked_ips_list', []);
-
-        if (empty($blockedList)) {
-            $this->info('No blocked IPs found');
-            return 0;
-        }
 
         $this->info("📋 Blocked IPs:");
         $this->newLine();
 
-        $headers = ['IP Address', 'Blocked At', 'Expires At', 'Reason', 'Status'];
-        $rows = [];
-
-        foreach ($blockedList as $ip => $data) {
-            $isStillBlocked = Cache::has("blocked_ip:{$ip}");
-            $rows[] = [
-                $ip,
-                $data['blocked_at'] ?? 'N/A',
-                $data['expires_at'] ?? 'N/A',
-                $data['reason'] ?? 'N/A',
-                $isStillBlocked ? '🔴 Blocked' : '🟢 Expired',
-            ];
+        // عرض المحظورين دائماً
+        if (!empty($permanentIps)) {
+            $this->info("🔒 Permanently Blocked (in code):");
+            foreach ($permanentIps as $ip => $comment) {
+                $this->line("   • {$ip} - {$comment}");
+            }
+            $this->newLine();
         }
 
-        $this->table($headers, $rows);
+        // عرض المحظورين مؤقتاً
+        if (!empty($blockedList)) {
+            $headers = ['IP Address', 'Blocked At', 'Expires At', 'Reason', 'Status'];
+            $rows = [];
+
+            foreach ($blockedList as $ip => $data) {
+                $isPermanent = isset($permanentIps[$ip]);
+                $isStillBlocked = Cache::has("blocked_ip:{$ip}") || $isPermanent;
+                
+                $status = $isPermanent ? '🔒 Permanent' : ($isStillBlocked ? '🔴 Blocked' : '🟢 Expired');
+                
+                $rows[] = [
+                    $ip,
+                    $data['blocked_at'] ?? 'N/A',
+                    $data['expires_at'] ?? 'N/A',
+                    $data['reason'] ?? 'N/A',
+                    $status,
+                ];
+            }
+
+            $this->table($headers, $rows);
+        } elseif (empty($permanentIps)) {
+            $this->info('No blocked IPs found');
+        }
         
         return 0;
+    }
+
+    /**
+     * Get permanently blocked IPs from middleware file
+     */
+    protected function getPermanentlyBlockedIps(): array
+    {
+        if (!File::exists($this->middlewarePath)) {
+            return [];
+        }
+
+        $content = File::get($this->middlewarePath);
+        $ips = [];
+
+        // استخراج IPs من array
+        if (preg_match('/\$permanentlyBlockedIps\s*=\s*\[([\s\S]*?)\];/', $content, $matches)) {
+            $arrayContent = $matches[1];
+            
+            // استخراج كل IP مع التعليق
+            preg_match_all("/['\"]([^'\"]+)['\"],?\s*\/\/\s*(.+)/", $arrayContent, $ipMatches, PREG_SET_ORDER);
+            
+            foreach ($ipMatches as $match) {
+                $ips[$match[1]] = trim($match[2]);
+            }
+        }
+
+        return $ips;
     }
 
     /**
