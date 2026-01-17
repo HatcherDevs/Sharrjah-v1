@@ -173,6 +173,12 @@ class ManageBlockedIps extends Command
             return 1;
         }
 
+        // التحقق إذا كان محظور بشكل دائم في الكود
+        $permanentIps = $this->getPermanentlyBlockedIps();
+        if (isset($permanentIps[$ip])) {
+            $this->removePermanentBlock($ip);
+        }
+
         Cache::forget("blocked_ip:{$ip}");
         Cache::forget("csrf_errors:{$ip}");
 
@@ -184,6 +190,31 @@ class ManageBlockedIps extends Command
         $this->info("✅ IP {$ip} has been unblocked");
         
         return 0;
+    }
+
+    /**
+     * Remove permanent block from middleware file
+     */
+    protected function removePermanentBlock(string $ip): bool
+    {
+        if (!File::exists($this->middlewarePath)) {
+            return false;
+        }
+
+        $content = File::get($this->middlewarePath);
+
+        // حذف السطر الذي يحتوي على IP
+        $pattern = "/\s*['\"]" . preg_quote($ip, '/') . "['\"],?\s*\/\/.*\n/";
+        $newContent = preg_replace($pattern, "\n", $content);
+
+        if ($newContent !== $content) {
+            File::put($this->middlewarePath, $newContent);
+            $this->info("   🔓 Removed from permanent block list (code)");
+            $this->warn("   ⚠️  Remember to deploy/commit the changes!");
+            return true;
+        }
+
+        return false;
     }
 
     /**
