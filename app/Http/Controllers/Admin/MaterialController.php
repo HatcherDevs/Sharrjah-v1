@@ -57,6 +57,9 @@ class MaterialController extends Controller
     public function single($slug)
     {
         $post = Material::where('slug', $slug)->first();
+        if (!$post) {
+            abort(404);
+        }
         $page = Page::where('slug', 're-materialize')->first();
         $similar = Material::where('active', 1)->where('slug', '!=', $slug)->where('belongs_to', '!=', 'Journeys_Into_Architecture_Archives')->inRandomOrder()->limit(4)->get();
 
@@ -66,6 +69,9 @@ class MaterialController extends Controller
     public function single2($slug)
     {
         $post = Material::where('slug', $slug)->first();
+        if (!$post) {
+            abort(404);
+        }
         $page = Page::where('slug', 'journeys-into-architecture-archives')->first();
         $similar = Material::where('active', 1)->where('slug', '!=', $slug)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->inRandomOrder()->limit(4)->get();
 
