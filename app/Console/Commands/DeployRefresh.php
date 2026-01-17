@@ -34,7 +34,7 @@ class DeployRefresh extends Command
         // Git pull (unless --no-pull flag is used)
         if (!$this->option('no-pull')) {
             $this->info('📥 Pulling latest code from v10...');
-            $result = $this->runCommand('git pull origin v10');
+            $result = $this->executeShellCommand('git pull origin v10');
             if ($result !== 0) {
                 $this->error('❌ Git pull failed!');
                 return 1;
@@ -78,7 +78,7 @@ class DeployRefresh extends Command
      * @param string $command
      * @return int
      */
-    protected function runCommand(string $command): int
+    protected function executeShellCommand(string $command): int
     {
         $process = Process::fromShellCommandline($command, base_path());
         $process->setTimeout(300);
