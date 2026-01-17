@@ -15,6 +15,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        \App\Http\Middleware\BlockMaliciousRequests::class, // حماية من هجمات JNDI/Log4Shell - يجب أن يكون أولاً
         \App\Http\Middleware\BlockBadBots::class,
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,

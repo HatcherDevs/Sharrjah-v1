@@ -9,6 +9,91 @@
 
 /*
 |--------------------------------------------------------------------------
+| SECURITY: Block JNDI/Log4Shell Attacks FIRST (Before Anything Else)
+|--------------------------------------------------------------------------
+| This MUST be the first thing to run to prevent Host header injection
+| attacks from causing 500 errors before Laravel even loads.
+*/
+
+// قائمة الـ Headers التي يجب فحصها
+$headersToCheck = [
+    'HTTP_HOST',
+    'HTTP_X_FORWARDED_HOST',
+    'HTTP_X_FORWARDED_FOR',
+    'HTTP_X_REAL_IP',
+    'HTTP_REFERER',
+    'HTTP_USER_AGENT',
+    'HTTP_X_ORIGINAL_URL',
+    'HTTP_X_REWRITE_URL',
+    'HTTP_X_ORIGINAL_HOST',
+    'HTTP_X_HTTP_METHOD_OVERRIDE',
+    'REQUEST_URI',
+    'QUERY_STRING',
+];
+
+// أنماط الهجمات الضارة
+$maliciousPatterns = [
+    '${',           // JNDI injection
+    '%24%7B',       // URL encoded ${
+    '%24{',         // Partial URL encoded
+    '$%7B',         // Partial URL encoded
+    'jndi:',        // JNDI protocol
+    'ldap:',        // LDAP protocol
+    'rmi:',         // RMI protocol
+    'dns:',         // DNS protocol
+    'scanner-fortirecon', // Known scanner
+    'acunetix',     // Known scanner
+];
+
+// فحص جميع الـ Headers
+foreach ($headersToCheck as $header) {
+    if (isset($_SERVER[$header])) {
+        $value = strtolower($_SERVER[$header]);
+        $decodedValue = strtolower(urldecode($_SERVER[$header]));
+        
+        foreach ($maliciousPatterns as $pattern) {
+            if (strpos($value, $pattern) !== false || strpos($decodedValue, $pattern) !== false) {
+                // تسجيل الهجوم (اختياري)
+                error_log(sprintf(
+                    '[SECURITY] Blocked JNDI attack - IP: %s, Header: %s, Pattern: %s',
+                    $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                    $header,
+                    $pattern
+                ));
+                
+                http_response_code(400);
+                exit('Bad Request');
+            }
+        }
+    }
+}
+
+// فحص HTTP_X_HTTP_METHOD_OVERRIDE للتأكد من صحته
+if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+    $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+    $method = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+    
+    if (!in_array($method, $allowedMethods)) {
+        http_response_code(400);
+        exit('Bad Request');
+    }
+}
+
+// تنظيف وتحقق من صحة Host header
+if (isset($_SERVER['HTTP_HOST'])) {
+    $host = $_SERVER['HTTP_HOST'];
+    // إزالة port
+    $host = preg_replace('/:\d+$/', '', $host);
+    
+    // التحقق من أن Host صالح (فقط حروف وأرقام ونقاط وشرطات)
+    if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-\.]*[a-zA-Z0-9]$/', $host) && $host !== 'localhost') {
+        http_response_code(400);
+        exit('Bad Request');
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Block Bad Bots (Before Laravel Loads)
 |--------------------------------------------------------------------------
 */
@@ -60,19 +145,28 @@ $blockedPaths = [
     '/autodiscover', '/owa/', '/ecp/', '/ews/',
     // Config files
     '/.env', '/.git', '/.svn', '/.htaccess', '/.htpasswd',
+    '/sftp-config.json', '/config.phpinfo', '/phpunit.xml',
     // Admin panels
     '/phpmyadmin', '/pma/', '/myadmin', '/mysql', '/adminer',
     '/cpanel', '/plesk', '/webmail', '/roundcube',
     // Shell/Backdoor
     '/shell', '/cmd', '/eval', '/exec', '/system',
-    '/c99', '/r57', '/webshell', '/backdoor',
+    '/c99', '/r57', '/webshell', '/backdoor', '/getcmd',
     // Laravel internals (من برا)
     '/vendor/', '/storage/', '/bootstrap/', '/config/',
     '/database/', '/resources/', '/app/',
+    // Livewire exploits
+    '/livewire/update', '/livewire/message',
     // Common exploits
     '/cgi-bin', '/scripts/', '/.well-known/security',
     '/backup', '/dump', '/debug', '/test', '/temp/', '/tmp/',
     '/info.php', '/phpinfo', '/php-info',
+    // API scanning
+    '/api/agent', '/_profiler', '/modules',
+    // MCP/SSE scanning
+    '/mcp', '/sse',
+    // Action files (Confluence/Atlassian)
+    '.action',
     // Other CMS
     '/joomla', '/drupal', '/magento', '/typo3',
 ];
