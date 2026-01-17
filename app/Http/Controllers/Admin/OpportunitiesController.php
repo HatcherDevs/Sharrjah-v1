@@ -97,7 +97,7 @@ class OpportunitiesController extends Controller
         // dd($slugs);
         $upcoming = Post::where('active',1)->where('slug', $slug)->whereDate('publish_date', '>=', date('Y-m-d').' 00:00:00')->orderBy('id','DESC')->get();
         
-        return view('pages.opportunities-single',compact('page','data','upcoming','post','slugs'));
+        return view('pages.opportunities-single',compact('page','data','upcoming','post','slug'));
     
     }
 

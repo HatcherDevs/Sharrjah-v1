@@ -6,28 +6,39 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <meta name="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
+    <meta name="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar ?? '' : $post->excerpt ?? '' }}" />
     <!-- Schema.org markup for Google+ -->
-    <meta itemprop="name" content="SAT Talks || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
-    <meta itemprop="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
-    <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
+    <meta itemprop="name"
+        content="SAT Talks || {{ isset($_GET['lang']) ? $post->title_ar ?? '' : $post->title ?? '' }}">
+    <meta itemprop="description"
+        content="{{ isset($_GET['lang']) ? $post->excerpt_ar ?? '' : $post->excerpt ?? '' }}">
+    @if ($post && $post->slider && $post->slider->square)
+        <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
+    @endif
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
     <meta name="twitter:site" content="@publisher_handle">
     <meta name="twitter:title"
-        content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
-    <meta name="twitter:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
+        content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar ?? '' : $post->title ?? '' }}">
+    <meta name="twitter:description"
+        content="{{ isset($_GET['lang']) ? $post->excerpt_ar ?? '' : $post->excerpt ?? '' }}">
     <meta name="twitter:creator" content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
-    <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
+    @if ($post && $post->slider && $post->slider->square)
+        <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
+    @endif
 
     <!-- Open Graph data -->
-    <meta property="og:title" content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}" />
+    <meta property="og:title" content="Al Manakh Spaces || {{ isset($_GET['lang']) ? $post->title_ar ?? '' : $post->title ?? '' }}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ url('pages/triennial-2023/' . $post->slug) }}" />
-    <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
-    <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
+    @if ($post && $post->slug)
+        <meta property="og:url" content="{{ url('pages/triennial-2023/' . $post->slug) }}" />
+    @endif
+    @if ($post && $post->slider && $post->slider->square)
+        <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
+    @endif
+    <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar ?? '' : $post->excerpt ?? '' }}" />
     <meta property="og:site_name" content="Sharjah Architecture Triennial" />
     <meta property="article:published_time" content="2018-10-28T05:59:00+01:00" />
     <meta property="article:modified_time" content="2018-010-28T19:08:47+01:00" />
@@ -40,7 +51,7 @@
     <link rel="shortcut icon" href="{{ asset('public/favicon.ico') }}" type="image/x-icon">
     <link rel="icon" href="{{ asset('public/favicon.ico') }}" type="image/x-icon">
 
-    <title>{{ isset($_GET['lang']) ? $post->title_ar : $post->title }}</title>
+    <title>{{ isset($_GET['lang']) ? $post->title_ar ?? 'SAT' : $post->title ?? 'Triennial 2023' }}</title>
     <!-- Bootstrap core CSS -->
     <link href="{{ asset('public/css/bootstrap.min.css') }}" rel="stylesheet">
 
@@ -398,13 +409,13 @@
                                 <div class="breadcrumbs ar" style="height: 20px;">
                                     <a href="{{ url('/?lang=ar') }}" style="color: rgb(0, 0, 0);">الصفحة الرئيسية</a>
                                     &gt;
-                                    <a href="{{ url('pages/programmes/triennial-2023?lang=ar') }}" style="color: rgb(0, 0, 0);">{{ $page->name_ar }}</a>
+                                    <a href="{{ url('pages/programmes/triennial-2023?lang=ar') }}" style="color: rgb(0, 0, 0);">{{ $page->name_ar ?? 'برنامج' }}</a>
                                 </div>
                             @else
                                 <div class="breadcrumbs en" style="height: 20px;">
                                     <a href="{{ url('/') }}" style="color: rgb(0, 0, 0);">Home</a>
                                     &gt;
-                                    <a href="{{ url('pages/programmes/triennial-2023') }}" style="color: rgb(0, 0, 0);">{{ $page->name }}</a>
+                                    <a href="{{ url('pages/programmes/triennial-2023') }}" style="color: rgb(0, 0, 0);">{{ $page->name ?? 'Programme' }}</a>
                                 </div>
                             @endif
                         </div>
@@ -412,7 +423,7 @@
 
                         <div class="row">
                             <div class="col-md-9">
-                                <h1>{!! isset($_GET['lang']) ? $post->title_ar : $post->title !!}</h1>
+                                <h1>{!! isset($_GET['lang']) ? $post->title_ar ?? '' : $post->title ?? '' !!}</h1>
                             </div>
 
                             <div class="col-md-3 sideb">
@@ -433,9 +444,9 @@
                         <div class="col-md-9">
                             <div class="row">
                             <?php $page = $post; ?>
-                                    @if (count($page->sliders) == 1)
+                                    @if ($page && count($page->sliders) == 1)
                                         <div class="col-md-12">
-                                            @if ($page->slider->square)
+                                            @if ($page && $page->slider && $page->slider->square)
                                                 <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
                                                     @if (isset($_GET['lang']))
@@ -444,7 +455,7 @@
                                                         <span class="en float-left">{{ $page->slider->square->caption }}</span>
                                                     @endif
                                                 </span>
-                                            @elseif($page->slider->landscape)
+                                            @elseif($page && $page->slider && $page->slider->landscape)
                                                 <img src="{{ asset('public/' . $page->slider->landscape->url) }}" width="100%" class="featured-img">
                                                 <span class="imgcap">
                                                     @if (isset($_GET['lang']))
