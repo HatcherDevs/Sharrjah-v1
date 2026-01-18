@@ -170,9 +170,7 @@ class RateLimitProtection
 
         return $ip === $subnet;
     }
-     * التحقق من الحظر الدائم
-     * يدعم IPv4 و IPv6
-     */
+
     protected function isPermanentlyBlocked(string $ip): bool
     {
         foreach ($this->permanentlyBlockedIps as $blockedIp) {
