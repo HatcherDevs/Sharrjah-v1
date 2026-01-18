@@ -15,11 +15,13 @@ class RateLimitProtection
 {
     /**
      * قائمة IPs المحظورة بشكل دائم
-     * أضف أي IP مشبوه هنا
+     * أضف أي IP مشبوه هنا (IPv4 و IPv6)
+     * مثال IPv6: '2001:0db8:85a3::8a2e:0370:7334'
      */
     protected $permanentlyBlockedIps = [
         '69.58.12.239', // DoS attacker - 2026-01-17
         '1.2.3.4', // DoS attack - 2026-01-17
+        // أضف IPv6 هنا أيضاً
     ];
 
     /**
@@ -114,23 +116,75 @@ class RateLimitProtection
             $ip = trim(explode(',', $ip)[0]);
         }
 
+        // تنظيف IPv6 (إزالة الأقواس إن وجدت)
+        $ip = str_replace(['[', ']'], '', $ip);
+
         return $ip;
     }
 
     /**
      * التحقق من whitelist
+     * يدعم IPv4 و IPv6 والـ CIDR ranges
      */
     protected function isWhitelisted(string $ip): bool
     {
-        return in_array($ip, $this->whitelistedIps);
+        foreach ($this->whitelistedIps as $whitelistedIp) {
+            // فحص مباشر
+            if ($ip === $whitelistedIp) {
+                return true;
+            }
+
+            // فحص CIDR ranges (إذا كانت)
+            if ($this->ipInRange($ip, $whitelistedIp)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
+     * فحص إذا كان IP ضمن CIDR range
+     * يدعم IPv4 و IPv6
+     */
+    protected function ipInRange(string $ip, string $range): bool
+    {
+        if (!str_contains($range, '/')) {
+            return false;
+        }
+
+        [$subnet, $bits] = explode('/', $range);
+        $ip = ip2long($ip);
+        $subnet = ip2long($subnet);
+
+        if ($ip === false || $subnet === false) {
+            return false; // IPv6 أو IP غير صحيح
+        }
+
+        $mask = -1 << (32 - (int)$bits);
+        $subnet &= $mask;
+        $ip &= $mask;
+
+        return $ip === $subnet;
+    }
      * التحقق من الحظر الدائم
+     * يدعم IPv4 و IPv6
      */
     protected function isPermanentlyBlocked(string $ip): bool
     {
-        return in_array($ip, $this->permanentlyBlockedIps);
+        foreach ($this->permanentlyBlockedIps as $blockedIp) {
+            // فحص مباشر
+            if ($ip === $blockedIp) {
+                return true;
+            }
+
+            // فحص CIDR ranges
+            if ($this->ipInRange($ip, $blockedIp)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
