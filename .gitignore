@@ -1,6 +1,10 @@
 .env
 /vendor
 
+# Blocked IPs configuration - local changes only
+config/blocked-ips.php
+!config/blocked-ips.example.php
+
 public/**/*.jpg
 public/**/*.jpeg
 public/**/*.png

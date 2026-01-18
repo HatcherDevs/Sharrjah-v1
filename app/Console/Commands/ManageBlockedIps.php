@@ -35,7 +35,7 @@ class ManageBlockedIps extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->middlewarePath = app_path('Http/Middleware/RateLimitProtection.php');
+        $this->middlewarePath = config_path('blocked-ips.php');
     }
 
     /**
@@ -110,12 +110,12 @@ class ManageBlockedIps extends Command
     }
 
     /**
-     * Add permanent block to middleware file
+     * Add permanent block to config file
      */
     protected function addPermanentBlock(string $ip, string $reason): int
     {
         if (!File::exists($this->middlewarePath)) {
-            $this->error('Middleware file not found: ' . $this->middlewarePath);
+            $this->error('Config file not found: ' . $this->middlewarePath);
             return 1;
         }
 
@@ -132,7 +132,7 @@ class ManageBlockedIps extends Command
         $newEntry = "        '{$ip}', // {$reason} - {$date}";
 
         // البحث عن نهاية array المحظورة
-        $pattern = '/(\$permanentlyBlockedIps\s*=\s*\[[\s\S]*?)(^\s*\];)/m';
+        $pattern = "/('permanently_blocked'\s*=>\s*\[[\s\S]*?)(^\s*\],)/m";
         
         if (preg_match($pattern, $content, $matches)) {
             $replacement = $matches[1] . $newEntry . "\n" . $matches[2];
@@ -152,14 +152,14 @@ class ManageBlockedIps extends Command
 
             $this->info("✅ IP {$ip} has been PERMANENTLY blocked");
             $this->info("   Reason: {$reason}");
-            $this->info("   Added to: RateLimitProtection.php");
+            $this->info("   Added to: config/blocked-ips.php");
             $this->newLine();
             $this->warn("⚠️  Remember to deploy/commit the changes!");
             
             return 0;
         }
 
-        $this->error('Could not find $permanentlyBlockedIps array in middleware');
+        $this->error('Could not find permanently_blocked array in config file');
         return 1;
     }
 
@@ -193,7 +193,7 @@ class ManageBlockedIps extends Command
     }
 
     /**
-     * Remove permanent block from middleware file
+     * Remove permanent block from config file
      */
     protected function removePermanentBlock(string $ip): bool
     {
@@ -209,7 +209,7 @@ class ManageBlockedIps extends Command
 
         if ($newContent !== $content) {
             File::put($this->middlewarePath, $newContent);
-            $this->info("   🔓 Removed from permanent block list (code)");
+            $this->info("   🔓 Removed from permanent block list (config)");
             $this->warn("   ⚠️  Remember to deploy/commit the changes!");
             return true;
         }

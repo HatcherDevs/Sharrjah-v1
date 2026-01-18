@@ -15,43 +15,46 @@ class RateLimitProtection
 {
     /**
      * قائمة IPs المحظورة بشكل دائم
-     * أضف أي IP مشبوه هنا (IPv4 و IPv6)
-     * مثال IPv6: '2001:0db8:85a3::8a2e:0370:7334'
+     * تُقرأ من config/blocked-ips.php
      */
-    protected $permanentlyBlockedIps = [
-        '69.58.12.239', // DoS attacker - 2026-01-17
-        '1.2.3.4', // DoS attack - 2026-01-17
-        // أضف IPv6 هنا أيضاً
-    ];
+    protected $permanentlyBlockedIps;
 
     /**
      * IPs المسموح لها دائماً (whitelist)
      */
-    protected $whitelistedIps = [
-        '127.0.0.1',
-        '::1',
-        // أضف IPs موثوقة هنا
-    ];
+    protected $whitelistedIps;
 
     /**
      * الحد الأقصى للطلبات في الدقيقة الواحدة
      */
-    protected $maxRequestsPerMinute = 60;
+    protected $maxRequestsPerMinute;
 
     /**
      * الحد الأقصى للطلبات في 10 ثواني (للكشف عن الهجمات السريعة)
      */
-    protected $maxRequestsPer10Seconds = 15;
+    protected $maxRequestsPer10Seconds;
 
     /**
      * مدة الحظر التلقائي بالدقائق
      */
-    protected $autoBanDuration = 30;
+    protected $autoBanDuration;
 
     /**
      * الحد الأقصى لأخطاء CSRF قبل الحظر
      */
-    protected $maxCsrfErrors = 5;
+    protected $maxCsrfErrors;
+
+    public function __construct()
+    {
+        $config = config('blocked-ips');
+        
+        $this->permanentlyBlockedIps = $config['permanently_blocked'] ?? [];
+        $this->whitelistedIps = $config['whitelisted'] ?? [];
+        $this->maxRequestsPerMinute = $config['rate_limit']['max_requests_per_minute'] ?? 60;
+        $this->maxRequestsPer10Seconds = $config['rate_limit']['max_requests_per_10_seconds'] ?? 15;
+        $this->autoBanDuration = $config['rate_limit']['auto_ban_duration_minutes'] ?? 30;
+        $this->maxCsrfErrors = $config['csrf']['max_errors_before_ban'] ?? 5;
+    }
 
     /**
      * Handle an incoming request.
