@@ -238,7 +238,7 @@ class PageController extends Controller
                 $target = Upload::find($upload['id']);
 
                 if ($target) {
-                    $target->update(['caption' => $upload['EN'], 'caption_ar' => $upload['AR']]);
+                    $target->update(['caption' => $upload['EN'] ?? '', 'caption_ar' => $upload['AR'] ?? '']);
                 }
             }
         }
@@ -338,7 +338,7 @@ class PageController extends Controller
                 foreach ($uploadCaptions as $id => $caption) {
                     $target = Upload::find($id);
                     if ($target)
-                        $target->update(['caption' => $caption['EN'], 'caption_ar' => $caption['AR']]);
+                        $target->update(['caption' => $caption['EN'] ?? '', 'caption_ar' => $caption['AR'] ?? '']);
                 }
             }
 
