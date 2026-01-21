@@ -68,7 +68,7 @@ class PostController extends Controller
 
         $forms = Form::select('id','title')->get();
 
-        $page_name = $page->parent->name;
+        $page_name = $page->parent ? $page->parent->name : null;
 
         return view('admin.posts.edit',compact('page','pageType','forms','page_name'));
     }
@@ -193,14 +193,16 @@ class PostController extends Controller
         if($request->has('uploads')){
             $uploads = $request->input('uploads');
 
-            foreach ($uploads as $upload){
-                $target = Upload::find($upload['id']);
+            if($uploads){
+                foreach ($uploads as $upload){
+                    $target = Upload::find($upload['id']);
 
-                if($target){
-                    $target->update([
-                        'caption' => isset($upload['EN']) ? $upload['EN'] : '',
-                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : ''
-                    ]);
+                    if($target){
+                        $target->update([
+                            'caption' => isset($upload['EN']) ? $upload['EN'] : '',
+                            'caption_ar' => isset($upload['AR']) ? $upload['AR'] : ''
+                        ]);
+                    }
                 }
             }
         }
@@ -252,7 +254,7 @@ class PostController extends Controller
                             $slide->uploads()->create($photo[0]);
                         }
 
-                        if($file['landscape']) {
+                        if(isset($file['landscape']) && $file['landscape']) {
                             // Landscape Image
                             $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
 
