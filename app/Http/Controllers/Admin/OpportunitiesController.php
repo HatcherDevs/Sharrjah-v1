@@ -88,10 +88,21 @@ class OpportunitiesController extends Controller
             else {
                 $data = Post::where('active',1)->where('slug', $slug)->orderBy($_GET['sort'],$_GET['order'])->get();
             }
+            
+            $post = Post::where('slug', $slug)->first();
+            
+            if (!$post) {
+                abort(404);
+            }
 
-            return view('pages.opportunities-single',compact('page','data','publications'));
+            return view('pages.opportunities-single',compact('page','data','publications','post'));
         }
         $post = Post::where('slug', $slug)->first();
+        
+        if (!$post) {
+            abort(404);
+        }
+        
         $slug=  Post::select('slug')->where('slug', $slug)->get();
         $data = Post::where('active',1)->where('slug', $slug)->whereDate('publish_date', '<', date('Y-m-d').' 00:00:00')->orderBy('id','DESC')->get();
         // dd($slugs);

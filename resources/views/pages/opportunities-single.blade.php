@@ -132,45 +132,52 @@
 @endsection
 
 @section('content')
-    <div class="innerpage">
+    @if (!isset($post) || !$post)
+        <div class="container text-center" style="padding: 100px 0;">
+            <h1>Page Not Found</h1>
+            <p>The opportunity you are looking for does not exist or has been removed.</p>
+            <a href="/pages/about/opportunities">Back to Opportunities</a>
+        </div>
+    @else
+        <div class="innerpage">
 
-        <div class="container text-center">
-            <div class="body-section contents with-img-header">
-                <div class="row" dir="rtl">
+            <div class="container text-center">
+                <div class="body-section contents with-img-header">
+                    <div class="row" dir="rtl">
 
-                    <div class="col-md-6 text-right">
-                        <div class="breadcrumbs">
-                            {{--  @include('partials.breadcrumbs-ar')  --}}
-                            <a href="/">الصفحة الرئيسية</a>
+                        <div class="col-md-6 text-right">
+                            <div class="breadcrumbs">
+                                {{--  @include('partials.breadcrumbs-ar')  --}}
+                                <a href="/">الصفحة الرئيسية</a>
 
-                            &gt;
+                                &gt;
 
-                            <a href="/pages/about">عن المؤسسة</a>
-
-
+                                <a href="/pages/about">عن المؤسسة</a>
 
 
-                            &gt; <a href="opportunities/{!! $post->slug !!}?lang=ar">{!! $post->title_ar !!}</a>
 
-                        </div>
 
-                        {{-- @if (isset($_GET['lang'])) --}}
-                        {{-- <a href="{{ url()->current() }}">Switch to English --}}
-                        {{-- </a><br /> --}}
-                        {{-- <br /> --}}
-                        {{-- @else --}}
-                        {{-- <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة --}}
-                        {{-- العربية</a> --}}
-                        {{-- <br /> --}}
-                        {{-- <br /> --}}
-                        {{-- @endif --}}
+                                &gt; <a href="opportunities/{!! $post->slug !!}?lang=ar">{!! $post->title_ar !!}</a>
 
-                        <h1>{!! $post->title_ar !!}</h1>
-                        @if (count($post->sliders))
-                            <?php $page = $post; ?>
-                            {{--  @include('partials.slide-images')  --}}
-                        @endif
-                        {{-- @if (!count($post->sliders))
+                            </div>
+
+                            {{-- @if (isset($_GET['lang'])) --}}
+                            {{-- <a href="{{ url()->current() }}">Switch to English --}}
+                            {{-- </a><br /> --}}
+                            {{-- <br /> --}}
+                            {{-- @else --}}
+                            {{-- <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة --}}
+                            {{-- العربية</a> --}}
+                            {{-- <br /> --}}
+                            {{-- <br /> --}}
+                            {{-- @endif --}}
+
+                            <h1>{!! $post->title_ar !!}</h1>
+                            @if (count($post->sliders))
+                                <?php $page = $post; ?>
+                                {{--  @include('partials.slide-images')  --}}
+                            @endif
+                            {{-- @if (!count($post->sliders))
                             <div class="row">
                                 <div class="col-md-6">
                                     {!! $post->content_ar !!}
@@ -180,45 +187,45 @@
                             <br />
                             <br />
                         @endif --}}
-                    </div>
-
-                    <div class="col-md-6 text-left">
-                        <div class="breadcrumbs en">
-                            {{--  @include('partials.breadcrumbs')  --}}
-                            <div class="breadcrumbs en" style="height: 20px;">
-                                <a href="/">Home</a>
-                                &gt;
-                                <a href="/pages/about">About</a>
-
-
-
-
-
-
-                                &gt;
-                                <a href="{!! $post->slug !!}">{!! $post->title !!}</a>
-                            </div>
                         </div>
 
+                        <div class="col-md-6 text-left">
+                            <div class="breadcrumbs en">
+                                {{--  @include('partials.breadcrumbs')  --}}
+                                <div class="breadcrumbs en" style="height: 20px;">
+                                    <a href="/">Home</a>
+                                    &gt;
+                                    <a href="/pages/about">About</a>
 
 
-                        {{-- @if (isset($_GET['lang'])) --}}
-                        {{-- <a href="{{ url()->current() }}">Switch to English --}}
-                        {{-- </a><br /> --}}
-                        {{-- <br /> --}}
-                        {{-- @else --}}
-                        {{-- <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة --}}
-                        {{-- العربية</a> --}}
-                        {{-- <br /> --}}
-                        {{-- <br /> --}}
-                        {{-- @endif --}}
-                        <h1 class="en">{!! $post->title !!} </h1>
 
-                        @if (count($post->sliders))
-                            <?php $page = $post; ?>
-                            {{--  @include('partials.slide-images')  --}}
-                        @endif
-                        {{--  @if (!count($post->sliders))
+
+
+
+                                    &gt;
+                                    <a href="{!! $post->slug !!}">{!! $post->title !!}</a>
+                                </div>
+                            </div>
+
+
+
+                            {{-- @if (isset($_GET['lang'])) --}}
+                            {{-- <a href="{{ url()->current() }}">Switch to English --}}
+                            {{-- </a><br /> --}}
+                            {{-- <br /> --}}
+                            {{-- @else --}}
+                            {{-- <a href="{{ url()->current() . '?lang=ar' }}" class="float-right">التبديل إلى اللغة --}}
+                            {{-- العربية</a> --}}
+                            {{-- <br /> --}}
+                            {{-- <br /> --}}
+                            {{-- @endif --}}
+                            <h1 class="en">{!! $post->title !!} </h1>
+
+                            @if (count($post->sliders))
+                                <?php $page = $post; ?>
+                                {{--  @include('partials.slide-images')  --}}
+                            @endif
+                            {{--  @if (!count($post->sliders))
                                 <div class="row">
                                     <div class="col-md-6">
                                         {!! $post->content !!}
@@ -229,112 +236,112 @@
                                 <br/>
                             @endif  --}}
 
+                        </div>
+
+
                     </div>
-
-
                 </div>
             </div>
-        </div>
-        <div class="container text-center">
-            <div class="body-section contents with-img-header">
-                @if (count($post->sliders) > 1)
-                    <div class="owl-carousel-holder">
-                        <div class="arrows">
-                            <button class="prev float-left"></button>
-                            <button class="next float-right"></button>
-                        </div>
-                        <div class="owl-carousel owl-theme">
-                            @foreach ($post->sliders as $slide)
-                                @if ($page->parent->slug == 'partners')
-                                    @if ($slide->original)
-                                        <div class="item">
-                                            <img src="{{ url('public/' . $slide->original->url) }}"
-                                                data-en="{{ $slide->original->caption }}"
-                                                data-ar="{{ $slide->original->caption_ar }}">
-                                        </div>
-                                    @endif
-                                @else
-                                    @if ($slide->landscape)
-                                        <div class="item">
-                                            <img src="{{ url('public/' . $slide->landscape->url) }}"
-                                                data-en="{{ $slide->landscape->caption }}"
-                                                data-ar="{{ $slide->landscape->caption_ar }}">
-                                        </div>
-                                    @endif
-                                @endif
-                            @endforeach
-                        </div>
-                        <div id="owl-caption"></div>
-                        <div id="owl-dots"></div>
-                    </div>
-                @endif
-
-                <div class="row" dir="">
-                    @if ($page->sliders && count($page->sliders) == 1)
-                        <div class="col-md-12">
-                            @if ($page->parent->slug == 'partners')
-                                @if ($page->slider->original)
-                                    <img src="{{ url('public/' . $page->slider->original->url) }}" width="100%">
-                                    <span class="imgcap">
-
-                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                            <span dir="rtl"
-                                                class="">{{ $page->slider->original->caption_ar }}</span>
-                                        @else
-                                            <span class="en">{{ $page->slider->original->caption }}</span>
+            <div class="container text-center">
+                <div class="body-section contents with-img-header">
+                    @if (count($post->sliders) > 1)
+                        <div class="owl-carousel-holder">
+                            <div class="arrows">
+                                <button class="prev float-left"></button>
+                                <button class="next float-right"></button>
+                            </div>
+                            <div class="owl-carousel owl-theme">
+                                @foreach ($post->sliders as $slide)
+                                    @if ($page->parent->slug == 'partners')
+                                        @if ($slide->original)
+                                            <div class="item">
+                                                <img src="{{ url('public/' . $slide->original->url) }}"
+                                                    data-en="{{ $slide->original->caption }}"
+                                                    data-ar="{{ $slide->original->caption_ar }}">
+                                            </div>
                                         @endif
-                                    </span>
-                                @endif
-                            @else
-                                @if ($page->slider->landscape)
-                                    <img src="{{ url('public/' . $page->slider->landscape->url) }}" width="100%"
-                                        class="featured-img">
-                                    <span class="imgcap">
-
-                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                            <span dir="rtl"
-                                                class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
-                                        @else
-                                            <span class="en float-left">{{ $page->slider->landscape->caption }}</span>
+                                    @else
+                                        @if ($slide->landscape)
+                                            <div class="item">
+                                                <img src="{{ url('public/' . $slide->landscape->url) }}"
+                                                    data-en="{{ $slide->landscape->caption }}"
+                                                    data-ar="{{ $slide->landscape->caption_ar }}">
+                                            </div>
                                         @endif
-                                    </span>
-                                @endif
-                            @endif
-                            <br />
-                            <br />
+                                    @endif
+                                @endforeach
+                            </div>
+                            <div id="owl-caption"></div>
+                            <div id="owl-dots"></div>
                         </div>
                     @endif
 
-                    <div class="col-md-6 text-left">
-                        {!! $post->content !!}
-                    </div>
-                    <div class="col-md-6 text-right">
-                        {!! $post->content_ar !!}
-                    </div>
+                    <div class="row" dir="">
+                        @if ($page->sliders && count($page->sliders) == 1)
+                            <div class="col-md-12">
+                                @if ($page->parent->slug == 'partners')
+                                    @if ($page->slider->original)
+                                        <img src="{{ url('public/' . $page->slider->original->url) }}" width="100%">
+                                        <span class="imgcap">
 
-                    <!--   <div class="col-md-6 </?php echo isset($_GET['lang']) ? 'text-right cairo' : 'text-left'; ?>" </?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                                                        {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
-                                                        </div>
-                                    -->
+                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                <span dir="rtl"
+                                                    class="">{{ $page->slider->original->caption_ar }}</span>
+                                            @else
+                                                <span class="en">{{ $page->slider->original->caption }}</span>
+                                            @endif
+                                        </span>
+                                    @endif
+                                @else
+                                    @if ($page->slider->landscape)
+                                        <img src="{{ url('public/' . $page->slider->landscape->url) }}" width="100%"
+                                            class="featured-img">
+                                        <span class="imgcap">
+
+                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                <span dir="rtl"
+                                                    class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
+                                            @else
+                                                <span class="en float-left">{{ $page->slider->landscape->caption }}</span>
+                                            @endif
+                                        </span>
+                                    @endif
+                                @endif
+                                <br />
+                                <br />
+                            </div>
+                        @endif
+
+                        <div class="col-md-6 text-left">
+                            {!! $post->content !!}
+                        </div>
+                        <div class="col-md-6 text-right">
+                            {!! $post->content_ar !!}
+                        </div>
+
+                        <!--   <div class="col-md-6 </?php echo isset($_GET['lang']) ? 'text-right cairo' : 'text-left'; ?>" </?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
+                                                            {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
+                                                            </div>
+                                        -->
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="container text-center">
-            <div class="body-section contents" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                @if (count($data))
-                    <br />
-                    <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                    </div>
-                    <br />
-                    <!--
-                    // ! ||--------------------------------------------------------------------------------||
-                    // ! ||                  this comment to hide bottom for opportunities                 ||
-                    // ! ||--------------------------------------------------------------------------------||
-                    -->
-                    {{-- <div class="row"> --}}
-                    {{-- @foreach ($data as $item) --}}
-                    {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+            <div class="container text-center">
+                <div class="body-section contents" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
+                    @if (count($data))
+                        <br />
+                        <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
+                        </div>
+                        <br />
+                        <!--
+                        // ! ||--------------------------------------------------------------------------------||
+                        // ! ||                  this comment to hide bottom for opportunities                 ||
+                        // ! ||--------------------------------------------------------------------------------||
+                        -->
+                        {{-- <div class="row"> --}}
+                        {{-- @foreach ($data as $item) --}}
+                        {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                 <div class="col-md-4 col-sm-6 text-right column-box"
                                     style="margin-bottom: 15px !important;">
                                 @else
@@ -342,7 +349,7 @@
                                         style="margin-bottom: 15px !important;">
                             @endif --}}
 
-                    {{-- @if (isset($_GET['lang']))
+                        {{-- @if (isset($_GET['lang']))
                                 @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                     <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
                                         {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
@@ -352,7 +359,7 @@
                                     {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                             @endif --}}
 
-                    {{-- @if (count($item->sliders[0]))
+                        {{-- @if (count($item->sliders[0]))
                                 @if ($item->sliders[0]->landscape)
                                     <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}" width="100%">
                                 @else
@@ -362,87 +369,88 @@
                                 <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                             @endif --}}
 
-                    {{-- @if (isset($_GET['lang'])) --}}
-                    {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar') --}}
-                    {{-- <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div> --}}
-                    {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
-                    {{-- <div class="title ar">{{ $item->title_ar }}</div> --}}
-                    {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
-                    {{-- <div class="content ar">{{ $item->excerpt_ar }}</div> --}}
-                    {{-- @endif --}}
-                    {{-- @else --}}
-                    {{-- <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div> --}}
-                    {{-- <div class="publication en">{{ $item->country }}</div> --}}
-                    {{-- <div class="title en">{{ $item->title }}</div> --}}
-                    {{-- <div class="author en">{{ $item->speaker }}</div> --}}
-                    {{-- <div class="content en">{{ $item->excerpt }}</div> --}}
-                    {{-- @endif --}}
-                    {{-- </a> --}}
+                        {{-- @if (isset($_GET['lang'])) --}}
+                        {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar') --}}
+                        {{-- <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div> --}}
+                        {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
+                        {{-- <div class="title ar">{{ $item->title_ar }}</div> --}}
+                        {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
+                        {{-- <div class="content ar">{{ $item->excerpt_ar }}</div> --}}
+                        {{-- @endif --}}
+                        {{-- @else --}}
+                        {{-- <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div> --}}
+                        {{-- <div class="publication en">{{ $item->country }}</div> --}}
+                        {{-- <div class="title en">{{ $item->title }}</div> --}}
+                        {{-- <div class="author en">{{ $item->speaker }}</div> --}}
+                        {{-- <div class="content en">{{ $item->excerpt }}</div> --}}
+                        {{-- @endif --}}
+                        {{-- </a> --}}
 
-                    {{-- </div> --}}
-                    {{-- @endforeach --}}
-                    {{-- </div> --}}
-                    {{-- </div> --}}
-                @endif
+                        {{-- </div> --}}
+                        {{-- @endforeach --}}
+                        {{-- </div> --}}
+                        {{-- </div> --}}
+                    @endif
 
-                @if (count($upcoming))
-                    <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                        <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS'; ?> </h3>
-                        <br />
-                        <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
-                            <div class="row">
-                                @foreach ($upcoming as $item)
-                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                        <div class="col-md-4 col-sm-6 text-right column-box"
-                                            style="margin-bottom: 15px !important;">
-                                        @else
-                                            <div class="col-md-4 col-sm-6 text-left column-box"
-                                                style="margin-bottom: 15px !important;;">
-                                    @endif
-
-                                    @if (isset($_GET['lang']))
+                    @if (count($upcoming))
+                        <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
+                            <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>"><?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS'; ?> </h3>
+                            <br />
+                            <div style="text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
+                                <div class="row">
+                                    @foreach ($upcoming as $item)
                                         @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                            <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                            <div class="col-md-4 col-sm-6 text-right column-box"
+                                                style="margin-bottom: 15px !important;">
+                                            @else
+                                                <div class="col-md-4 col-sm-6 text-left column-box"
+                                                    style="margin-bottom: 15px !important;;">
                                         @endif
-                                    @else
-                                        <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                            {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
-                                    @endif
 
-                                    @if (count($item->sliders[0]))
-                                        @if ($item->sliders[0]->landscape)
-                                            <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}"
-                                                width="100%">
+                                        @if (isset($_GET['lang']))
+                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
+                                                    {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                            @endif
+                                        @else
+                                            <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
+                                                {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                        @endif
+
+                                        @if (count($item->sliders[0]))
+                                            @if ($item->sliders[0]->landscape)
+                                                <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}"
+                                                    width="100%">
+                                            @else
+                                                <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
+                                            @endif
                                         @else
                                             <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
                                         @endif
-                                    @else
-                                        <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%">
-                                    @endif
 
-                                    @if (isset($_GET['lang']))
-                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                        @if (isset($_GET['lang']))
+                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}
+                                                </div>
+                                                {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
+                                                <div class="title ar">{{ $item->title_ar }}</div>
+                                                {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
+                                                <div class="content ar">{{ $item->excerpt_ar }}</div>
+                                            @endif
+                                        @else
                                             <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div>
-                                            {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
-                                            <div class="title ar">{{ $item->title_ar }}</div>
-                                            {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
-                                            <div class="content ar">{{ $item->excerpt_ar }}</div>
+                                            {{-- <div class="publication en">{{ $item->country }}</div> --}}
+                                            <div class="title en">{{ $item->title }}</div>
+                                            {{-- <div class="author en">{{ $item->speaker }}</div> --}}
+                                            <div class="content en">{{ $item->excerpt }}</div>
                                         @endif
-                                    @else
-                                        <div class="publish_date en">{{ $item->publish_date->format('d-m-Y') }}</div>
-                                        {{-- <div class="publication en">{{ $item->country }}</div> --}}
-                                        <div class="title en">{{ $item->title }}</div>
-                                        {{-- <div class="author en">{{ $item->speaker }}</div> --}}
-                                        <div class="content en">{{ $item->excerpt }}</div>
-                                    @endif
-                                    </a>
+                                        </a>
 
-                            </div>
-                @endforeach
+                                </div>
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
     @endif
     </div>
     </div>
@@ -469,6 +477,7 @@
     @endif
 
     </div>
+    @endif
 
 @endsection
 
