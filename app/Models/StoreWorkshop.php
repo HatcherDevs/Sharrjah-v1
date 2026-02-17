@@ -286,7 +286,7 @@ class StoreWorkshop extends Model
     public function getPageTypeAttribute()
     {
         $data['type'] = 'page';
-        $data['value'] = '';
+        $data['value'] = [];
 
         if ($this->externalFiles()->count()) {
             $data['type'] = "file";

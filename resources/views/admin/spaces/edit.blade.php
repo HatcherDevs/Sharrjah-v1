@@ -66,7 +66,11 @@
                                     <?php
                                     $types = [['value' => 'page', 'name' => 'Page'], ['value' => 'url', 'name' => 'Link to external page'], ['value' => 'file', 'name' => 'Links to file'], ['value' => 'blank', 'name' => 'No link']];
                                     
-                                    if ($pageType['en']['type'] == 'url' && $pageType['en']['value']->url == '#') {
+                                    if (!isset($pageType['en'])) {
+                                        $pageType['en'] = ['type' => 'page', 'value' => null];
+                                    }
+                                    
+                                    if ($pageType['en']['type'] == 'url' && isset($pageType['en']['value']) && $pageType['en']['value']->url == '#') {
                                         $pageType['en']['type'] = 'blank';
                                     }
                                     ?>
@@ -80,12 +84,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group type-box url"
-                                    style="{{ $pageType['en']['type'] == 'url' && $pageType['en']['value']->url != '#' ? 'display:block' : '' }}">
+                                    style="{{ $pageType['en']['type'] == 'url' && isset($pageType['en']['value']) && $pageType['en']['value']->url != '#' ? 'display:block' : '' }}">
                                     <div class="hidden link">
                                         <label>Page URL:</label>
                                         <input type="text" class="form-control" placeholder="External link"
                                             name="external[en][value]"
-                                            value="{{ $pageType['en']['type'] == 'url' ? $pageType['en']['value']->url : '' }}">
+                                            value="{{ $pageType['en']['type'] == 'url' && isset($pageType['en']['value']) ? $pageType['en']['value']->url : '' }}">
                                     </div>
                                 </div>
 
@@ -94,7 +98,7 @@
                                     <div class="hidden link">
                                         <label>
                                             Upload file: <br /><br />
-                                            @if ($pageType['en']['type'] == 'file')
+                                            @if ($pageType['en']['type'] == 'file' && isset($pageType['en']['value']))
                                                 <a
                                                     href="{{ url('public/' . $pageType['en']['value']->path . '/' . $pageType['en']['value']->file_name) }} ">{{ $pageType['en']['value']->original_name }}</a>
                                             @endif
@@ -152,7 +156,11 @@
                                     <?php
                                     $types = [['value' => 'page', 'name' => 'Page'], ['value' => 'url', 'name' => 'Link to external page'], ['value' => 'file', 'name' => 'Links to file'], ['value' => 'blank', 'name' => 'No link']];
                                     
-                                    if ($pageType['ar']['type'] == 'url' && $pageType['ar']['value']->url == '#') {
+                                    if (!isset($pageType['ar'])) {
+                                        $pageType['ar'] = ['type' => 'page', 'value' => null];
+                                    }
+                                    
+                                    if ($pageType['ar']['type'] == 'url' && isset($pageType['ar']['value']) && $pageType['ar']['value']->url == '#') {
                                         $pageType['ar']['type'] = 'blank';
                                     }
                                     ?>
@@ -166,12 +174,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group type-box url"
-                                    style="{{ $pageType['ar']['type'] == 'url' && $pageType['ar']['value']->url != '#' ? 'display:block' : '' }}">
+                                    style="{{ $pageType['ar']['type'] == 'url' && isset($pageType['ar']['value']) && $pageType['ar']['value']->url != '#' ? 'display:block' : '' }}">
                                     <div class="hidden link">
                                         <label>Page URL:</label>
                                         <input type="text" class="form-control" placeholder="External link"
                                             name="external[ar][value]"
-                                            value="{{ $pageType['ar']['type'] == 'url' ? $pageType['ar']['value']->url : '' }}">
+                                            value="{{ $pageType['ar']['type'] == 'url' && isset($pageType['ar']['value']) ? $pageType['ar']['value']->url : '' }}">
                                     </div>
                                 </div>
 
@@ -181,7 +189,7 @@
                                     <div class="hidden link">
                                         <label>
                                             Upload file:
-                                            @if ($pageType['ar']['type'] == 'file')
+                                            @if ($pageType['ar']['type'] == 'file' && isset($pageType['ar']['value']))
                                                 <a
                                                     href="{{ url('public/' . $pageType['ar']['value']->path . '/' . $pageType['ar']['value']->file_name) }} ">{{ $pageType['ar']['value']->original_name }}</a>
                                             @endif
