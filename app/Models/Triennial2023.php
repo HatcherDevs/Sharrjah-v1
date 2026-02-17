@@ -74,7 +74,10 @@ class Triennial2023 extends Model
         'last_content_ar'
     ];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
+
     public $timestamps = false;
 
     public function links(){

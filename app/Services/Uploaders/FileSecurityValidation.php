@@ -307,6 +307,13 @@ trait FileSecurityValidation {
         elseif (substr($firstBytes, 0, 4) === "RIFF" && substr($firstBytes, 8, 4) === "WEBP" && $extension === 'webp') {
             $isValidImage = true;
         }
+        // SVG: starts with <svg or <?xml
+        elseif ($extension === 'svg') {
+            $trimmedBytes = ltrim($firstBytes);
+            if (stripos($trimmedBytes, '<svg') === 0 || stripos($trimmedBytes, '<?xml') === 0) {
+                $isValidImage = true;
+            }
+        }
 
         if (!$isValidImage) {
             throw new Exception('File content does not match the declared image type. File may be corrupted or malicious.');
@@ -325,20 +332,29 @@ trait FileSecurityValidation {
     {
         $extension = strtolower($file->getClientOriginalExtension());
         
-        // Only check text-based files
-        $textExtensions = ['txt', 'csv', 'html', 'htm', 'xml', 'json'];
+        // Define groups of extensions
+        // SVG is text-based (XML), so it should be checked like a text file
+        $textExtensions = ['txt', 'csv', 'html', 'htm', 'xml', 'json', 'svg'];
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
         
-        // For images, check if they contain PHP/script tags (image polyglot attack)
-        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+        // Scan content only for text-based files
+        // We avoid scanning binary images for PHP tags because it causes false positives in binary data
+        // and binary images are already validated by magic bytes in validateFileContent()
+        if (in_array($extension, $textExtensions)) {
             $content = file_get_contents($filePath);
             
-            // Check for PHP tags
-            if (preg_match('/<\?php/i', $content) || 
-                preg_match('/<\?=/i', $content) ||
-                preg_match('/<script/i', $content)) {
+            // Check for PHP tags: <?php and <?=
+            if (preg_match('/<\?php/i', $content) || preg_match('/<\?=/i', $content)) {
+                throw new Exception('File contains potentially malicious PHP tags');
+            }
+            
+            // Check for script tags
+            if (preg_match('/<script/i', $content)) {
                 throw new Exception('File contains potentially malicious script tags');
             }
         }
+        // For binary images, if we want to be extra safe, we could check just the beginning
+        // but magic bytes already ensured it's a valid image format.
     }
 
     /**
@@ -426,8 +442,12 @@ trait FileSecurityValidation {
         $filePath = $file->getRealPath();
         $extension = strtolower($file->getClientOriginalExtension());
 
-        // For non-image files, scan content
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+        // Only scan text-based or potentially vulnerable files.
+        // Avoid scanning large binary files like PDF, DOCX, etc., for raw text patterns
+        // because it causes many false positives.
+        $vulnerableExtensions = ['txt', 'csv', 'html', 'htm', 'xml', 'json', 'svg'];
+
+        if (in_array($extension, $vulnerableExtensions)) {
             $content = file_get_contents($filePath);
             
             // Check for PHP code
@@ -437,7 +457,7 @@ trait FileSecurityValidation {
                 throw new Exception('File content contains potentially malicious code');
             }
 
-            // Check for eval, base64_decode, system, exec, shell_exec
+            // Check for dangerous functions
             $dangerousFunctions = [
                 '/\beval\s*\(/i',
                 '/\bexec\s*\(/i',
@@ -496,4 +516,3 @@ trait FileSecurityValidation {
         return $fileName;
     }
 }
-

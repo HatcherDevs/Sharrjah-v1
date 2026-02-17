@@ -13,6 +13,7 @@ use App\Services\Uploaders\SpaceImagesUploader;
 use App\Services\Uploaders\SpaceLandscapeImageUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
+use App\Models\Forms\Form;
 
 use App\Http\Requests;
 use Illuminate\Support\Str;
@@ -20,6 +21,11 @@ use Illuminate\Support\Str;
 class SpacesController extends Controller
 {
     use CanCreateSlug;
+
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
 
     public function __construct(Space $model, SpaceImagesUploader $uploader, SpaceLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
@@ -71,7 +77,9 @@ class SpacesController extends Controller
             $pageType['ar']['value'] = $page->externalLinks()->where('language','ar')->first();
         }
 
-        return view('admin.spaces.edit',compact('page','pageType'));
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.spaces.edit',compact('page','pageType','forms'));
     }
 
     public function delete($id){
@@ -84,7 +92,8 @@ class SpacesController extends Controller
     }
 
     public function create(){
-        return view('admin.spaces.create');
+        $forms = Form::select('id', 'title')->get();
+        return view('admin.spaces.create', compact('forms'));
     }
 
     public function store(Request $request){
@@ -192,7 +201,10 @@ class SpacesController extends Controller
                 $target = Upload::find($upload['id']);
 
                 if($target){
-                    $target->update(['caption'=>$upload['EN'],'caption_ar'=>$upload['AR']]);
+                    $target->update([
+                        'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
+                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
+                    ]);
                 }
             }
         }
@@ -200,71 +212,56 @@ class SpacesController extends Controller
         if($page){
             $uploads = $request->file('uploads');
             if($uploads){
-
                 foreach ($request->file('uploads') as $uploadid => $upload){
                     if($upload){
                         $target = Upload::find($uploadid);
-
                         if($target){
                             $targetSlide = SpaceImageSlide::find($target->uploadable_id);
-
                             if($target->template=="square")
                                 $photo = ($files != null ? $this->uploader->upload($upload) : false);
                             else
                                 $photo = ($files != null ? $this->luploader->upload($upload) : false);
 
                             $newUpload = $targetSlide->uploads()->create($photo[0]);
-
                             $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-
                             unset($uploadCaptions[$target->id]);
                             $target->delete();
-                        } else {
-
                         }
                     }
                 }
             }
 
-            foreach ($files as $index=>$file){
-
-                if($file['square'] || $file['landscape']){
-                    $slide = $page->sliders()->create([]);
-
-                    if($file['square']){
-                        // Square Image
-                        $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
-
-                        $slide->uploads()->create($photo[0]);
-                    }
-
-                    if($file['landscape']) {
-                        // Landscape Image
-                        $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                        $photo[1]['caption'] = $captions[$index]['EN'];
-                        $photo[1]['caption_ar'] = $captions[$index]['AR'];
-
-                        $slide->uploads()->createMany($photo);
+            if (is_array($files)) {
+                foreach ($files as $index=>$file){
+                    if($file['square'] || $file['landscape']){
+                        $slide = $page->sliders()->create([]);
+                        if($file['square']){
+                            // Square Image
+                            $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
+                            $photo[0]['caption'] = $captions[$index]['EN'];
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            $slide->uploads()->create($photo[0]);
+                        }
+                        if($file['landscape']) {
+                            // Landscape Image
+                            $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
+                            $photo[0]['caption'] = $captions[$index]['EN'];
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                            $photo[1]['caption'] = $captions[$index]['EN'];
+                            $photo[1]['caption_ar'] = $captions[$index]['AR'];
+                            $slide->uploads()->createMany($photo);
+                        }
                     }
                 }
             }
 
-            if($newUploads['square'] || $newUploads['landscape']){
-
+            if(isset($newUploads) && is_array($newUploads) && ($newUploads['square'] || $newUploads['landscape'])){
                 $slide = SpaceImageSlide::find($request->input('newUploads')['slide_id']);
-
                 if($newUploads['square']) {
                     // Square Image
                     $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
                     $slide->uploads()->create($photo[0]);
                 }
-
                 if($newUploads['landscape']) {
                     // Landscape Image
                     $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
@@ -275,7 +272,6 @@ class SpacesController extends Controller
             if($uploadCaptions){
                 foreach ( $uploadCaptions as $id => $caption ) {
                     $target = Upload::find($id);
-
                     if($target)
                         $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
                 }
@@ -284,7 +280,6 @@ class SpacesController extends Controller
             if($request->input('delete')){
                 foreach ( $request->input('delete') as $item) {
                     $target = SpaceImageSlide::find($item);
-
                     if($target){
                         if($target->square && $target->landscape)
                             $target->square->delete();

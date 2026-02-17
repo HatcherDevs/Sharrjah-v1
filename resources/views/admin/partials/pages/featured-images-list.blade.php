@@ -1,4 +1,4 @@
-@if (count($page->sliders))
+@if (isset($page) && count($page->sliders))
     <div class="form-group" style="border-top:3px solid #ccc">
         <br />
         <strong>Featured Images</strong>

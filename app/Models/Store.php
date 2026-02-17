@@ -62,7 +62,10 @@ class Store extends Model
         'collection_id',
     ];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
+
     public $timestamps = false;
 
     public function links(){

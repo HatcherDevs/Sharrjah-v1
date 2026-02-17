@@ -59,7 +59,10 @@ class Opportunities extends Model
         'audio_file',
     ];
 
-    public $dates = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
+
     public $timestamps = false;
 
     public function links(){

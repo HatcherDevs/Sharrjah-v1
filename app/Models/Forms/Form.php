@@ -8,7 +8,10 @@ class Form extends Model
 {
     protected $fillable = ['title','title_ar','slug','description','description_ar'];
 
-    public $dates = ['date_start','date_end'];
+    protected $casts = [
+        'date_start' => 'datetime',
+        'date_end' => 'datetime',
+    ];
 
     public function questions(){
         return $this->hasMany('App\Models\Forms\FormQuestion');
