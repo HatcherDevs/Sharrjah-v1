@@ -211,7 +211,10 @@ class PodcastController extends Controller
                 $target = Upload::find($upload['id']);
 
                 if($target){
-                    $target->update(['caption'=>$upload['EN'],'caption_ar'=>$upload['AR']]);
+                    $target->update([
+                        'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
+                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
+                    ]);
                 }
             }
         }
