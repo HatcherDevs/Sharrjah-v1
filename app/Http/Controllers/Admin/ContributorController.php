@@ -74,10 +74,10 @@ class ContributorController extends Controller
 
         if($newPage && $files){
             foreach ($files as $index=>$file){
-                if($file['square'] || $file['landscape'])
+                if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape']))
                     $slide = $newPage->sliders()->create([]);
 
-                if($file['square']){
+                if(isset($file['square']) && $file['square']){
                     // Square Image
                     $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
                     $photo[0]['caption'] = $captions[$index]['EN'];
@@ -85,7 +85,7 @@ class ContributorController extends Controller
                     $slide->uploads()->create($photo[0]);
                 }
 
-                if($file['landscape']) {
+                if(isset($file['landscape']) && $file['landscape']) {
                     // Landscape Image
                     $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
                     $photo[0]['caption'] = $captions[$index]['EN'];
@@ -200,10 +200,10 @@ class ContributorController extends Controller
             if ($files) {
                 foreach ($files as $index=>$file){
 
-                    if($file['square'] || $file['landscape']){
+                    if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])){
                         $slide = $page->sliders()->create([]);
 
-                        if($file['square']){
+                        if(isset($file['square']) && $file['square']){
                             // Square Image
                             $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
 
@@ -213,7 +213,7 @@ class ContributorController extends Controller
                             $slide->uploads()->create($photo[0]);
                         }
 
-                        if($file['landscape']) {
+                        if(isset($file['landscape']) && $file['landscape']) {
                             // Landscape Image
                             $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
 
@@ -222,8 +222,8 @@ class ContributorController extends Controller
 
                             $slide->uploads()->create($photo[0]);
                         }
+                    }
                 }
-            }
             }
 
             if($newUploads && ($newUploads['square'] || $newUploads['landscape'])){
