@@ -118,7 +118,7 @@ class SpacesController extends Controller
         $images = $request->file('slides');
         $captions = $request->input('captions');
 
-        if($newPage){
+        if($newPage && $files){
             foreach ($files as $index=>$file){
                 if($file['square'] || $file['landscape'])
                     $slide = $newPage->sliders()->create([]);

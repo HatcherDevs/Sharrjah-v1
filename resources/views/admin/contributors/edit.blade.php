@@ -39,7 +39,7 @@
                                     <label for="exampleInputEmail3">Assign to:</label>
                                     <select class="form-control" name="contributor[letter]">
                                         @foreach ($letters['en'] as $letter)
-                                            @if ($page->contributor->letter == $letter)
+                                            @if (optional($page->contributor)->letter == $letter)
                                                 <option selected="selected" value="{{ $letter }}">{{ $letter }}
                                                 </option>
                                             @else
@@ -60,7 +60,7 @@
                                     <label for="exampleInputEmail3">Assign to:</label>
                                     <select class="form-control" name="contributor[letter_ar]">
                                         @foreach ($letters['ar'] as $letter)
-                                            @if ($page->contributor->letter_ar == $letter)
+                                            @if (optional($page->contributor)->letter_ar == $letter)
                                                 <option selected="selected" value="{{ $letter }}">{{ $letter }}
                                                 </option>
                                             @else

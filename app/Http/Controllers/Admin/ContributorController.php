@@ -72,7 +72,7 @@ class ContributorController extends Controller
         $files = $request->file('images');
         $captions = $request->input('captions');
 
-        if($newPage){
+        if($newPage && $files){
             foreach ($files as $index=>$file){
                 if($file['square'] || $file['landscape'])
                     $slide = $newPage->sliders()->create([]);
@@ -316,7 +316,7 @@ class ContributorController extends Controller
             $page->forms()->create(['form_id'=>1]);
         }
 
-        $page->contributor->update($request['contributor']);
+        $page->contributor()->updateOrCreate([], $request['contributor']);
 
         return redirect()->back();
     }

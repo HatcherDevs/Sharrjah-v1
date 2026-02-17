@@ -128,7 +128,7 @@ class SatTourController extends Controller
         $newUploads = $request->file('newUploads');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($newPage){
+        if($newPage && $files){
             foreach ($files as $index=>$file){
 
                 if($file['square']){

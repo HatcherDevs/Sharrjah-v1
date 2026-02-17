@@ -188,7 +188,7 @@ class Post extends Model
      */
     public function contributor()
     {
-        return $this->hasOne('App\Models\Contributor');
+        return $this->hasOne('App\Models\Contributor')->withDefault();
     }
 
     /**
