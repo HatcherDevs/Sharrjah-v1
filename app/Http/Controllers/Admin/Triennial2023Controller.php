@@ -69,9 +69,19 @@ class Triennial2023Controller extends Controller
         return view('pages.triennial-2023', compact('page', 'data', 'upcoming'));
     }
 
-    public function preview($id)
+    public function preview($id, Request $request)
     {
-        $post = $this->model->find($id);
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Triennial2023();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Triennial2023::where('active', 1)->where('slug', '!=', $post->slug)->where('series', $post->series)->get();
         return view('pages.triennial-2023-event-preview', compact('post', 'similar'));
     }

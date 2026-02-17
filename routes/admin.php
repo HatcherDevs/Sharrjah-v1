@@ -67,6 +67,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
     Route::get('create/contributors', 'Admin\ContributorController@create');
     Route::get('contributors/{id}/edit', 'Admin\ContributorController@edit');
+    Route::match(['get', 'post'], 'contributors/preview/{id}', 'Admin\ContributorController@preview');
     Route::get('posts/contributors', 'Admin\ContributorController@show');
     Route::post('create/contributors', 'Admin\ContributorController@store');
     Route::post('update/contributors', 'Admin\ContributorController@update');
@@ -109,6 +110,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('materials/', 'Admin\MaterialController@show');
     Route::post('materials/', 'Admin\MaterialController@store');
     Route::get('materials/{id}/edit', 'Admin\MaterialController@edit');
+    Route::match(['get', 'post'], 'materials/preview/{id}', 'Admin\MaterialController@preview');
     Route::get('materials/{id}/delete', 'Admin\MaterialController@delete');
 
     Route::get('create/materials/videos', 'Admin\MaterialController@createVideo');
@@ -256,14 +258,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     });
 
     // Preview routes
-    Route::get('pages/preview/{id}', 'Admin\PageController@preview');
-    Route::get('posts/preview/{id}', 'Admin\PageController@previewPost');
-    Route::get('publications/preview/{id}', 'Admin\PageController@previewPublication');
-    Route::get('podcasts/preview/{id}', 'Admin\PodcastController@preview');
-    Route::get('re-materialize/preview/{id}', 'Admin\MaterialController@preview');
-    Route::get('spaces/preview/{id}', 'Admin\SpacesController@preview');
-    Route::get('stores/preview/{id}', 'Admin\StoreController@preview');
-    Route::get('stores/workshops/preview/{id}', 'Admin\StoreWorkshopController@preview');
-    Route::get('triennial-2023/preview/{id}', 'Admin\Triennial2023Controller@preview');
-    Route::get('sat-tours/preview/{id}', 'Admin\SatTourController@preview');
+    Route::match(['get', 'post'], 'pages/preview/{id}', 'Admin\PageController@preview');
+    Route::match(['get', 'post'], 'posts/preview/{id}', 'Admin\PageController@previewPost');
+    Route::match(['get', 'post'], 'publications/preview/{id}', 'Admin\PageController@previewPublication');
+    Route::match(['get', 'post'], 'podcasts/preview/{id}', 'Admin\PodcastController@preview');
+    Route::match(['get', 'post'], 're-materialize/preview/{id}', 'Admin\MaterialController@preview');
+    Route::match(['get', 'post'], 'spaces/preview/{id}', 'Admin\SpacesController@preview');
+    Route::match(['get', 'post'], 'stores/preview/{id}', 'Admin\StoreController@preview');
+    Route::match(['get', 'post'], 'stores/workshops/preview/{id}', 'Admin\StoreWorkshopController@preview');
+    Route::match(['get', 'post'], 'triennial-2023/preview/{id}', 'Admin\Triennial2023Controller@preview');
+    Route::match(['get', 'post'], 'sat-tours/preview/{id}', 'Admin\SatTourController@preview');
 });

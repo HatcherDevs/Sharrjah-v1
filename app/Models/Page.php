@@ -120,7 +120,7 @@ class Page extends Model
     {
         $parent = $this->parent()->first();
         if ($parent == null)
-            return [];
+            return null;
 
         return $this->find($parent->page_parent_id);
     }

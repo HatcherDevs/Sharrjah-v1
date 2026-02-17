@@ -122,7 +122,7 @@ class Podcast extends Model
         $data = $this->uploads()->where('template','landscape')->first();
 
         if($data==null)
-            return [];
+            return null;
 
         return $data;
     }
@@ -131,7 +131,7 @@ class Podcast extends Model
         $data = $this->uploads()->where('template','original')->first();
 
         if($data==null)
-            return [];
+            return null;
 
         return $data;
     }
@@ -140,7 +140,7 @@ class Podcast extends Model
         $data = $this->uploads()->where('template','square')->first();
 
         if($data==null)
-            return [];
+            return null;
 
         return $data;
     }

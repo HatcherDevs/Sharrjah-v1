@@ -352,6 +352,45 @@ class ContributorController extends Controller
         return view('admin.contributors.edit',compact('page','letters','pageType'));
     }
 
+    public function preview($id, Request $request)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            abort(404, 'Post does not exist');
+        }
+
+        if ($request->isMethod('post')) {
+            $post->fill($request->all());
+        }
+
+        $page = $post->parent;
+        if (!$page) {
+            $page = Page::where('slug', 'contributors')->first();
+        }
+
+        $relatedPages['posts'] = [];
+        $relatedPages['pages'] = [];
+
+        $rPosts = Post::search($post->title, null, true, true)->where('title', '!=', $post->title)->get();
+
+        foreach ($rPosts as $dpost) {
+            if (stripos($dpost->title, $post->title) === false) {
+                $relatedPages['posts'][] = $dpost;
+            }
+        }
+
+        $rPages = Page::search($post->title, null, true, true)->get();
+
+        foreach ($rPages as $dpage) {
+            if (isset($page) && stripos($dpage->name, $post->title) === false && $dpage->name != $page->name) {
+                $relatedPages['pages'][] = $dpage;
+            }
+        }
+
+        return view('pages.post', compact('page', 'post', 'relatedPages'));
+    }
+
     public function orderUpdate(Request $request){
         $data = $request->input();
 

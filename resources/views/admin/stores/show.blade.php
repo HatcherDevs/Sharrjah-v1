@@ -26,15 +26,18 @@
                                         <th onclick="sortTable(1)">Title Arabic</th>
                                         <th>Action</th>
                                     </tr>
-                                    @foreach($data as $item)
+                                    @foreach ($data as $item)
                                         <tr>
                                             <td>{{ $item->title }}</td>
                                             <td>{{ $item->title_ar }}</td>
-                                            <td><a href="{{ URL('admin/stores/'.$item->id.'/edit') }}">Edit</a>
+                                            <td><a href="{{ URL('admin/stores/' . $item->id . '/edit') }}">Edit</a>
                                                 |
-                                                <a target="_blank" href="{{ URL('stores/preview/'.$item->id) }}">Preview</a>
+                                                <a target="_blank"
+                                                    href="{{ URL('admin/stores/preview/' . $item->id) }}">Preview</a>
                                                 |
-                                                <a href="{{ URL('admin/stores/'.$item->id.'/delete') }}" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a></td>
+                                                <a href="{{ URL('admin/stores/' . $item->id . '/delete') }}"
+                                                    onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </table>
@@ -45,5 +48,4 @@
             </div>
         </div>
     </div>
-
 @endsection

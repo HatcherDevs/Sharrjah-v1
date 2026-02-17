@@ -23,8 +23,9 @@
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <a target="_blank" href="{{ URL('spaces/preview/' . $page->id) }}">Click here to preview
-                                    page</a>
+                                <a target="_blank" href="javascript:void(0)"
+                                    onclick="previewDraft('{{ URL('admin/spaces/preview/' . $page->id) }}')">Click here to
+                                    preview page</a>
                             </div>
                         </div>
                     </div>

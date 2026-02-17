@@ -24,7 +24,8 @@
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <a target="_blank" href="{{ URL('stores/workshops/preview/' . $page->id) }}">Click here to
+                                <a target="_blank" href="{{ URL('admin/stores/workshops/preview/' . $page->id) }}">Click
+                                    here to
                                     preview page</a>
                             </div>
                         </div>

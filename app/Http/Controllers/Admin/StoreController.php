@@ -41,9 +41,19 @@ class StoreController extends Controller
         return view('admin.stores.show', compact('data'));
     }
 
-    public function preview($id)
+    public function preview($id, Request $request)
     {
-        $post = $this->model->find($id);
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Store();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Store::where('active', 1)->orderBy('publish_date', 'DESC')->get();
         return view('pages.store-preview', compact('post', 'similar'));
     }

@@ -90,9 +90,15 @@ class PageController extends Controller
         return view('pages.preview', compact('page', 'data'));
     }
 
-    public function previewPost($id)
+    public function previewPost($id, Request $request)
     {
-        $post = Post::find($id);
+        if ($request->isMethod('post')) {
+            $post = Post::find($id) ?: new Post();
+            $post->fill($request->all());
+        } else {
+            $post = Post::find($id);
+        }
+
         if (!$post) {
             abort(404);
         }
@@ -100,9 +106,19 @@ class PageController extends Controller
         return view('pages.post-preview', compact('post', 'relatedPages'));
     }
 
-    public function previewPublication($id)
+    public function previewPublication($id, Request $request)
     {
-        $post = Publication::find($id);
+        if ($request->isMethod('post')) {
+            $post = Publication::find($id) ?: new Publication();
+            $post->fill($request->all());
+        } else {
+            $post = Publication::find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         return view('pages.publication-preview', compact('post'));
     }
 

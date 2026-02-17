@@ -40,8 +40,18 @@ class SpacesController extends Controller
         return view('admin.spaces.show',compact('data'));
     }
 
-    public function preview($id){
-        $post = $this->model->find($id);
+    public function preview($id, Request $request){
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Space();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Space::where('active',1)->where('slug','!=',$post->slug)->where('series',$post->series)->get();
         return view('pages.space-preview',compact('post','similar'));
     }

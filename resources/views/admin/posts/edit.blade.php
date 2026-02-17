@@ -9,7 +9,7 @@
                 <div class="col-md-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h3>Edit {{ $page_name }}  {{ $page_name == 'Calendar' ? "Event" : '' }}</h3>
+                            <h3>Edit {{ $page_name }} {{ $page_name == 'Calendar' ? 'Event' : '' }}</h3>
                         </div>
                     </div>
                 </div>
@@ -17,13 +17,15 @@
 
             <form class="forms-sample" action="{{ url('admin/posts/update') }}" method="post" enctype="multipart/form-data">
                 <input type="hidden" value="{!! csrf_token() !!}" name="_token">
-                <input type="hidden" value="{{ $page->id  }}" name="id">
+                <input type="hidden" value="{{ $page->id }}" name="id">
 
                 <div class="row">
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <a target="_blank" href="{{ URL('posts/preview/'.$page->id) }}">Click here to preview page</a>
+                                <a target="_blank" href="javascript:void(0)"
+                                    onclick="previewDraft('{{ URL('admin/posts/preview/' . $page->id) }}')">Click here to
+                                    preview page</a>
                             </div>
                         </div>
                     </div>

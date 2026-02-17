@@ -39,8 +39,18 @@ class SatTourController extends Controller
         return view('admin.tours.show',compact('data'));
     }
 
-    public function preview($id){
-        $post = $this->model->find($id);
+    public function preview($id, Request $request){
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Tour();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Material::where('active',1)->where('slug','!=',$post->slug)->where('series',$post->series)->get();
         return view('pages.tour-preview',compact('post','similar'));
     }

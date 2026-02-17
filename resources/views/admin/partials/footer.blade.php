@@ -342,6 +342,26 @@
         top: 9000000000000000000000000000px !important;
 </style>
 
+<script>
+    function previewDraft(url) {
+        var form = $('.forms-sample');
+        var originalAction = form.attr('action');
+        var originalTarget = form.attr('target');
+
+        form.attr('action', url);
+        form.attr('target', '_blank');
+        form.submit();
+
+        // Restore
+        form.attr('action', originalAction);
+        if (originalTarget) {
+            form.attr('target', originalTarget);
+        } else {
+            form.removeAttr('target');
+        }
+    }
+</script>
+
 @yield('js')
 
 </html>

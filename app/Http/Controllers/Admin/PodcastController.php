@@ -33,8 +33,18 @@ class PodcastController extends Controller
         return view('admin.podcasts.show',compact('data'));
     }
 
-    public function preview($id){
-        $post = $this->model->find($id);
+    public function preview($id, Request $request){
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Podcast();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Podcast::where('active',1)->where('slug','!=',$post->slug)->where('series',$post->series)->get();
         return view('pages.podcast-preview',compact('post','similar'));
     }

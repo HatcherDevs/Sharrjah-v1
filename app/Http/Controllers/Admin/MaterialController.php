@@ -47,9 +47,19 @@ class MaterialController extends Controller
         return view('admin.materials.show', compact('data'));
     }
 
-    public function preview($id)
+    public function preview($id, Request $request)
     {
-        $post = $this->model->find($id);
+        if ($request->isMethod('post')) {
+            $post = $this->model->find($id) ?: new Material();
+            $post->fill($request->all());
+        } else {
+            $post = $this->model->find($id);
+        }
+
+        if (!$post) {
+            abort(404);
+        }
+
         $similar = Material::where('active', 1)->where('slug', '!=', $post->slug)->where('series', $post->series)->get();
         return view('pages.material-preview', compact('post', 'similar'));
     }

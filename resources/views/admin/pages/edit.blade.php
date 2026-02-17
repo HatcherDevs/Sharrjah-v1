@@ -23,8 +23,10 @@
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                            <a target="_blank" href="{{ URL('pages/preview/'.$page->id) }}">Click here to preview page</a>
-                        </div>
+                                <a target="_blank" href="javascript:void(0)"
+                                    onclick="previewDraft('{{ URL('admin/pages/preview/' . $page->id) }}')">Click here to
+                                    preview page</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -49,10 +51,10 @@
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                @if( $page->id == 16 )
-                                    <input type="hidden"  name="page_id" value="15">
+                                @if ($page->id == 16)
+                                    <input type="hidden" name="page_id" value="15">
                                 @elseif($page->id == 17)
-                                    <input type="hidden"  name="page_id" value="15">
+                                    <input type="hidden" name="page_id" value="15">
                                 @else
                                     @include('admin.partials.pages.parent-page-form')
                                 @endif
@@ -91,13 +93,13 @@
                     </div>
                 </div>
 
-             @if ($page->slug == "venues-and-times")
-             {{-- <h2>//////Start venues</h2> --}}
-             
-                @include('admin.partials.pages.additional2_content')    
-                
-             {{-- <h2>//////End venues</h2> --}}
-             @endif
+                @if ($page->slug == 'venues-and-times')
+                    {{-- <h2>//////Start venues</h2> --}}
+
+                    @include('admin.partials.pages.additional2_content')
+
+                    {{-- <h2>//////End venues</h2> --}}
+                @endif
                 <div class="row">
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
@@ -106,12 +108,15 @@
                                     <label>Publish date</label>
                                     <?php
                                     $date = \Carbon\Carbon::now()->format('m/d/y');
-
-                                    if(isset($page))
-                                        if($page->created_at)
+                                    
+                                    if (isset($page)) {
+                                        if ($page->created_at) {
                                             $date = $page->created_at->format('m/d/y');
+                                        }
+                                    }
                                     ?>
-                                    <input type="text" class="form-control datetimepicker" readonly placeholder="" name="created_at" value="{{ $date }}">
+                                    <input type="text" class="form-control datetimepicker" readonly placeholder=""
+                                        name="created_at" value="{{ $date }}">
                                 </div>
                             </div>
                         </div>
@@ -131,10 +136,8 @@
             </form>
         </div>
     </div>
-
 @endsection
 
 @section('js')
     <script src="{{ asset('public/admin/js/file-upload.js') }}"></script>
-    
 @endsection
