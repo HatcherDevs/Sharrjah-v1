@@ -32,29 +32,31 @@
         </div>
     </div>
 
-    @foreach ($page->items as $item)
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card-box">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                {{ $item->title }} <br />
-                                @if ($item->uploads()->first())
-                                    {{ $item->uploads()->first()->original_name }} <br />
-                                    Link:
-                                    {{ asset('/public' . $item->uploads()->first()->path . '/' . $item->uploads()->first()->file_name) }}
-                                    <br /><br />
-                                @endif
-                                <label>Remove file:</label>
-                                <input type="checkbox" name="delete[{{ $item->id }}]">
+    @if (isset($page) && $page->items && $page->items->count())
+        @foreach ($page->items as $item)
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card-box">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ $item->title }} <br />
+                                    @if ($item->uploads()->first())
+                                        {{ $item->uploads()->first()->original_name }} <br />
+                                        Link:
+                                        {{ asset('/public' . $item->uploads()->first()->path . '/' . $item->uploads()->first()->file_name) }}
+                                        <br /><br />
+                                    @endif
+                                    <label>Remove file:</label>
+                                    <input type="checkbox" name="delete[{{ $item->id }}]">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endforeach
+        @endforeach
+    @endif
 
     {{--    <div class="row"> --}}
     {{--        <div class="col-md-12"> --}}

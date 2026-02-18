@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Forms\Form;
 use App\Models\Material;
 use App\Models\MaterialImageSlide;
 use App\Models\Page;
-use App\Models\PublicationImageSlide;
 use App\Models\Upload;
 use App\Services\Uploaders\ExternalFileUploader;
 use App\Services\Uploaders\MaterialImagesUploader;
 use App\Services\Uploaders\MaterialLandscapeImageUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use Illuminate\Support\Str;
 
 class MaterialController extends Controller
@@ -22,8 +20,11 @@ class MaterialController extends Controller
     use CanCreateSlug;
 
     protected $model;
+
     protected $uploader;
+
     protected $luploader;
+
     protected $file_uploader;
 
     public function __construct(Material $model, MaterialImagesUploader $uploader, MaterialLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
@@ -36,22 +37,25 @@ class MaterialController extends Controller
 
     public function show()
     {
-        $page_name = "Re-materialize";
+        $page_name = 'Re-materialize';
         $data = $this->model->where('is_video', 0)->where('is_open', 0)->get();
+
         return view('admin.materials.show', compact('data', 'page_name'));
     }
 
     public function showVideos()
     {
-        $page_name = "Re-materialize Videos";
+        $page_name = 'Re-materialize Videos';
         $data = $this->model->where('is_video', 1)->get();
+
         return view('admin.materials.show', compact('data', 'page_name'));
     }
 
     public function showOpenCalls()
     {
-        $page_name = "Re-materialize Open Calls";
+        $page_name = 'Re-materialize Open Calls';
         $data = $this->model->where('is_open', 1)->get();
+
         return view('admin.materials.show', compact('data', 'page_name'));
     }
 
@@ -63,7 +67,7 @@ class MaterialController extends Controller
     public function single($slug)
     {
         $post = Material::where('slug', $slug)->first();
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
         $page = Page::where('slug', 're-materialize')->first();
@@ -75,7 +79,7 @@ class MaterialController extends Controller
     public function single2($slug)
     {
         $post = Material::where('slug', $slug)->first();
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
         $page = Page::where('slug', 'journeys-into-architecture-archives')->first();
@@ -86,27 +90,27 @@ class MaterialController extends Controller
 
     public function edit($id)
     {
-        $page_name = "Re-materialize Item";
+        $page_name = 'Re-materialize Item';
         $page = $this->model->find($id);
 
         $pageType = [
             'en' => ['type' => 'page', 'value' => null],
-            'ar' => ['type' => 'page', 'value' => null]
+            'ar' => ['type' => 'page', 'value' => null],
         ];
 
         if ($page->externalFiles()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "file";
+            $pageType['en']['type'] = 'file';
             $pageType['en']['value'] = $page->externalFiles()->where('language', 'en')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "url";
+            $pageType['en']['type'] = 'url';
             $pageType['en']['value'] = $page->externalLinks()->where('language', 'en')->first();
         }
 
         if ($page->externalFiles()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "file";
+            $pageType['ar']['type'] = 'file';
             $pageType['ar']['value'] = $page->externalFiles()->where('language', 'ar')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "url";
+            $pageType['ar']['type'] = 'url';
             $pageType['ar']['value'] = $page->externalLinks()->where('language', 'ar')->first();
         }
 
@@ -117,34 +121,56 @@ class MaterialController extends Controller
     {
         $page = $this->model->find($id);
 
-        if ($page)
+        if ($page) {
             $page->delete();
+        }
 
         return redirect()->back();
     }
 
     public function create()
     {
-        $page_name = "Create Re-materialize Item";
+        $page_name = 'Create Re-materialize Item';
         $isVideo = 0;
         $isOpen = 0;
-        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function createVideo()
     {
-        $page_name = "Create Re-materialize Video";
+        $page_name = 'Create Re-materialize Video';
         $isVideo = 1;
         $isOpen = 0;
-        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function createOpenCall()
     {
-        $page_name = "Create Re-materialize Open Call";
+        $page_name = 'Create Re-materialize Open Call';
         $isVideo = 0;
         $isOpen = 1;
-        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.materials.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function store(Request $request)
@@ -189,27 +215,31 @@ class MaterialController extends Controller
             $page_type_en = $external['en']['type'] ?? null;
             $page_type_ar = $external['ar']['type'] ?? null;
 
-            if ($page_type_ar == "file") {
+            if ($page_type_ar == 'file') {
                 $fileRow = $newPage->externalFiles()->create(['language' => 'ar']);
                 $files_ar = $request->file('external_file_ar');
                 if ($files_ar) {
                     $photo = $this->file_uploader->upload($files_ar);
-                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                    if ($photo) {
+                        $fileRow->uploads()->create($photo[0]);
+                    }
                 }
-            } elseif ($page_type_ar == "url" || $page_type_ar == "blank") {
-                $url = $page_type_ar == "blank" ? "#" : ($external['ar']['value'] ?? '#');
+            } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
+                $url = $page_type_ar == 'blank' ? '#' : ($external['ar']['value'] ?? '#');
                 $newPage->externalLinks()->create(['language' => 'ar', 'url' => $url]);
             }
 
-            if ($page_type_en == "file") {
+            if ($page_type_en == 'file') {
                 $fileRow = $newPage->externalFiles()->create(['language' => 'en']);
                 $files_en = $request->file('external_file_en');
                 if ($files_en) {
                     $photo = $this->file_uploader->upload($files_en);
-                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                    if ($photo) {
+                        $fileRow->uploads()->create($photo[0]);
+                    }
                 }
-            } elseif ($page_type_en == "url" || $page_type_en == "blank") {
-                $url = $page_type_en == "blank" ? "#" : ($external['en']['value'] ?? '#');
+            } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
+                $url = $page_type_en == 'blank' ? '#' : ($external['en']['value'] ?? '#');
                 $newPage->externalLinks()->create(['language' => 'en', 'url' => $url]);
             }
         }
@@ -221,18 +251,18 @@ class MaterialController extends Controller
             }
         }
 
-        return redirect()->to('admin/materials/' . $newPage->id . '/edit');
+        return redirect()->to('admin/materials/'.$newPage->id.'/edit');
     }
 
     public function update(Request $request, $preview_id = null)
     {
         $id = $preview_id ?: $request->input('id');
         $page = $this->model->find($id);
-        $page_name = "Re-materialize Item";
+        $page_name = 'Re-materialize Item';
 
-        if (!$page) {
+        if (! $page) {
             if ($request->input('preview_mode') == 'draft') {
-                $page = new Material();
+                $page = new Material;
             } else {
                 dd('Page does not exist');
             }
@@ -240,17 +270,18 @@ class MaterialController extends Controller
 
         $data = $request->except('images', 'id', 'buttonLink', 'preview_mode', 'external', 'uploads', 'newUploads', 'captions', 'upload-captions', 'delete');
 
-        if (isset($data['title']) && $data['title'] != $page->title)
+        if (isset($data['title']) && $data['title'] != $page->title) {
             $data['slug'] = $this->generateSlug($request->input('title'));
+        }
 
         $data['publish_date'] = strtotime($request->input('publish_date'));
 
         $video = $request->file('video_file');
         if ($video) {
             $destinationPath = 'uploads/materials/video';
-            $videoName = Str::random('24') . '.' . $video->getClientOriginalExtension();
-            $video->move('public/' . $destinationPath, $videoName);
-            $data['video_file'] = $destinationPath . '/' . $videoName;
+            $videoName = Str::random('24').'.'.$video->getClientOriginalExtension();
+            $video->move('public/'.$destinationPath, $videoName);
+            $data['video_file'] = $destinationPath.'/'.$videoName;
         }
 
         if ($request->input('preview_mode') == 'draft') {
@@ -258,6 +289,7 @@ class MaterialController extends Controller
             $similar = Material::where('active', 1)->where('slug', '!=', $page->slug)->where('series', $page->series)->get();
             $post = $page;
             $is_preview = true;
+
             return view('pages.material-preview', compact('post', 'similar', 'is_preview'));
         }
 
@@ -287,10 +319,11 @@ class MaterialController extends Controller
                     if ($target) {
                         $targetSlide = MaterialImageSlide::find($target->uploadable_id);
                         if ($targetSlide) {
-                            if ($target->template == "square")
+                            if ($target->template == 'square') {
                                 $photo = $this->uploader->upload($upload);
-                            else
+                            } else {
                                 $photo = $this->luploader->upload($upload);
+                            }
 
                             if ($photo) {
                                 $newUpload = $targetSlide->uploads()->create($photo[0]);
@@ -333,8 +366,9 @@ class MaterialController extends Controller
         if ($uploadCaptions && is_array($uploadCaptions)) {
             foreach ($uploadCaptions as $id => $caption) {
                 $target = Upload::find($id);
-                if ($target)
+                if ($target) {
                     $target->update(['caption' => $caption['EN'] ?? '', 'caption_ar' => $caption['AR'] ?? '']);
+                }
             }
         }
 
@@ -342,7 +376,9 @@ class MaterialController extends Controller
         if ($delete_slides && is_array($delete_slides)) {
             foreach ($delete_slides as $item) {
                 $target = MaterialImageSlide::find($item);
-                if ($target) $target->delete();
+                if ($target) {
+                    $target->delete();
+                }
             }
         }
 
@@ -351,35 +387,39 @@ class MaterialController extends Controller
             $page_type_en = $external['en']['type'] ?? null;
             $page_type_ar = $external['ar']['type'] ?? null;
 
-            if ($page_type_ar == "file") {
+            if ($page_type_ar == 'file') {
                 $page->externalLinks()->where('language', 'ar')->delete();
                 $files_ar = $request->file('external_file_ar');
                 if ($files_ar) {
                     $page->externalFiles()->where('language', 'ar')->delete();
                     $fileRow = $page->externalFiles()->create(['language' => 'ar']);
                     $photo = $this->file_uploader->upload($files_ar);
-                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                    if ($photo) {
+                        $fileRow->uploads()->create($photo[0]);
+                    }
                 }
-            } elseif ($page_type_ar == "url" || $page_type_ar == "blank") {
+            } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
                 $page->externalFiles()->where('language', 'ar')->delete();
                 $page->externalLinks()->where('language', 'ar')->delete();
-                $url = $page_type_ar == "blank" ? "#" : ($external['ar']['value'] ?? '#');
+                $url = $page_type_ar == 'blank' ? '#' : ($external['ar']['value'] ?? '#');
                 $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
             }
 
-            if ($page_type_en == "file") {
+            if ($page_type_en == 'file') {
                 $page->externalLinks()->where('language', 'en')->delete();
                 $files_en = $request->file('external_file_en');
                 if ($files_en) {
                     $page->externalFiles()->where('language', 'en')->delete();
                     $fileRow = $page->externalFiles()->create(['language' => 'en']);
                     $photo = $this->file_uploader->upload($files_en);
-                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                    if ($photo) {
+                        $fileRow->uploads()->create($photo[0]);
+                    }
                 }
-            } elseif ($page_type_en == "url" || $page_type_en == "blank") {
+            } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
                 $page->externalFiles()->where('language', 'en')->delete();
                 $page->externalLinks()->where('language', 'en')->delete();
-                $url = $page_type_en == "blank" ? "#" : ($external['en']['value'] ?? '#');
+                $url = $page_type_en == 'blank' ? '#' : ($external['en']['value'] ?? '#');
                 $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
             }
         }
@@ -392,6 +432,6 @@ class MaterialController extends Controller
             }
         }
 
-        return redirect()->to('admin/materials/' . $page->id . '/edit');
+        return redirect()->to('admin/materials/'.$page->id.'/edit');
     }
 }

@@ -1,6 +1,11 @@
 .env
 /vendor
 
+# Bootstrap cache files - generated locally
+bootstrap/cache/packages.php
+bootstrap/cache/routes-v7.php
+bootstrap/cache/services.php
+
 # Blocked IPs configuration - local changes only
 config/blocked-ips.php
 !config/blocked-ips.example.php
