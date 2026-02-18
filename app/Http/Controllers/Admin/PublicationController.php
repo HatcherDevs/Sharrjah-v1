@@ -156,6 +156,13 @@ class PublicationController extends Controller
     }
 
     public function update(Request $request){
+        if ($request->input('preview_mode') == 'draft') {
+            $post = $this->model->find($request->input('id'));
+            $post->fill($request->except('images', 'id', 'buttonLink'));
+            $page = $post->parent;
+            $is_preview = true;
+            return view('pages.publication', compact('page', 'post', 'is_preview'));
+        }
 
         $page = $this->model->find($request->input('id'));
 
@@ -247,7 +254,6 @@ class PublicationController extends Controller
                     }
                 }
             }
-            }
 
             if($newUploads['square'] || $newUploads['landscape']){
 
@@ -284,7 +290,6 @@ class PublicationController extends Controller
                         $target->delete();
                 }
             }
-        }
 
         $page_type_en = $request->input('external')['en']['type'];
         $page_type_ar = $request->input('external')['ar']['type'];
@@ -344,6 +349,7 @@ class PublicationController extends Controller
         if($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
             $page->buttonLinks()->create($buttonLinks);
         }
+    }
 
         return redirect()->to('admin/publications/'.$page->id.'/edit');
     }
