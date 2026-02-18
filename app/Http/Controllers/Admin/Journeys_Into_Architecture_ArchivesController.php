@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Page;
-
-use App\Http\Requests;
-use App\Models\Upload;
-use App\Models\Material;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Traits\CanCreateSlug;
-use App\Models\MaterialImageSlide;
 use App\Http\Controllers\Controller;
+use App\Models\Forms\Form;
+use App\Models\Material;
+use App\Models\MaterialImageSlide;
+use App\Models\Page;
+use App\Models\Upload;
 use App\Services\Uploaders\ExternalFileUploader;
 use App\Services\Uploaders\MaterialImagesUploader;
 use App\Services\Uploaders\MaterialLandscapeImageUploader;
+use App\Traits\CanCreateSlug;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class Journeys_Into_Architecture_ArchivesController extends Controller
 {
     use CanCreateSlug;
 
     protected $model;
+
     protected $uploader;
+
     protected $luploader;
+
     protected $file_uploader;
 
     public function __construct(Material $model, MaterialImagesUploader $uploader, MaterialLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
@@ -35,22 +37,25 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
 
     public function show()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $data = $this->model->where('is_video', 0)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->get();
+
         return view('admin.Journeys_Into_Architecture_Archives.show', compact('data', 'page_name'));
     }
 
     public function showVideos()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $data = $this->model->where('is_video', 1)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->get();
+
         return view('admin.Journeys_Into_Architecture_Archives.show', compact('data', 'page_name'));
     }
 
     public function showOpenCalls()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $data = $this->model->where('is_open', 1)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->get();
+
         return view('admin.Journeys_Into_Architecture_Archives.show', compact('data', 'page_name'));
     }
 
@@ -61,6 +66,7 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
         }
         $post = $this->model->where('belongs_to', 'Journeys_Into_Architecture_Archives')->find($id);
         $similar = Material::where('active', 1)->where('slug', '!=', $post->slug)->where('series', $post->series)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->get();
+
         return view('pages.material-preview', compact('post', 'similar'));
     }
 
@@ -75,27 +81,27 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
 
     public function edit($id)
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $page = $this->model->find($id);
 
         $pageType = [
             'en' => ['type' => 'page', 'value' => null],
-            'ar' => ['type' => 'page', 'value' => null]
+            'ar' => ['type' => 'page', 'value' => null],
         ];
 
         if ($page->externalFiles()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "file";
+            $pageType['en']['type'] = 'file';
             $pageType['en']['value'] = $page->externalFiles()->where('language', 'en')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "url";
+            $pageType['en']['type'] = 'url';
             $pageType['en']['value'] = $page->externalLinks()->where('language', 'en')->first();
         }
 
         if ($page->externalFiles()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "file";
+            $pageType['ar']['type'] = 'file';
             $pageType['ar']['value'] = $page->externalFiles()->where('language', 'ar')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "url";
+            $pageType['ar']['type'] = 'url';
             $pageType['ar']['value'] = $page->externalLinks()->where('language', 'ar')->first();
         }
 
@@ -106,34 +112,56 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
     {
         $page = $this->model->find($id);
 
-        if ($page)
+        if ($page) {
             $page->delete();
+        }
 
         return redirect()->back();
     }
 
     public function create()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $isVideo = 0;
         $isOpen = 0;
-        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function createVideo()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $isVideo = 1;
         $isOpen = 0;
-        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function createOpenCall()
     {
-        $page_name = "Journeys Into Architecture Archives";
+        $page_name = 'Journeys Into Architecture Archives';
         $isVideo = 0;
         $isOpen = 1;
-        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name'));
+        $page = new Material;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
+
+        return view('admin.Journeys_Into_Architecture_Archives.create', compact('isVideo', 'isOpen', 'page_name', 'page', 'pageType', 'forms'));
     }
 
     public function store(Request $request)
@@ -143,8 +171,8 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
         $data['slug'] = $this->generateSlug($request->input('title'));
         $data['publish_date'] = strtotime($request->input('publish_date'));
 
-        $data['belongs_to'] = "Journeys_Into_Architecture_Archives";
-        
+        $data['belongs_to'] = 'Journeys_Into_Architecture_Archives';
+
         $newPage = $this->model->create($data);
 
         $files = $request->file('images');
@@ -186,25 +214,27 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
         $page_type_en = $external['en']['type'] ?? null;
         $page_type_ar = $external['ar']['type'] ?? null;
 
-        if ($page_type_ar == "file") {
+        if ($page_type_ar == 'file') {
             $fileRow = $newPage->externalFiles()->create(['language' => 'ar']);
             $files_ar = $request->file('external_file_ar');
             $photo = ($files_ar != null ? $this->file_uploader->upload($files_ar) : false);
             if ($photo) {
                 $fileRow->uploads()->create($photo[0]);
             }
-        } elseif (($page_type_ar == "url" || $page_type_ar == "blank") && isset($external['ar']['value']))
+        } elseif (($page_type_ar == 'url' || $page_type_ar == 'blank') && isset($external['ar']['value'])) {
             $newPage->externalLinks()->create(['language' => 'ar', 'url' => $external['ar']['value']]);
+        }
 
-        if ($page_type_en == "file") {
+        if ($page_type_en == 'file') {
             $fileRow = $newPage->externalFiles()->create(['language' => 'en']);
             $files_en = $request->file('external_file_en');
             $photo = ($files_en != null ? $this->file_uploader->upload($files_en) : false);
             if ($photo) {
                 $fileRow->uploads()->create($photo[0]);
             }
-        } elseif (($page_type_en == "url" || $page_type_en == "blank") && isset($external['en']['value']))
+        } elseif (($page_type_en == 'url' || $page_type_en == 'blank') && isset($external['en']['value'])) {
             $newPage->externalLinks()->create(['language' => 'en', 'url' => $external['en']['value']]);
+        }
 
         $buttonLinks = $request->input('buttonLink');
 
@@ -214,20 +244,22 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
             }
         }
 
-        return redirect()->to('admin/Journeys_Into_Architecture_Archives/' . $newPage->id . '/edit');
+        return redirect()->to('admin/Journeys_Into_Architecture_Archives/'.$newPage->id.'/edit');
     }
 
     public function update(Request $request)
     {
         $page = $this->model->find($request->input('id'));
 
-        if (!$page)
+        if (! $page) {
             dd('Page does not exist');
+        }
 
         $data = $request->except('images', 'id', 'buttonLink', 'preview_mode');
 
-        if (isset($data['title']) && $data['title'] != $page->title)
+        if (isset($data['title']) && $data['title'] != $page->title) {
             $data['slug'] = $this->generateSlug($request->input('title'));
+        }
 
         $data['publish_date'] = strtotime($request->input('publish_date'));
 
@@ -235,6 +267,7 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
             $page->fill($data);
             $post = $page;
             $similar = Material::where('active', 1)->where('slug', '!=', $post->slug)->where('series', $post->series)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->get();
+
             return view('pages.material-preview', compact('post', 'similar'))->with('is_preview', true);
         }
 
@@ -243,11 +276,11 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
 
         if ($video) {
             $destinationPath = 'uploads/Journeys_Into_Architecture_Archives/video';
-            $videoName = Str::random('24') . '.' . $video->getClientOriginalExtension();
-            $video->move('public/' . $destinationPath, $videoName);
+            $videoName = Str::random('24').'.'.$video->getClientOriginalExtension();
+            $video->move('public/'.$destinationPath, $videoName);
             // END OF AUDIO UPLOAD
 
-            $data['video_file'] = $destinationPath . '/' . $videoName;
+            $data['video_file'] = $destinationPath.'/'.$videoName;
         }
 
         $page->update($data);
@@ -267,7 +300,7 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                     if ($target) {
                         $target->update([
                             'caption' => $upload['EN'] ?? '',
-                            'caption_ar' => $upload['AR'] ?? ''
+                            'caption_ar' => $upload['AR'] ?? '',
                         ]);
                     }
                 }
@@ -285,10 +318,11 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                         if ($target) {
                             $targetSlide = MaterialImageSlide::find($target->uploadable_id);
 
-                            if ($target->template == "square")
+                            if ($target->template == 'square') {
                                 $photo = ($files != null ? $this->uploader->upload($upload) : false);
-                            else
+                            } else {
                                 $photo = ($files != null ? $this->luploader->upload($upload) : false);
+                            }
 
                             if ($photo) {
                                 $newUpload = $targetSlide->uploads()->create($photo[0]);
@@ -341,11 +375,12 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                 foreach ($uploadCaptions as $id => $caption) {
                     $target = Upload::find($id);
 
-                    if ($target)
+                    if ($target) {
                         $target->update([
                             'caption' => $caption['EN'] ?? '',
-                            'caption_ar' => $caption['AR'] ?? ''
+                            'caption_ar' => $caption['AR'] ?? '',
                         ]);
+                    }
                 }
             }
 
@@ -354,10 +389,11 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                     $target = MaterialImageSlide::find($item);
 
                     if ($target) {
-                        if ($target->square && $target->landscape)
+                        if ($target->square && $target->landscape) {
                             $target->square->delete();
-                        else
+                        } else {
                             $target->delete();
+                        }
                     }
                 }
             }
@@ -367,7 +403,7 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
         $page_type_en = $external['en']['type'] ?? null;
         $page_type_ar = $external['ar']['type'] ?? null;
 
-        if ($page_type_ar == "file") {
+        if ($page_type_ar == 'file') {
             $page->externalLinks()->where('language', 'ar')->delete();
             $files_ar = $request->file('external_file_ar');
 
@@ -379,17 +415,17 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                     $fileRow->uploads()->create($photo[0]);
                 }
             }
-        } elseif ($page_type_ar == "url" || $page_type_ar == "blank") {
+        } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
             $page->externalFiles()->where('language', 'ar')->delete();
             $page->externalLinks()->where('language', 'ar')->delete();
-            $url = $page_type_ar == "blank" ? "#" : ($external['ar']['value'] ?? '#');
+            $url = $page_type_ar == 'blank' ? '#' : ($external['ar']['value'] ?? '#');
             $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
-        } elseif ($page_type_ar == "page") {
+        } elseif ($page_type_ar == 'page') {
             $page->externalLinks()->where('language', 'ar')->delete();
             $page->externalFiles()->where('language', 'ar')->delete();
         }
 
-        if ($page_type_en == "file") {
+        if ($page_type_en == 'file') {
             $page->externalLinks()->where('language', 'en')->delete();
             $files_en = $request->file('external_file_en');
 
@@ -401,12 +437,12 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
                     $fileRow->uploads()->create($photo[0]);
                 }
             }
-        } elseif ($page_type_en == "url" || $page_type_en == "blank") {
+        } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
             $page->externalFiles()->where('language', 'en')->delete();
             $page->externalLinks()->where('language', 'en')->delete();
-            $url = $page_type_en == "blank" ? "#" : ($external['en']['value'] ?? '#');
+            $url = $page_type_en == 'blank' ? '#' : ($external['en']['value'] ?? '#');
             $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
-        } elseif ($page_type_en == "page") {
+        } elseif ($page_type_en == 'page') {
             $page->externalLinks()->where('language', 'en')->delete();
             $page->externalFiles()->where('language', 'en')->delete();
         }
@@ -420,6 +456,6 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
             }
         }
 
-        return redirect()->to('admin/Journeys_Into_Architecture_Archives/' . $page->id . '/edit');
+        return redirect()->to('admin/Journeys_Into_Architecture_Archives/'.$page->id.'/edit');
     }
 }

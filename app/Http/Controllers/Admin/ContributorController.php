@@ -15,8 +15,6 @@ use App\Services\Uploaders\PostLandscapeImageUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
-
 class ContributorController extends Controller
 {
     use CanCreateSlug;
@@ -31,39 +29,45 @@ class ContributorController extends Controller
         $this->file_uploader = $file_uploader;
     }
 
-    public function show(){
-        $page= Page::where('slug','contributors')->first();
+    public function show()
+    {
+        $page = Page::where('slug', 'contributors')->first();
 
         $page->load('posts');
 
         $data = $page->posts;
-        return view('admin.contributors.show',compact('data'));
+
+        return view('admin.contributors.show', compact('data'));
     }
 
-    public function order(){
-        $data_en =  $this->cs->generateEnData();
-        $data_ar =  $this->cs->generateArData();
+    public function order()
+    {
+        $data_en = $this->cs->generateEnData();
+        $data_ar = $this->cs->generateArData();
 
-        return view('admin.contributors.order',compact('data_en','data_ar'));
+        return view('admin.contributors.order', compact('data_en', 'data_ar'));
     }
 
-    public function create(){
-        $page = Page::where('slug','contributors')->first();
+    public function create()
+    {
+        $page = Page::where('slug', 'contributors')->first();
 
-        if(!$page)
+        if (! $page) {
             abort(404, 'Post type does not exist.');
+        }
 
         $page_id = $page->id;
 
-        $letters['en'] = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-        $letters['ar'] = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
+        $letters['en'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        $letters['ar'] = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'];
 
-        return view('admin.contributors.create',compact('page_id','letters'));
+        return view('admin.contributors.create', compact('page_id', 'letters'));
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $data = $request->except('images','external');
+        $data = $request->except('images', 'external');
         $data['slug'] = $this->generateSlug($request->input('title'));
 
         $data['publish_date'] = strtotime($request->input('publish_date'));
@@ -72,25 +76,30 @@ class ContributorController extends Controller
         $files = $request->file('images');
         $captions = $request->input('captions');
 
-        if($newPage && $files){
-            foreach ($files as $index=>$file){
-                if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape']))
+        if ($newPage && $files) {
+            foreach ($files as $index => $file) {
+                if ((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])) {
                     $slide = $newPage->sliders()->create([]);
-
-                if(isset($file['square']) && $file['square']){
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
                 }
 
-                if(isset($file['landscape']) && $file['landscape']) {
+                if (isset($file['square']) && $file['square']) {
+                    // Square Image
+                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
+                    if ($photo) {
+                        $photo[0]['caption'] = $captions[$index]['EN'];
+                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                        $slide->uploads()->create($photo[0]);
+                    }
+                }
+
+                if (isset($file['landscape']) && $file['landscape']) {
                     // Landscape Image
                     $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
+                    if ($photo) {
+                        $photo[0]['caption'] = $captions[$index]['EN'];
+                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
             }
         }
@@ -98,50 +107,52 @@ class ContributorController extends Controller
         $page_type_en = $request->input('external')['en']['type'];
         $page_type_ar = $request->input('external')['ar']['type'];
 
-        if($page_type_ar=="file"){
-            $fileRow = $newPage->externalFiles()->create(['language'=>'ar']);
+        if ($page_type_ar == 'file') {
+            $fileRow = $newPage->externalFiles()->create(['language' => 'ar']);
             $files = $request->file('external_file_ar');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
             $fileRow->uploads()->create($photo[0]);
+        } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
+            $newPage->externalLinks()->create(['language' => 'ar', 'url' => $request->input('external')['ar']['value']]);
         }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank")
-            $newPage->externalLinks()->create(['language'=>'ar','url'=>$request->input('external')['ar']['value']]);
 
-        if($page_type_en=="file"){
-            $fileRow = $newPage->externalFiles()->create(['language'=>'en']);
+        if ($page_type_en == 'file') {
+            $fileRow = $newPage->externalFiles()->create(['language' => 'en']);
             $files = $request->file('external_file_en');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
             $fileRow->uploads()->create($photo[0]);
+        } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
+            $newPage->externalLinks()->create(['language' => 'en', 'url' => $request->input('external')['en']['value']]);
         }
-        elseif($page_type_en=="url" || $page_type_en=="blank")
-            $newPage->externalLinks()->create(['language'=>'en','url'=>$request->input('external')['en']['value']]);
 
-
-        if($request->input('form_id')){
+        if ($request->input('form_id')) {
             $newPage->forms()->delete();
-            $newPage->forms()->create(['form_id'=>1]);
+            $newPage->forms()->create(['form_id' => 1]);
         }
 
-        if($newPage){
+        if ($newPage) {
             $newPage->contributor()->create($request['contributor']);
         }
 
         return redirect()->to('admin/posts/contributors');
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
 
         $page = Post::find($request->input('id'));
 
-        if(!$page)
+        if (! $page) {
             abort(404, 'Page does not exist');
+        }
 
-        $data = $request->except('images','id');
+        $data = $request->except('images', 'id');
 
-        if($data['title'] != $page->title)
+        if ($data['title'] != $page->title) {
             $data['slug'] = $this->generateSlug($request->input('title'));
+        }
 
         $data['publish_date'] = strtotime($request->input('publish_date'));
 
@@ -153,36 +164,37 @@ class ContributorController extends Controller
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($request->has('uploads')){
+        if ($request->has('uploads')) {
             $uploads = $request->input('uploads');
 
-            foreach ($uploads as $upload){
+            foreach ($uploads as $upload) {
                 $target = Upload::find($upload['id']);
 
-                if($target){
+                if ($target) {
                     $target->update([
                         'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
-                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
+                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : ''),
                     ]);
                 }
             }
         }
 
-        if($page){
+        if ($page) {
 
             $uploads = $request->file('uploads');
-            if($uploads){
-                foreach ($request->file('uploads') as $uploadid => $upload){
-                    if($upload){
+            if ($uploads) {
+                foreach ($request->file('uploads') as $uploadid => $upload) {
+                    if ($upload) {
                         $target = Upload::find($uploadid);
 
-                        if($target){
+                        if ($target) {
                             $targetSlide = PostImageSlide::find($target->uploadable_id);
 
-                            if($target->template=="square")
+                            if ($target->template == 'square') {
                                 $photo = ($files != null ? $this->uploader->upload($upload) : false);
-                            else
+                            } else {
                                 $photo = ($files != null ? $this->luploader->upload($upload) : false);
+                            }
 
                             $newUpload = $targetSlide->uploads()->create($photo[0]);
 
@@ -198,12 +210,12 @@ class ContributorController extends Controller
             }
 
             if ($files) {
-                foreach ($files as $index=>$file){
+                foreach ($files as $index => $file) {
 
-                    if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])){
+                    if ((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])) {
                         $slide = $page->sliders()->create([]);
 
-                        if(isset($file['square']) && $file['square']){
+                        if (isset($file['square']) && $file['square']) {
                             // Square Image
                             $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
 
@@ -213,7 +225,7 @@ class ContributorController extends Controller
                             $slide->uploads()->create($photo[0]);
                         }
 
-                        if(isset($file['landscape']) && $file['landscape']) {
+                        if (isset($file['landscape']) && $file['landscape']) {
                             // Landscape Image
                             $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
 
@@ -226,39 +238,40 @@ class ContributorController extends Controller
                 }
             }
 
-            if($newUploads && ($newUploads['square'] || $newUploads['landscape'])){
-
+            if ($newUploads && ($newUploads['square'] || $newUploads['landscape'])) {
 
                 $slide = PostImageSlide::find($request->input('newUploads')['slide_id']);
 
-                if($newUploads['square']) {
+                if ($newUploads['square']) {
                     // Square Image
                     $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
                     $slide->uploads()->create($photo[0]);
                 }
 
-                if($newUploads['landscape']) {
+                if ($newUploads['landscape']) {
                     // Landscape Image
                     $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
                     $slide->uploads()->create($photo[0]);
                 }
             }
 
-            if($uploadCaptions){
-                foreach ( $uploadCaptions as $id => $caption ) {
+            if ($uploadCaptions) {
+                foreach ($uploadCaptions as $id => $caption) {
                     $target = Upload::find($id);
 
-                    if($target)
-                        $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
+                    if ($target) {
+                        $target->update(['caption' => $caption['EN'], 'caption_ar' => $caption['AR']]);
+                    }
                 }
             }
 
-            if($request->input('delete')){
-                foreach ( $request->input('delete') as $item) {
+            if ($request->input('delete')) {
+                foreach ($request->input('delete') as $item) {
                     $target = PostImageSlide::find($item);
 
-                    if($target)
+                    if ($target) {
                         $target->delete();
+                    }
                 }
             }
         }
@@ -266,54 +279,49 @@ class ContributorController extends Controller
         $page_type_en = $request->input('external')['en']['type'];
         $page_type_ar = $request->input('external')['ar']['type'];
 
-        if($page_type_ar=="file"){
-            $page->externalLinks()->where('language','ar')->delete();
+        if ($page_type_ar == 'file') {
+            $page->externalLinks()->where('language', 'ar')->delete();
             $files = $request->file('external_file_ar');
 
-            if($files){
-                $page->externalFiles()->where('language','ar')->delete();
-                $fileRow = $page->externalFiles()->create(['language'=>'ar']);
+            if ($files) {
+                $page->externalFiles()->where('language', 'ar')->delete();
+                $fileRow = $page->externalFiles()->create(['language' => 'ar']);
                 $photo = ($files != null ? $this->file_uploader->upload($files) : false);
                 $fileRow->uploads()->create($photo[0]);
             }
-        }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank"){
-            $page->externalFiles()->where('language','ar')->delete();
-            $page->externalLinks()->where('language','ar')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['ar']['value'];
-            $page->externalLinks()->create(['language'=>'ar','url'=> $url] );
-        }
-        elseif($page_type_ar=="page") {
-            $page->externalLinks()->where('language','ar')->delete();
-            $page->externalFiles()->where('language','ar')->delete();
+        } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
+            $page->externalFiles()->where('language', 'ar')->delete();
+            $page->externalLinks()->where('language', 'ar')->delete();
+            $url = $page_type_ar == 'blank' ? '#' : $request->input('external')['ar']['value'];
+            $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
+        } elseif ($page_type_ar == 'page') {
+            $page->externalLinks()->where('language', 'ar')->delete();
+            $page->externalFiles()->where('language', 'ar')->delete();
         }
 
-        if($page_type_en=="file"){
-            $page->externalLinks()->where('language','en')->delete();
+        if ($page_type_en == 'file') {
+            $page->externalLinks()->where('language', 'en')->delete();
             $files = $request->file('external_file_en');
 
-            if($files){
-                $page->externalFiles()->where('language','en')->delete();
-                $fileRow = $page->externalFiles()->create(['language'=>'en']);
+            if ($files) {
+                $page->externalFiles()->where('language', 'en')->delete();
+                $fileRow = $page->externalFiles()->create(['language' => 'en']);
                 $photo = ($files != null ? $this->file_uploader->upload($files) : false);
                 $fileRow->uploads()->create($photo[0]);
             }
+        } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
+            $page->externalFiles()->where('language', 'en')->delete();
+            $page->externalLinks()->where('language', 'en')->delete();
+            $url = $page_type_ar == 'blank' ? '#' : $request->input('external')['en']['value'];
+            $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
+        } elseif ($page_type_en == 'page') {
+            $page->externalLinks()->where('language', 'en')->delete();
+            $page->externalFiles()->where('language', 'en')->delete();
         }
-        elseif($page_type_en=="url" || $page_type_en=="blank"){
-            $page->externalFiles()->where('language','en')->delete();
-            $page->externalLinks()->where('language','en')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['en']['value'];
-            $page->externalLinks()->create(['language'=>'en','url'=> $url]);
-        }
-        elseif($page_type_en=="page") {
-            $page->externalLinks()->where('language','en')->delete();
-            $page->externalFiles()->where('language','en')->delete();
-        }
-
 
         $page->forms()->delete();
-        if($request->input('form_id')){
-            $page->forms()->create(['form_id'=>1]);
+        if ($request->input('form_id')) {
+            $page->forms()->create(['form_id' => 1]);
         }
 
         $page->contributor()->updateOrCreate([], $request['contributor']);
@@ -321,42 +329,43 @@ class ContributorController extends Controller
         return redirect()->back();
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $page = Post::find($id);
 
-        $letters['en'] = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-        $letters['ar'] = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
+        $letters['en'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        $letters['ar'] = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'];
 
         // Initialize with default values
         $pageType = [
-            'en' => ['type' => 'page', 'value' => (object)['url' => '#']],
-            'ar' => ['type' => 'page', 'value' => (object)['url' => '#']]
+            'en' => ['type' => 'page', 'value' => (object) ['url' => '#']],
+            'ar' => ['type' => 'page', 'value' => (object) ['url' => '#']],
         ];
 
         if ($page->externalFiles()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "file";
+            $pageType['en']['type'] = 'file';
             $pageType['en']['value'] = $page->externalFiles()->where('language', 'en')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'en')->count()) {
-            $pageType['en']['type'] = "url";
+            $pageType['en']['type'] = 'url';
             $pageType['en']['value'] = $page->externalLinks()->where('language', 'en')->first();
         }
 
         if ($page->externalFiles()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "file";
+            $pageType['ar']['type'] = 'file';
             $pageType['ar']['value'] = $page->externalFiles()->where('language', 'ar')->first()->uploads()->first();
         } elseif ($page->externalLinks()->where('language', 'ar')->count()) {
-            $pageType['ar']['type'] = "url";
+            $pageType['ar']['type'] = 'url';
             $pageType['ar']['value'] = $page->externalLinks()->where('language', 'ar')->first();
         }
 
-        return view('admin.contributors.edit',compact('page','letters','pageType'));
+        return view('admin.contributors.edit', compact('page', 'letters', 'pageType'));
     }
 
     public function preview($id, Request $request)
     {
         $post = Post::find($id);
 
-        if (!$post) {
+        if (! $post) {
             abort(404, 'Post does not exist');
         }
 
@@ -365,7 +374,7 @@ class ContributorController extends Controller
         }
 
         $page = $post->parent;
-        if (!$page) {
+        if (! $page) {
             $page = Page::where('slug', 'contributors')->first();
         }
 
@@ -391,20 +400,19 @@ class ContributorController extends Controller
         return view('pages.post', compact('page', 'post', 'relatedPages'));
     }
 
-    public function orderUpdate(Request $request){
+    public function orderUpdate(Request $request)
+    {
         $data = $request->input();
 
-        foreach ($data['contributors'] as $item){
+        foreach ($data['contributors'] as $item) {
 
             $target = $this->contributor->find($item['id']);
 
-            if($target){
+            if ($target) {
                 $target->update(\Illuminate\Support\Arr::except($item, 'id'));
             }
         }
 
         return redirect()->back();
     }
-
-
 }

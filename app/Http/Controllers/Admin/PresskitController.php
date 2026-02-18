@@ -8,8 +8,6 @@ use App\Models\PressKitItem;
 use App\Services\Uploaders\PressKitFileUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use Illuminate\Support\Facades\Session;
 
 class PresskitController extends Controller
@@ -22,36 +20,46 @@ class PresskitController extends Controller
         $this->uploader = $uploader;
     }
 
-    public function show(){
+    public function show()
+    {
         $data = $this->model->get();
-        return view('admin.presskits.show',compact('data'));
+
+        return view('admin.presskits.show', compact('data'));
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $page = $this->model->find($id);
 
-        return view('admin.presskits.edit',compact('page'));
+        return view('admin.presskits.edit', compact('page'));
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         $page = $this->model->find($id);
 
-        if($page)
+        if ($page) {
             $page->delete();
+        }
 
         return redirect()->back();
     }
 
-    public function create(){
-        return view('admin.presskits.create');
+    public function create()
+    {
+        $page = new PressKit;
+
+        return view('admin.presskits.create', compact('page'));
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $exists = $this->model->where('username',$request->input('username'))->count();
+        $exists = $this->model->where('username', $request->input('username'))->count();
 
-        if($exists){
+        if ($exists) {
             Session::flash('error', 'Username '.$request->input('username').' is already in use.');
+
             return redirect()->back();
         }
 
@@ -63,10 +71,10 @@ class PresskitController extends Controller
         $files = $request->file('files');
         $captions = $request->input('captions');
 
-        if($files){
+        if ($files) {
 
-            foreach ($files as $index=>$file){
-                if($file){
+            foreach ($files as $index => $file) {
+                if ($file) {
                     $itemData = [];
                     $itemData['title'] = $captions[$index]['EN'];
                     $itemData['title_ar'] = $captions[$index]['AR'];
@@ -84,18 +92,20 @@ class PresskitController extends Controller
         return redirect()->to('admin/presskits');
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
 
         $target = $this->model->find($request->input('id'));
 
-        if($target){
-            if($target->username != $request->input('username')){
+        if ($target) {
+            if ($target->username != $request->input('username')) {
                 Session::flash('error', 'Username '.$request->input('username').' is already in use.');
+
                 return redirect()->back();
             }
         }
 
-        $data = $request->except('_token','id');
+        $data = $request->except('_token', 'id');
         $data['publish_date'] = strtotime($data['publish_date']);
         $data['slug'] = $this->generateSlug($data['title']);
 
@@ -104,10 +114,10 @@ class PresskitController extends Controller
         $files = $request->file('files');
         $captions = $request->input('captions');
 
-        if($files){
+        if ($files) {
 
-            foreach ($files as $index=>$file){
-                if($file){
+            foreach ($files as $index => $file) {
+                if ($file) {
                     $itemData = [];
                     $itemData['title'] = $captions[$index]['EN'];
                     $itemData['title_ar'] = $captions[$index]['AR'];
@@ -121,10 +131,11 @@ class PresskitController extends Controller
 
         $delete = $request->input('delete');
 
-        foreach ($delete as $id => $row){
+        foreach ($delete as $id => $row) {
             $toDelete = PressKitItem::find($id);
             $toDelete->delete();
         }
+
         return redirect()->back();
     }
 }
