@@ -119,7 +119,9 @@ class PageController extends Controller
             abort(404);
         }
 
-        return view('pages.publication-preview', compact('post'));
+        $relatedPages = ['pages' => [], 'posts' => []];
+
+        return view('pages.publication-preview', compact('post', 'relatedPages'));
     }
 
     public function post(Request $request)
