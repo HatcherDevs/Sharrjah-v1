@@ -35,7 +35,8 @@ class PublicationController extends Controller
 
     public function show(){
         $data = $this->model->get();
-        return view('admin.publications.show',compact('data'));
+        $page_name = 'Publications';
+        return view('admin.publications.show',compact('data', 'page_name'));
     }
 
     public function single($slug){
@@ -47,6 +48,8 @@ class PublicationController extends Controller
 
     public function edit($id){
         $page = $this->model->find($id);
+
+        $page_name = 'Publications';
 
         $pageType = [];
 
@@ -68,7 +71,7 @@ class PublicationController extends Controller
             $pageType['ar']['value'] = $page->externalLinks()->where('language','ar')->first();
         }
 
-        return view('admin.publications.edit',compact('page','pageType'));
+        return view('admin.publications.edit',compact('page','pageType', 'page_name'));
     }
 
     public function delete($id){
@@ -81,7 +84,8 @@ class PublicationController extends Controller
     }
 
     public function create(){
-        return view('admin.publications.create');
+        $page_name = 'Publications';
+        return view('admin.publications.create', compact('page_name'));
     }
 
     public function store(Request $request){
