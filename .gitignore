@@ -5,6 +5,7 @@
 bootstrap/cache/packages.php
 bootstrap/cache/routes-v7.php
 bootstrap/cache/services.php
+bootstrap/cache/config.php
 
 # Blocked IPs configuration - local changes only
 config/blocked-ips.php
