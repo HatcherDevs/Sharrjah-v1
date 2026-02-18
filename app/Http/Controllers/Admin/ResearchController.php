@@ -26,6 +26,9 @@ class ResearchController extends Controller
 {
     use CanCreateSlug;
 
+    protected $building;
+    protected $type;
+
     public function __construct(ResearchBuilding $building, ResearchType $type)
     {
         $this->building = $building;
@@ -208,10 +211,10 @@ class ResearchController extends Controller
             $data['image'] = 'uploads/research/buildings/' . $newFileName;
         }
 
-        if (isset($files['gallery'])) {
-            $files = $files['gallery'];
+        if (isset($files['gallery']) && is_array($files['gallery'])) {
+            $galleryFiles = $files['gallery'];
 
-            foreach ($files as $file) {
+            foreach ($galleryFiles as $file) {
                 if ($file) {
                     //Move Uploaded File
                     $destinationPath = 'public/uploads/research/buildings';
@@ -222,9 +225,9 @@ class ResearchController extends Controller
                     $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
                 }
             }
-            if (isset($files['norm'])) {
+            if (isset($galleryFiles['norm']) && is_array($galleryFiles['norm'])) {
 
-                $images = $files['norm'];
+                $images = $galleryFiles['norm'];
 
                 foreach ($images as $file) {
                     if ($file) {
@@ -238,9 +241,9 @@ class ResearchController extends Controller
                     }
                 }
             }
-            if (isset($files['gif'])) {
+            if (isset($galleryFiles['gif']) && is_array($galleryFiles['gif'])) {
 
-                $images = $files['gif'];
+                $images = $galleryFiles['gif'];
 
                 foreach ($images as $file) {
                     if ($file) {
@@ -295,62 +298,65 @@ class ResearchController extends Controller
     {
 
         $files = $request->file('data');
+        $inputs = $request->input('data');
 
-        foreach ($request->input('data') as $kid => $item) {
-            $target = ResearchContent::find($kid);
+        if ($inputs && is_array($inputs)) {
+            foreach ($inputs as $kid => $item) {
+                $target = ResearchContent::find($kid);
 
-            if ($target) {
-                $target->update($item);
-            }
+                if ($target) {
+                    $target->update($item);
+                }
 
-            if (isset($files[$kid]['gallery'])) {
+                if (isset($files[$kid]['gallery']) && is_array($files[$kid]['gallery'])) {
 
-                $images = $files[$kid]['gallery'];
+                    $images = $files[$kid]['gallery'];
 
-                foreach ($images as $file) {
-                    if ($file) {
+                    foreach ($images as $file) {
+                        if ($file) {
 
-                        //Move Uploaded File
-                        $destinationPath = 'public/uploads/research/buildings';
-                        $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
-                        \Intervention\Image\Facades\Image::make($file->getRealPath())->save($destinationPath . '/' . $newFileName);
-                        // \Intervention\Image\Facades\Image::make($file->getRealPath())->fit(700, 1000)->save($destinationPath . '/' . $newFileName);
+                            //Move Uploaded File
+                            $destinationPath = 'public/uploads/research/buildings';
+                            $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
+                            \Intervention\Image\Facades\Image::make($file->getRealPath())->save($destinationPath . '/' . $newFileName);
+                            // \Intervention\Image\Facades\Image::make($file->getRealPath())->fit(700, 1000)->save($destinationPath . '/' . $newFileName);
 
-                        $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                            $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                        }
                     }
                 }
-            }
-            if (isset($files[$kid]['norm'])) {
+                if (isset($files[$kid]['norm']) && is_array($files[$kid]['norm'])) {
 
-                $images = $files[$kid]['norm'];
+                    $images = $files[$kid]['norm'];
 
-                foreach ($images as $file) {
-                    if ($file) {
+                    foreach ($images as $file) {
+                        if ($file) {
 
-                        //Move Uploaded File
-                        $destinationPath = 'public/uploads/research/buildings';
-                        $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
-                        \Intervention\Image\Facades\Image::make($file->getRealPath())->save($destinationPath . '/' . $newFileName);
+                            //Move Uploaded File
+                            $destinationPath = 'public/uploads/research/buildings';
+                            $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
+                            \Intervention\Image\Facades\Image::make($file->getRealPath())->save($destinationPath . '/' . $newFileName);
 
-                        $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                            $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                        }
                     }
                 }
-            }
-            if (isset($files[$kid]['gif'])) {
+                if (isset($files[$kid]['gif']) && is_array($files[$kid]['gif'])) {
 
-                $images = $files[$kid]['gif'];
+                    $images = $files[$kid]['gif'];
 
-                foreach ($images as $file) {
-                    if ($file) {
+                    foreach ($images as $file) {
+                        if ($file) {
 
-                        //Move Uploaded File
-                        $destinationPath = 'public/uploads/research/buildings';
-                        $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
+                            //Move Uploaded File
+                            $destinationPath = 'public/uploads/research/buildings';
+                            $newFileName = Str::random(32) . '.' . $file->getClientOriginalExtension();
 
-                        $file->move($destinationPath,  $newFileName);
+                            $file->move($destinationPath,  $newFileName);
 
 
-                        $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                            $target->images()->create(['image' => 'uploads/research/buildings/' . $newFileName]);
+                        }
                     }
                 }
             }

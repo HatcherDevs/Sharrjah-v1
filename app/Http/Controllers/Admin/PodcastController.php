@@ -20,6 +20,11 @@ class PodcastController extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
+
     public function __construct(Podcast $model, PodcastImagesUploader $uploader, PodcastLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
         $this->model = $model;

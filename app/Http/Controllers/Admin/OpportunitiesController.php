@@ -28,6 +28,11 @@ class OpportunitiesController extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
+
     public function __construct(Opportunities $model, Triennial2023ImagesUploader $uploader, Triennial2023LandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
         $this->model = $model;

@@ -21,6 +21,11 @@ class MaterialController extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
+
     public function __construct(Material $model, MaterialImagesUploader $uploader, MaterialLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
         $this->model = $model->where('belongs_to', 'materials');
