@@ -236,7 +236,7 @@
 
                                             <div class="col-md-3">
                                                 @if ($page->sliders[0]->landscape)
-                                                    <img src="{{ asset('public' . $page->sliders[0]->landscape->url) }}"
+                                                    <img src="{{ asset('public/' . $page->sliders[0]->landscape->url) }}"
                                                         width="100%">
                                                     <br />
                                                     <br />
@@ -255,8 +255,6 @@
                                                             name="images[0][landscape]" placeholder="Upload Image">
                                                     </div>
                                                 @endif
-                                                <input type="hidden" name="uploads[{{ $slide->square->id }}][id]"
-                                                    value="{{ $slide->square->id }}" width="100%">
                                             </div>
                                         </div>
                                     </div>

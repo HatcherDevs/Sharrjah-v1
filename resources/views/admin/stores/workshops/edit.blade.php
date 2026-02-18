@@ -295,8 +295,11 @@
                                                             name="newUploads[landscape]" placeholder="Upload Image">
                                                     </div>
                                                 @endif
-                                                <input type="hidden" name="uploads[{{ $slide->square->id }}][id]"
-                                                    value="{{ $slide->square->id }}" width="100%">
+                                                @if (isset($page->sliders[0]->square->id))
+                                                    <input type="hidden"
+                                                        name="uploads[{{ $page->sliders[0]->square->id }}][id]"
+                                                        value="{{ $page->sliders[0]->square->id }}" width="100%">
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

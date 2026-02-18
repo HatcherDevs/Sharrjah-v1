@@ -28,6 +28,11 @@ class Triennial2023Controller extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
+
     public function __construct(Triennial2023 $model, Triennial2023ImagesUploader $uploader, Triennial2023LandscapeImageUploader $luploader, ExternalFileUploader $file_uploader)
     {
         $this->model = $model;
@@ -39,7 +44,8 @@ class Triennial2023Controller extends Controller
     public function index()
     {
         $data = $this->model->get();
-        return view('admin.triennial-2023.show', compact('data'));
+        $page_name = 'Triennial 2023';
+        return view('admin.triennial-2023.show', compact('data', 'page_name'));
     }
 
     public function show()
@@ -99,7 +105,12 @@ class Triennial2023Controller extends Controller
     {
         $page = $this->model->find($id);
 
-        $pageType = [];
+        $page_name = 'Triennial 2023';
+
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null]
+        ];
 
         if ($page->externalFiles()->where('language', 'en')->count()) {
             $pageType['en']['type'] = "file";
@@ -117,7 +128,7 @@ class Triennial2023Controller extends Controller
             $pageType['ar']['value'] = $page->externalLinks()->where('language', 'ar')->first();
         }
 
-        return view('admin.triennial-2023.edit', compact('page', 'pageType'));
+        return view('admin.triennial-2023.edit', compact('page', 'pageType', 'page_name'));
     }
 
     public function delete($id)
@@ -132,7 +143,8 @@ class Triennial2023Controller extends Controller
 
     public function create()
     {
-        return view('admin.triennial-2023.create');
+        $page_name = 'Triennial 2023';
+        return view('admin.triennial-2023.create', compact('page_name'));
     }
 
     public function store(Request $request)
@@ -210,46 +222,58 @@ class Triennial2023Controller extends Controller
         return redirect()->to('admin/triennial-2023/' . $newPage->id . '/edit');
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $preview_id = null)
     {
-
-        $page = $this->model->find($request->input('id'));
+        if ($preview_id) {
+            $page = $this->model->find($preview_id);
+        } else {
+            $page = $this->model->find($request->input('id'));
+        }
 
         if (!$page)
-            dd('Page does not exist');
+            return redirect()->back()->withErrors(['msg' => 'Page does not exist']);
 
-        $data = $request->except('images', 'id', 'buttonLink');
+        $data = $request->except('images', 'id', 'buttonLink', 'external', 'preview_mode');
 
-        if ($data['title'] != $page->title)
+        if (($data['title'] ?? null) && $data['title'] != $page->title)
             $data['slug'] = $this->generateSlug($request->input('title'));
 
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        if (isset($data['publish_date'])) {
+            $data['publish_date'] = strtotime($request->input('publish_date'));
+        }
+
+        if ($request->input('preview_mode') == 'draft') {
+            $page->fill($data);
+            return $page;
+        }
 
         $page->update($data);
 
         $files = $request->file('images');
-        $uploads = $request->file('uploads');
         $newUploads = $request->file('newUploads');
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if ($request->has('uploads')) {
-            $uploads = $request->input('uploads');
+        if ($request->has('uploads') && is_array($request->input('uploads'))) {
+            $uploadsInputs = $request->input('uploads');
 
-            foreach ($uploads as $upload) {
-                $target = Upload::find($upload['id']);
-
-                if ($target) {
-                    $target->update(['caption' => $upload['EN'], 'caption_ar' => $upload['AR']]);
+            foreach ($uploadsInputs as $upload) {
+                if (isset($upload['id'])) {
+                    $target = Upload::find($upload['id']);
+                    if ($target) {
+                        $target->update([
+                            'caption' => $upload['EN'] ?? $upload['en'] ?? '',
+                            'caption_ar' => $upload['AR'] ?? $upload['ar'] ?? ''
+                        ]);
+                    }
                 }
             }
         }
 
         if ($page) {
-            $uploads = $request->file('uploads');
-            if ($uploads) {
-
-                foreach ($request->file('uploads') as $uploadid => $upload) {
+            $uploadsFiles = $request->file('uploads');
+            if ($uploadsFiles && is_array($uploadsFiles)) {
+                foreach ($uploadsFiles as $uploadid => $upload) {
                     if ($upload) {
                         $target = Upload::find($uploadid);
 
@@ -257,143 +281,141 @@ class Triennial2023Controller extends Controller
                             $targetSlide = Triennial2023ImageSlide::find($target->uploadable_id);
 
                             if ($target->template == "square")
-                                $photo = ($files != null ? $this->uploader->upload($upload) : false);
+                                $photo = ($uploaderResults = $this->uploader->upload($upload)) ? $uploaderResults : false;
                             else
-                                $photo = ($files != null ? $this->luploader->upload($upload) : false);
+                                $photo = ($uploaderResults = $this->luploader->upload($upload)) ? $uploaderResults : false;
 
-                            $newUpload = $targetSlide->uploads()->create($photo[0]);
-
-                            $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-
-                            unset($uploadCaptions[$target->id]);
-                            $target->delete();
-                        } else {
+                            if ($photo) {
+                                $newUpload = $targetSlide->uploads()->create($photo[0]);
+                                if (isset($uploadCaptions[$target->id])) {
+                                    $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                    unset($uploadCaptions[$target->id]);
+                                }
+                                $target->delete();
+                            }
                         }
                     }
                 }
             }
 
-            foreach ($files as $index => $file) {
+            if ($files && is_array($files)) {
+                foreach ($files as $index => $file) {
+                    if ((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])) {
+                        $slide = $page->sliders()->create([]);
 
-                if ((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])) {
-                    $slide = $page->sliders()->create([]);
+                        if (isset($file['square']) && $file['square']) {
+                            // Square Image
+                            $photo = $this->uploader->upload($file['square']);
+                            if ($photo) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? $captions[$index]['en'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? $captions[$index]['ar'] ?? '';
+                                $slide->uploads()->create($photo[0]);
+                            }
+                        }
 
-                    if (isset($file['square']) && $file['square']) {
-                        // Square Image
-                        $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
+                        if (isset($file['landscape']) && $file['landscape']) {
+                            // Landscape Image
+                            $photo = $this->luploader->upload($file['landscape']);
+                            if ($photo) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? $captions[$index]['en'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? $captions[$index]['ar'] ?? '';
+                                $slide->uploads()->createMany($photo);
+                            }
+                        }
+                    }
+                }
+            }
 
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
+            if ($newUploads && is_array($newUploads) && (($newUploads['square'] ?? null) || ($newUploads['landscape'] ?? null))) {
+                $slide = Triennial2023ImageSlide::find($request->input('newUploads')['slide_id'] ?? null);
 
-                        $slide->uploads()->create($photo[0]);
+                if ($slide) {
+                    if ($newUploads['square'] ?? null) {
+                        $photo = $this->uploader->upload($newUploads['square']);
+                        if ($photo) $slide->uploads()->create($photo[0]);
                     }
 
-                    if (isset($file['landscape']) && $file['landscape']) {
-                        // Landscape Image
-                        $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-
-                        $photo[0]['caption'] = $captions[$index]['EN'];
-                        $photo[0]['caption_ar'] = $captions[$index]['AR'];
-
-                        $slide->uploads()->createMany($photo);
+                    if ($newUploads['landscape'] ?? null) {
+                        $photo = $this->luploader->upload($newUploads['landscape']);
+                        if ($photo) $slide->uploads()->create($photo[0]);
                     }
                 }
             }
-            }
 
-            if ($newUploads['square'] || $newUploads['landscape']) {
-
-                $slide = Triennial2023ImageSlide::find($request->input('newUploads')['slide_id']);
-
-                if ($newUploads['square']) {
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
-                    $slide->uploads()->create($photo[0]);
-                }
-
-                if ($newUploads['landscape']) {
-                    // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
-                    $slide->uploads()->create($photo[0]);
-                }
-            }
-
-            if ($uploadCaptions) {
+            if ($uploadCaptions && is_array($uploadCaptions)) {
                 foreach ($uploadCaptions as $id => $caption) {
                     $target = Upload::find($id);
-
-                    if ($target)
-                        $target->update(['caption' => $caption['EN'], 'caption_ar' => $caption['AR']]);
+                    if ($target) {
+                        $target->update([
+                            'caption' => $caption['EN'] ?? $caption['en'] ?? '',
+                            'caption_ar' => $caption['AR'] ?? $caption['ar'] ?? ''
+                        ]);
+                    }
                 }
             }
 
-            if ($request->input('delete')) {
+            if ($request->input('delete') && is_array($request->input('delete'))) {
                 foreach ($request->input('delete') as $item) {
                     $target = Triennial2023ImageSlide::find($item);
-
                     if ($target) {
-                        if ($target->square && $target->landscape)
-                            $target->square->delete();
-                        else
-                            $target->delete();
+                        $target->delete();
                     }
                 }
             }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external');
+        if ($external && is_array($external)) {
+            $page_type_en = $external['en']['type'] ?? 'page';
+            $page_type_ar = $external['ar']['type'] ?? 'page';
 
-        if ($page_type_ar == "file") {
-            $page->externalLinks()->where('language', 'ar')->delete();
-            $files = $request->file('external_file_ar');
-
-            if ($files) {
+            // Arabic
+            if ($page_type_ar == "file") {
+                $page->externalLinks()->where('language', 'ar')->delete();
+                $files = $request->file('external_file_ar');
+                if ($files) {
+                    $page->externalFiles()->where('language', 'ar')->delete();
+                    $fileRow = $page->externalFiles()->create(['language' => 'ar']);
+                    $photo = $this->file_uploader->upload($files);
+                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                }
+            } elseif ($page_type_ar == "url" || $page_type_ar == "blank") {
                 $page->externalFiles()->where('language', 'ar')->delete();
-                $fileRow = $page->externalFiles()->create(['language' => 'ar']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $page->externalLinks()->where('language', 'ar')->delete();
+                $url = $page_type_ar == "blank" ? "#" : ($external['ar']['value'] ?? '#');
+                $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
+            } elseif ($page_type_ar == "page") {
+                $page->externalLinks()->where('language', 'ar')->delete();
+                $page->externalFiles()->where('language', 'ar')->delete();
             }
-        } elseif ($page_type_ar == "url" || $page_type_ar == "blank") {
-            $page->externalFiles()->where('language', 'ar')->delete();
-            $page->externalLinks()->where('language', 'ar')->delete();
-            $url = $page_type_ar == "blank" ? "#" : $request->input('external')['ar']['value'];
-            $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
-        } elseif ($page_type_ar == "page") {
-            $page->externalLinks()->where('language', 'ar')->delete();
-            $page->externalFiles()->where('language', 'ar')->delete();
-        }
 
-        if ($page_type_en == "file") {
-            $page->externalLinks()->where('language', 'en')->delete();
-            $files = $request->file('external_file_en');
-
-            if ($files) {
+            // English
+            if ($page_type_en == "file") {
+                $page->externalLinks()->where('language', 'en')->delete();
+                $files = $request->file('external_file_en');
+                if ($files) {
+                    $page->externalFiles()->where('language', 'en')->delete();
+                    $fileRow = $page->externalFiles()->create(['language' => 'en']);
+                    $photo = $this->file_uploader->upload($files);
+                    if ($photo) $fileRow->uploads()->create($photo[0]);
+                }
+            } elseif ($page_type_en == "url" || $page_type_en == "blank") {
                 $page->externalFiles()->where('language', 'en')->delete();
-                $fileRow = $page->externalFiles()->create(['language' => 'en']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $page->externalLinks()->where('language', 'en')->delete();
+                $url = $page_type_en == "blank" ? "#" : ($external['en']['value'] ?? '#');
+                $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
+            } elseif ($page_type_en == "page") {
+                $page->externalLinks()->where('language', 'en')->delete();
+                $page->externalFiles()->where('language', 'en')->delete();
             }
-        } elseif ($page_type_en == "url" || $page_type_en == "blank") {
-            $page->externalFiles()->where('language', 'en')->delete();
-            $page->externalLinks()->where('language', 'en')->delete();
-            $url = $page_type_ar == "blank" ? "#" : $request->input('external')['en']['value'];
-            $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
-        } elseif ($page_type_en == "page") {
-            $page->externalLinks()->where('language', 'en')->delete();
-            $page->externalFiles()->where('language', 'en')->delete();
         }
-
-        //        $page->forms()->delete();
-        //        if($request->input('form_id')){
-        //            $page->forms()->create(['form_id'=>1]);
-        //        }
 
         $buttonLinks = $request->input('buttonLink');
-
-        $page->buttonLinks()->delete();
-        if ($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']) {
-            $page->buttonLinks()->create($buttonLinks);
+        if ($buttonLinks && is_array($buttonLinks)) {
+            $page->buttonLinks()->delete();
+            if (($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) || ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)) {
+                $page->buttonLinks()->create($buttonLinks);
+            }
         }
 
         return redirect()->to('admin/triennial-2023/' . $page->id . '/edit');

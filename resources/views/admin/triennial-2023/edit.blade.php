@@ -18,14 +18,14 @@
             <form class="forms-sample" action="{{ url('admin/triennial-2023/update') }}" method="post"
                 enctype="multipart/form-data">
                 <input type="hidden" value="{!! csrf_token() !!}" name="_token">
-                <input type="hidden" value="{{ $page->id }}" name="id">
+                <input type="hidden" value="{{ isset($page) ? $page->id : '' }}" name="id">
 
                 <div class="row">
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
                                 <a target="_blank" href="javascript:void(0)"
-                                    onclick="previewDraft('{{ URL('admin/triennial-2023/preview/' . $page->id) }}')">Click
+                                    onclick="previewDraft('{{ URL('admin/triennial-2023/preview/' . (isset($page) ? $page->id : '')) }}')">Click
                                     here to preview page</a>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                                     <?php
                                     $types = [['value' => 'page', 'name' => 'Page'], ['value' => 'url', 'name' => 'Link to external page'], ['value' => 'file', 'name' => 'Links to file'], ['value' => 'blank', 'name' => 'No link']];
                                     
-                                    if ($pageType['en']['type'] == 'url' && $pageType['en']['value']->url == '#') {
+                                    if ($pageType['en']['type'] == 'url' && (isset($pageType['en']['value']) && $pageType['en']['value']->url == '#')) {
                                         $pageType['en']['type'] = 'blank';
                                     }
                                     ?>
@@ -82,12 +82,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group type-box url"
-                                    style="{{ $pageType['en']['type'] == 'url' && $pageType['en']['value']->url != '#' ? 'display:block' : '' }}">
+                                    style="{{ $pageType['en']['type'] == 'url' && (isset($pageType['en']['value']) && $pageType['en']['value']->url != '#') ? 'display:block' : '' }}">
                                     <div class="hidden link">
                                         <label>Page URL:</label>
                                         <input type="text" class="form-control" placeholder="External link"
                                             name="external[en][value]"
-                                            value="{{ $pageType['en']['type'] == 'url' ? $pageType['en']['value']->url : '' }}">
+                                            value="{{ $pageType['en']['type'] == 'url' && isset($pageType['en']['value']) ? $pageType['en']['value']->url : '' }}">
                                     </div>
                                 </div>
 
@@ -96,7 +96,7 @@
                                     <div class="hidden link">
                                         <label>
                                             Upload file: <br /><br />
-                                            @if ($pageType['en']['type'] == 'file')
+                                            @if ($pageType['en']['type'] == 'file' && isset($pageType['en']['value']))
                                                 <a
                                                     href="{{ url('public/' . $pageType['en']['value']->path . '/' . $pageType['en']['value']->file_name) }} ">{{ $pageType['en']['value']->original_name }}</a>
                                             @endif
@@ -154,7 +154,7 @@
                                     <?php
                                     $types = [['value' => 'page', 'name' => 'Page'], ['value' => 'url', 'name' => 'Link to external page'], ['value' => 'file', 'name' => 'Links to file'], ['value' => 'blank', 'name' => 'No link']];
                                     
-                                    if ($pageType['ar']['type'] == 'url' && $pageType['ar']['value']->url == '#') {
+                                    if ($pageType['ar']['type'] == 'url' && (isset($pageType['ar']['value']) && $pageType['ar']['value']->url == '#')) {
                                         $pageType['ar']['type'] = 'blank';
                                     }
                                     ?>
@@ -168,12 +168,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group type-box url"
-                                    style="{{ $pageType['ar']['type'] == 'url' && $pageType['ar']['value']->url != '#' ? 'display:block' : '' }}">
+                                    style="{{ $pageType['ar']['type'] == 'url' && (isset($pageType['ar']['value']) && $pageType['ar']['value']->url != '#') ? 'display:block' : '' }}">
                                     <div class="hidden link">
                                         <label>Page URL:</label>
                                         <input type="text" class="form-control" placeholder="External link"
                                             name="external[ar][value]"
-                                            value="{{ $pageType['ar']['type'] == 'url' ? $pageType['ar']['value']->url : '' }}">
+                                            value="{{ $pageType['ar']['type'] == 'url' && isset($pageType['ar']['value']) ? $pageType['ar']['value']->url : '' }}">
                                     </div>
                                 </div>
 
@@ -183,7 +183,7 @@
                                     <div class="hidden link">
                                         <label>
                                             Upload file:
-                                            @if ($pageType['ar']['type'] == 'file')
+                                            @if ($pageType['ar']['type'] == 'file' && isset($pageType['ar']['value']))
                                                 <a
                                                     href="{{ url('public/' . $pageType['ar']['value']->path . '/' . $pageType['ar']['value']->file_name) }} ">{{ $pageType['ar']['value']->original_name }}</a>
                                             @endif
@@ -473,7 +473,7 @@
                     <div class="col-md-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                @if (count($page->sliders))
+                                @if (isset($page) && count($page->sliders))
                                     <div class="form-group" style="border-top:3px solid #ccc">
                                         <br />
                                         <strong>Event Primary Image</strong>
@@ -500,14 +500,17 @@
                                                             name="newUploads[landscape]" placeholder="Upload Image">
                                                     </div>
                                                 @endif
-                                                <input type="hidden" name="uploads[{{ $slide->square->id }}][id]"
-                                                    value="{{ $slide->square->id }}" width="100%">
+                                                @if (isset($page->sliders[0]->square->id))
+                                                    <input type="hidden"
+                                                        name="uploads[{{ $page->sliders[0]->square->id }}][id]"
+                                                        value="{{ $page->sliders[0]->square->id }}" width="100%">
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
                                 @endif
 
-                                @if (count($page->sliders))
+                                @if (isset($page) && count($page->sliders))
                                     <div class="form-group" style="border-top:3px solid #ccc">
                                         <br />
                                         <strong>Event Slide Images</strong>
@@ -519,25 +522,29 @@
                                                 <div class="file-upload" style="width:100%;">
                                                     <div class="row">
                                                         <div class="col-md-3">
-                                                            <img src="{{ asset('public' . $slide->square->url) }}"
-                                                                width="100%">
+                                                            @if ($slide->square)
+                                                                <img src="{{ asset('public' . $slide->square->url) }}"
+                                                                    width="100%">
+                                                            @endif
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label>Caption EN:</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Image Caption EN"
-                                                                    name="upload-captions[{{ $slide->square->id }}][EN]"
-                                                                    value="{{ $slide->square->caption }}">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label>Caption AR:</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Image Caption AR"
-                                                                    name="upload-captions[{{ $slide->square->id }}][AR]"
-                                                                    value="{{ $slide->square->caption_ar }}">
-                                                            </div>
+                                                            @if ($slide->square)
+                                                                <div class="form-group">
+                                                                    <label>Caption EN:</label>
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Image Caption EN"
+                                                                        name="upload-captions[{{ $slide->square->id }}][EN]"
+                                                                        value="{{ $slide->square->caption }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Caption AR:</label>
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Image Caption AR"
+                                                                        name="upload-captions[{{ $slide->square->id }}][AR]"
+                                                                        value="{{ $slide->square->caption_ar }}">
+                                                                </div>
+                                                            @endif
 
                                                             @if ($slide->square)
                                                                 <div class="form-group">

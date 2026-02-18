@@ -29,11 +29,11 @@
         }
 
         /*
-                      1. Base
-                    */
+                              1. Base
+                            */
         /*
-                      2. Components
-                    */
+                              2. Components
+                            */
         div.control-container {
             margin-top: 10px;
             padding: 20px 10px;
@@ -88,8 +88,8 @@
         }
 
         /*
-                      Small only
-                    */
+                              Small only
+                            */
         @media screen and (max-width: 39.9375em) {
             div.control-container div.amplitude-play-pause {
                 background-size: cover;
@@ -131,11 +131,11 @@
         }
 
         /*
-                      Medium only
-                    */
+                              Medium only
+                            */
         /*
-                      Large Only
-                    */
+                              Large Only
+                            */
         div.time-container {
             opacity: 0.5;
             font-family: 'Open Sans';
@@ -156,14 +156,14 @@
         }
 
         /*
-                      Small only
-                    */
+                              Small only
+                            */
         /*
-                      Medium only
-                    */
+                              Medium only
+                            */
         /*
-                      Large Only
-                    */
+                              Large Only
+                            */
         progress.amplitude-song-played-progress {
             background-color: #313252;
             -webkit-appearance: none;
@@ -193,17 +193,17 @@
         }
 
         /*
-                      Small only
-                    */
+                              Small only
+                            */
         /*
-                      Medium only
-                    */
+                              Medium only
+                            */
         /*
-                      Large Only
-                    */
+                              Large Only
+                            */
         /*
-                      3. Layout
-                    */
+                              3. Layout
+                            */
         div.bottom-container {
             background-color: #ffffff;
             border-bottom-right-radius: 10px;
@@ -213,14 +213,14 @@
         }
 
         /*
-                      Small only
-                    */
+                              Small only
+                            */
         /*
-                      Medium only
-                    */
+                              Medium only
+                            */
         /*
-                      Large Only
-                    */
+                              Large Only
+                            */
         div#single-song-player {
             margin: auto;
             width: 100%;
@@ -381,54 +381,59 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <?php $page = $post; ?>
-                                    @if (count($page->sliders) == 1)
-                                        <div class="col-md-12">
-                                            @if ($page->slider->square)
-                                                <img src="{{ asset('public/' . $page->slider->square->url) }}"
-                                                    width="100%" class="featured-img">
-                                                <span class="imgcap">
-                                                    @if (isset($_GET['lang']))
-                                                        <span dir="rtl"
-                                                            class="float-right">{{ $page->slider->square->caption_ar }}</span>
-                                                    @else
-                                                        <span
-                                                            class="en float-left">{{ $page->slider->square->caption }}</span>
-                                                    @endif
-                                                </span>
-                                            @elseif($page->slider->landscape)
-                                                <img src="{{ asset('public/' . $page->slider->landscape->url) }}"
-                                                    width="100%" class="featured-img">
-                                                <span class="imgcap">
-                                                    @if (isset($_GET['lang']))
-                                                        <span dir="rtl"
-                                                            class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
-                                                    @else
-                                                        <span
-                                                            class="en float-left">{{ $page->slider->landscape->caption }}</span>
-                                                    @endif
-                                                </span>
-                                            @endif
-                                        </div>
-                                    @elseif(count($page->sliders) > 1)
-                                        <div class="col-md-12">
-                                            <div class="owl-carousel-holder" dir="ltr">
-                                                <div class="arrows">
-                                                    <button class="prev float-left"></button>
-                                                    <button class="next float-right"></button>
-                                                </div>
-                                                <div class="owl-carousel owl-theme">
-                                                    @foreach ($page->sliders as $slide)
-                                                        <div class="item">
+                                @elseif($page->sliders && count($page->sliders) == 1)
+                                    <div class="col-md-12">
+                                        @if ($page->slider && $page->slider->square)
+                                            <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%"
+                                                class="featured-img">
+                                            <span class="imgcap">
+                                                @if (isset($_GET['lang']))
+                                                    <span dir="rtl"
+                                                        class="float-right">{{ $page->slider->square->caption_ar }}</span>
+                                                @else
+                                                    <span class="en float-left">{{ $page->slider->square->caption }}</span>
+                                                @endif
+                                            </span>
+                                        @elseif($page->slider && $page->slider->landscape)
+                                            <img src="{{ asset('public/' . $page->slider->landscape->url) }}"
+                                                width="100%" class="featured-img">
+                                            <span class="imgcap">
+                                                @if (isset($_GET['lang']))
+                                                    <span dir="rtl"
+                                                        class="float-right">{{ $page->slider->landscape->caption_ar }}</span>
+                                                @else
+                                                    <span
+                                                        class="en float-left">{{ $page->slider->landscape->caption }}</span>
+                                                @endif
+                                            </span>
+                                        @endif
+                                    </div>
+                                @elseif($page->sliders && count($page->sliders) > 1)
+                                    <div class="col-md-12">
+                                        <div class="owl-carousel-holder" dir="ltr">
+                                            <div class="arrows">
+                                                <button class="prev float-left"></button>
+                                                <button class="next float-right"></button>
+                                            </div>
+                                            <div class="owl-carousel owl-theme">
+                                                @foreach ($page->sliders as $slide)
+                                                    <div class="item">
+                                                        @if ($slide->square)
                                                             <img src="{{ url('public/' . $slide->square->url) }}"
                                                                 data-en="{{ $slide->square->caption }}"
                                                                 data-ar="{{ $slide->square->caption_ar }}">
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                                <div id="owl-caption"></div>
-                                                <div id="owl-dots"></div>
+                                                        @elseif($slide->landscape)
+                                                            <img src="{{ url('public/' . $slide->landscape->url) }}"
+                                                                data-en="{{ $slide->landscape->caption }}"
+                                                                data-ar="{{ $slide->landscape->caption_ar }}">
+                                                        @endif
+                                                    </div>
+                                                @endforeach
                                             </div>
+                                            <div id="owl-caption"></div>
+                                            <div id="owl-dots"></div>
                                         </div>
+                                    </div>
                                     @endif
 
                                     <div class="col-md-12">
@@ -499,58 +504,66 @@
                                         </h3>
                                         <br />
                                         <div class="row">
-                                            @foreach ($similar as $item)
-                                                @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                                    <div class="col-md-4 col-sm-6 text-right column-box {{ $item->id == $post->id ? 'current' : '' }}"
-                                                        style="margin-bottom: 15px !important;">
-                                                    @else
-                                                        <div class="col-md-4 col-sm-6 text-left column-box {{ $item->id == $post->id ? 'current' : '' }}"
-                                                            style="margin-bottom: 15px !important;;">
-                                                @endif
-
-                                                @if ($item->id != $post->id)
-                                                    @if (isset($_GET['lang']))
-                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                                            <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                                {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
-                                                        @endif
-                                                    @else
-                                                        <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                            {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                            @if (isset($similar))
+                                                @foreach ($similar as $item)
+                                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                        <div class="col-md-4 col-sm-6 text-right column-box {{ $item->id == $post->id ? 'current' : '' }}"
+                                                            style="margin-bottom: 15px !important;">
+                                                        @else
+                                                            <div class="col-md-4 col-sm-6 text-left column-box {{ $item->id == $post->id ? 'current' : '' }}"
+                                                                style="margin-bottom: 15px !important;;">
                                                     @endif
-                                                @endif
 
-                                                @if (count($item->sliders[0]))
-                                                    @if ($item->sliders[0]->landscape)
-                                                        <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}"
-                                                            width="100%">
+                                                    @if ($item->id != $post->id)
+                                                        @if (isset($_GET['lang']))
+                                                            @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                                <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
+                                                                    {!! $item->pageType['type'] == 'file'
+                                                                        ? 'download="' . ($item->fileDataAr ? $item->fileDataAr->original_name : '') . '"'
+                                                                        : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                            @endif
+                                                        @else
+                                                            <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
+                                                                {!! $item->pageType['type'] == 'file'
+                                                                    ? 'download="' . ($item->fileData ? $item->fileData->original_name : '') . '"'
+                                                                    : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                        @endif
+                                                    @endif
+
+                                                    @if ($item->sliders && count($item->sliders) > 0 && $item->sliders[0])
+                                                        @if ($item->sliders[0]->landscape)
+                                                            <img src="{{ asset('public/' . $item->sliders[0]->landscape->url) }}"
+                                                                width="100%">
+                                                        @elseif ($item->sliders[0]->square)
+                                                            <img src="{{ asset('public/' . $item->sliders[0]->square->url) }}"
+                                                                width="100%">
+                                                        @else
+                                                            <img src="{{ asset('public/img/placeholder-square.jpg') }}"
+                                                                width="100%">
+                                                        @endif
                                                     @else
                                                         <img src="{{ asset('public/img/placeholder-square.jpg') }}"
                                                             width="100%">
                                                     @endif
-                                                @else
-                                                    <img src="{{ asset('public/img/placeholder-square.jpg') }}"
-                                                        width="100%">
-                                                @endif
 
-                                                @if (isset($_GET['lang']))
-                                                    @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
-                                                        <div class="publish_date en">{{ $item->artist_ar }}</div>
-                                                        {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
-                                                        <div class="title ar">{{ $item->title_ar }}</div>
-                                                        {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
-                                                        {{--                                    <div class="content ar">{{ $item->excerpt_ar }}</div> --}}
+                                                    @if (isset($_GET['lang']))
+                                                        @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
+                                                            <div class="publish_date en">{{ $item->artist_ar }}</div>
+                                                            {{-- <div class="publication ar">{{ $item->country_ar }}</div> --}}
+                                                            <div class="title ar">{{ $item->title_ar }}</div>
+                                                            {{-- <div class="author ar">{{ $item->speaker_ar }}</div> --}}
+                                                            {{--                                    <div class="content ar">{{ $item->excerpt_ar }}</div> --}}
+                                                        @endif
+                                                    @else
+                                                        <div class="publish_date en">{{ $item->artist }}</div>
+                                                        {{-- <div class="publication en">{{ $item->country }}</div> --}}
+                                                        <div class="title en">{{ $item->title }}</div>
+                                                        {{-- <div class="author en">{{ $item->speaker }}</div> --}}
+                                                        {{--                                <div class="content en">{{ $item->excerpt }}</div> --}}
                                                     @endif
-                                                @else
-                                                    <div class="publish_date en">{{ $item->artist }}</div>
-                                                    {{-- <div class="publication en">{{ $item->country }}</div> --}}
-                                                    <div class="title en">{{ $item->title }}</div>
-                                                    {{-- <div class="author en">{{ $item->speaker }}</div> --}}
-                                                    {{--                                <div class="content en">{{ $item->excerpt }}</div> --}}
-                                                @endif
-                                                @if ($item->id != $post->id)
-                                                    </a>
-                                                @endif
+                                                    @if ($item->id != $post->id)
+                                                        </a>
+                                                    @endif
 
                                         </div>
                                         @endforeach
@@ -559,7 +572,7 @@
 
                                     <br />
 
-                                    @if (count($upcoming))
+                                    @if (isset($upcoming) && count($upcoming))
                                         <div class="<?php echo isset($_GET['lang']) ? 'text-right' : 'text-left'; ?>" <?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
                                             <h3 style="font-weight:bold;text-align: <?php echo isset($_GET['lang']) ? 'right' : 'left'; ?>">
                                                 <?php echo isset($_GET['lang']) ? 'الفعاليات القادمة' : 'UPCOMING EVENTS'; ?> </h3>
@@ -569,11 +582,15 @@
                                                     @if (isset($_GET['lang']))
                                                         @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                                {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                                {!! $item->pageType['type'] == 'file'
+                                                                    ? 'download="' . ($item->fileDataAr ? $item->fileDataAr->original_name : '') . '"'
+                                                                    : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                         @endif
                                                     @else
                                                         <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                            {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                            {!! $item->pageType['type'] == 'file'
+                                                                ? 'download="' . ($item->fileData ? $item->fileData->original_name : '') . '"'
+                                                                : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                     @endif
                                                     </a>
 
@@ -581,13 +598,13 @@
                                                         @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <h4 style="font-weight:bold;text-transform: uppercase;">
                                                                 {{ $item->title_ar }}</h4>
-                                                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
+                                                            <p>{{ isset($item->publish_date) && is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : (isset($item->publish_date) ? $item->publish_date->format('d-m-Y') : '') }}
                                                             </p>
                                                             <p>{{ $item->excerpt }}</p>
                                                         @else
                                                             <h4 style="font-weight:bold;text-transform: uppercase;">
                                                                 {{ $item->title }}</h4>
-                                                            <p>{{ is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : $item->publish_date->format('d-m-Y') }}
+                                                            <p>{{ isset($item->publish_date) && is_string($item->publish_date) ? \Carbon\Carbon::parse($item->publish_date)->format('d-m-Y') : (isset($item->publish_date) ? $item->publish_date->format('d-m-Y') : '') }}
                                                             </p>
                                                             <p>{{ $item->excerpt_ar }}</p>
                                                         @endif
@@ -596,11 +613,15 @@
                                                     @if (isset($_GET['lang']))
                                                         @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                             <a href="{{ $item->linkAr }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                                {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileDataAr->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                                {!! $item->pageType['type'] == 'file'
+                                                                    ? 'download="' . ($item->fileDataAr ? $item->fileDataAr->original_name : '') . '"'
+                                                                    : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                         @endif
                                                     @else
                                                         <a href="{{ $item->link }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}"
-                                                            {!! $item->pageType['type'] == 'file' ? 'download="' . $item->fileData->original_name . '"' : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
+                                                            {!! $item->pageType['type'] == 'file'
+                                                                ? 'download="' . ($item->fileData ? $item->fileData->original_name : '') . '"'
+                                                                : '' !!} {!! $item->pageType['type'] == 'url' || $item->pageType['type'] == 'file' ? 'target="_blank"' : '' !!}>
                                                     @endif
                                                     <br />
 

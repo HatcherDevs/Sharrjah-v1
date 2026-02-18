@@ -9,7 +9,7 @@
                 <div class="col-md-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h3>Edit Podcast</h3>
+                            <h3>Edit {{ $page_name }}</h3>
                         </div>
                     </div>
                 </div>
@@ -303,8 +303,11 @@
                                                             name="newUploads[landscape]" placeholder="Upload Image">
                                                     </div>
                                                 @endif
-                                                <input type="hidden" name="uploads[{{ $slide->square->id }}][id]"
-                                                    value="{{ $slide->square->id }}" width="100%">
+                                                @if (isset($page->sliders[0]->square->id))
+                                                    <input type="hidden"
+                                                        name="uploads[{{ $page->sliders[0]->square->id }}][id]"
+                                                        value="{{ $page->sliders[0]->square->id }}" width="100%">
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -322,27 +325,28 @@
                                                 <div class="file-upload" style="width:100%;">
                                                     <div class="row">
                                                         <div class="col-md-3">
-                                                            <img src="{{ asset('public' . $slide->square->url) }}"
-                                                                width="100%">
+                                                            @if ($slide->square)
+                                                                <img src="{{ asset('public' . $slide->square->url) }}"
+                                                                    width="100%">
+                                                            @endif
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label>Caption EN:</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Image Caption EN"
-                                                                    name="upload-captions[{{ $slide->square->id }}][EN]"
-                                                                    value="{{ $slide->square->caption }}">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label>Caption AR:</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Image Caption AR"
-                                                                    name="upload-captions[{{ $slide->square->id }}][AR]"
-                                                                    value="{{ $slide->square->caption_ar }}">
-                                                            </div>
-
                                                             @if ($slide->square)
+                                                                <div class="form-group">
+                                                                    <label>Caption EN:</label>
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Image Caption EN"
+                                                                        name="upload-captions[{{ $slide->square->id }}][EN]"
+                                                                        value="{{ $slide->square->caption }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Caption AR:</label>
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Image Caption AR"
+                                                                        name="upload-captions[{{ $slide->square->id }}][AR]"
+                                                                        value="{{ $slide->square->caption_ar }}">
+                                                                </div>
                                                                 <div class="form-group">
                                                                     <label>Replace Image (1000x1000):</label>
                                                                     <input type="file" class="form-control"

@@ -64,9 +64,12 @@ class SatTourController extends Controller
     }
 
     public function edit($id){
-        $page = $this->model->find($id);
+        $page = $this->model->find($id) ?: abort(404);
 
-        $pageType = [];
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null]
+        ];
 
         if($page->externalFiles()->where('language','en')->count()){
             $pageType['en']['type'] = "file";
@@ -128,16 +131,18 @@ class SatTourController extends Controller
         $newUploads = $request->file('newUploads');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($newPage && $files){
+        if($newPage && $files && is_array($files)){
             foreach ($files as $index=>$file){
 
-                if($file['square']){
+                if(isset($file['square']) && $file['square']){
                     $slide = $newPage->sliders()->create([]);
                     // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
+                    $photo = $this->uploader->upload($file['square']);
+                    if ($photo) {
+                        $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                        $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                        $slide->uploads()->create($photo[0]);
+                    }
                 }
             }
 
@@ -167,38 +172,39 @@ class SatTourController extends Controller
                 }
             }
 
-            if($uploadCaptions){
+            if($uploadCaptions && is_array($uploadCaptions)){
                 foreach ( $uploadCaptions as $id => $caption ) {
                     $target = Upload::find($id);
 
                     if($target)
-                        $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
+                        $target->update(['caption'=>$caption['EN'] ?? '','caption_ar'=>$caption['AR'] ?? '']);
                 }
             }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external');
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if($page_type_ar=="file"){
             $fileRow = $newPage->externalFiles()->create(['language'=>'ar']);
-            $files = $request->file('external_file_ar');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
+            $files_ar = $request->file('external_file_ar');
+            $photo = ($files_ar != null ? $this->file_uploader->upload($files_ar) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) $fileRow->uploads()->create($photo[0]);
         }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank")
-            $newPage->externalLinks()->create(['language'=>'ar','url'=>$request->input('external')['ar']['value']]);
+        elseif(($page_type_ar=="url" || $page_type_ar=="blank") && isset($external['ar']['value']))
+            $newPage->externalLinks()->create(['language'=>'ar','url'=>$external['ar']['value']]);
 
         if($page_type_en=="file"){
             $fileRow = $newPage->externalFiles()->create(['language'=>'en']);
-            $files = $request->file('external_file_en');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
+            $files_en = $request->file('external_file_en');
+            $photo = ($files_en != null ? $this->file_uploader->upload($files_en) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) $fileRow->uploads()->create($photo[0]);
         }
-        elseif($page_type_en=="url" || $page_type_en=="blank")
-            $newPage->externalLinks()->create(['language'=>'en','url'=>$request->input('external')['en']['value']]);
+        elseif(($page_type_en=="url" || $page_type_en=="blank") && isset($external['en']['value']))
+            $newPage->externalLinks()->create(['language'=>'en','url'=>$external['en']['value']]);
 //
 //
 //        if($request->input('form_id')){
@@ -238,17 +244,19 @@ class SatTourController extends Controller
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($request->has('uploads')){
+        if($request->has('uploads') && is_array($request->input('uploads'))){
             $uploads = $request->input('uploads');
 
             foreach ($uploads as $upload){
-                $target = Upload::find($upload['id']);
+                if (isset($upload['id'])) {
+                    $target = Upload::find($upload['id']);
 
-                if($target){
-                    $target->update([
-                        'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
-                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
-                    ]);
+                    if($target){
+                        $target->update([
+                            'caption' => $upload['EN'] ?? ($upload['caption'] ?? ''),
+                            'caption_ar' => $upload['AR'] ?? ($upload['caption_ar'] ?? '')
+                        ]);
+                    }
                 }
             }
         }
@@ -260,32 +268,36 @@ class SatTourController extends Controller
                 $page->sliders()->where('is_main',1)->delete();
                 $mslider = $page->sliders()->create(['is_main'=>1]);
                 $photo = $this->luploader->upload($postImage);
-                $mslider->uploads()->createMany($photo);
+                if ($photo) $mslider->uploads()->createMany($photo);
             }
 
-            foreach ($files as $index=>$file){
-                if($file['square'] || $file['landscape'])
-                    $slide = $page->sliders()->create([]);
+            if ($files && is_array($files)) {
+                foreach ($files as $index=>$file){
+                    if(isset($file['square']) && $file['square'] || isset($file['landscape']) && $file['landscape'])
+                        $slide = $page->sliders()->create([]);
 
-                if($file['square']){
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
+                    if(isset($file['square']) && $file['square']){
+                        // Square Image
+                        $photo = $this->uploader->upload($file['square']);
+                        if ($photo) {
+                            $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                            $slide->uploads()->create($photo[0]);
+                        }
+                    }
                 }
             }
 
-            if($uploadCaptions){
+            if($uploadCaptions && is_array($uploadCaptions)){
                 foreach ( $uploadCaptions as $id => $caption ) {
                     $target = Upload::find($id);
 
                     if($target)
-                        $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
+                        $target->update(['caption'=>$caption['EN'] ?? '','caption_ar'=>$caption['AR'] ?? '']);
                 }
             }
 
-            if($request->input('delete')){
+            if($request->input('delete') && is_array($request->input('delete'))){
                 foreach ( $request->input('delete') as $item) {
                     $target = TourImageSlide::find($item);
 
@@ -305,24 +317,25 @@ class SatTourController extends Controller
 //            }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external');
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if($page_type_ar=="file"){
             $page->externalLinks()->where('language','ar')->delete();
-            $files = $request->file('external_file_ar');
+            $files_ar = $request->file('external_file_ar');
 
-            if($files){
+            if($files_ar){
                 $page->externalFiles()->where('language','ar')->delete();
                 $fileRow = $page->externalFiles()->create(['language'=>'ar']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $photo = ($files_ar != null ? $this->file_uploader->upload($files_ar) : false);
+                if ($photo) $fileRow->uploads()->create($photo[0]);
             }
         }
         elseif($page_type_ar=="url" || $page_type_ar=="blank"){
             $page->externalFiles()->where('language','ar')->delete();
             $page->externalLinks()->where('language','ar')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['ar']['value'];
+            $url = $page_type_ar=="blank" ? "#" : ($external['ar']['value'] ?? '#');
             $page->externalLinks()->create(['language'=>'ar','url'=> $url] );
         }
         elseif($page_type_ar=="page") {
@@ -332,19 +345,19 @@ class SatTourController extends Controller
 
         if($page_type_en=="file"){
             $page->externalLinks()->where('language','en')->delete();
-            $files = $request->file('external_file_en');
+            $files_en = $request->file('external_file_en');
 
-            if($files){
+            if($files_en){
                 $page->externalFiles()->where('language','en')->delete();
                 $fileRow = $page->externalFiles()->create(['language'=>'en']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $photo = ($files_en != null ? $this->file_uploader->upload($files_en) : false);
+                if ($photo) $fileRow->uploads()->create($photo[0]);
             }
         }
         elseif($page_type_en=="url" || $page_type_en=="blank"){
             $page->externalFiles()->where('language','en')->delete();
             $page->externalLinks()->where('language','en')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['en']['value'];
+            $url = $page_type_en=="blank" ? "#" : ($external['en']['value'] ?? '#');
             $page->externalLinks()->create(['language'=>'en','url'=> $url]);
         }
         elseif($page_type_en=="page") {
@@ -352,16 +365,13 @@ class SatTourController extends Controller
             $page->externalFiles()->where('language','en')->delete();
         }
 
-//        $page->forms()->delete();
-//        if($request->input('form_id')){
-//            $page->forms()->create(['form_id'=>1]);
-//        }
-
         $buttonLinks = $request->input('buttonLink');
 
-        $page->buttonLinks()->delete();
-        if($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
-            $page->buttonLinks()->create($buttonLinks);
+        if ($buttonLinks && is_array($buttonLinks)) {
+            $page->buttonLinks()->delete();
+            if(($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) || ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)){
+                $page->buttonLinks()->create($buttonLinks);
+            }
         }
 
         return redirect()->to('admin/tours/'.$page->id.'/edit');

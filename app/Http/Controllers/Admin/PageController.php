@@ -124,77 +124,35 @@ class PageController extends Controller
         return view('pages.publication-preview', compact('post', 'relatedPages'));
     }
 
-    public function post(Request $request)
+    public function preview($id, Request $request)
     {
-
-        $data = $request->except('images', 'page_id');
-        $data['slug'] = $this->generateSlug($request->input('name'));
-
-        $newPage = $this->model->create($data);
-
-        if ($newPage && $request->input('page_id')) {
-            $newPage->parent()->create(['page_parent_id' => $request->input('page_id')]);
-        }
-
-        $files = $request->file('images');
-        $captions = $request->input('captions');
-
-        if ($newPage) {
-            foreach ($files as $index => $file) {
-                if ($file['square'] || $file['landscape'])
-                    $slide = $newPage->sliders()->create([]);
-
-                if ($file['square']) {
-
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-
-                    $slide->uploads()->create($photo[0]);
-                }
-
-                if ($file['landscape']) {
-                    // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-
-                    $slide->uploads()->create($photo[0]);
-                }
-            }
-        }
-
-        if ($request->input('form_id')) {
-            $newPage->forms()->delete();
-            $newPage->forms()->create(['form_id' => 1]);
-        }
-
-        return redirect()->to('admin/web-pages/' . $newPage->id . '/edit');
+        return $this->update($request, $id);
     }
 
-    public function update(Request $request)
+    public function post(Request $request)
     {
+        return $this->update($request);
+    }
 
-        $page = $this->model->find($request->input('id'));
+    public function update(Request $request, $preview_id = null)
+    {
+        $id = $request->input('id') ?: $preview_id;
+        $page = $id ? $this->model->find($id) : new $this->model;
 
+        if (!$page && $id) {
+            abort(404, 'Page does not exist');
+        }
 
-        // Start additional2_content
-        $additional2_content_en = json_encode($request->additional2_content_en);
-        $additional2_content_ar = json_encode($request->additional2_content_ar);
-
-
+        // Handle additional2_content images first
         $additional2_imgs_page = [];
-
-        $currentImgs = json_decode($page->additional2_content_img);
-        if ($currentImgs) {
-            foreach ($currentImgs as $img) {
-                if ($img != null) {
-                    if (in_array($img, $request->input('additional2_content_img') ?? [])) {
+        if ($id && $page->additional2_content_img) {
+            $currentImgs = json_decode($page->additional2_content_img, true);
+            if (is_array($currentImgs)) {
+                $requestedImgs = $request->input('additional2_content_img') ?: [];
+                foreach ($currentImgs as $img) {
+                    if ($img && in_array($img, $requestedImgs)) {
                         array_push($additional2_imgs_page, $img);
-                    } else {
+                    } else if ($img) {
                         if (File::exists(public_path($img))) {
                             File::delete(public_path($img));
                         }
@@ -203,90 +161,90 @@ class PageController extends Controller
             }
         }
 
-        if ($request->hasFile('additional2_content_img')) {
-            foreach ($request->file('additional2_content_img') as  $img) {
+        $add2_files = $request->file('additional2_content_img');
+        if (is_array($add2_files)) {
+            foreach ($add2_files as $img) {
                 if ($img) {
                     $s = $this->uploaderFullWidth->upload($img);
+                    if ($s && isset($s[0])) {
+                        array_push($additional2_imgs_page, $s[0]['path'] . '/' . $s[0]['file_name']);
+                    }
                 }
-                array_push($additional2_imgs_page, $img ? $s[0]['path'] . '/' . $s[0]['file_name'] : null);
             }
         }
-        $img_encoded = $additional2_imgs_page ? json_encode($additional2_imgs_page) : null;
+        $img_encoded = !empty($additional2_imgs_page) ? json_encode($additional2_imgs_page) : null;
 
-        // End additional2_content
+        $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads', 'additional2_content_en', 'additional2_content_ar', 'additional2_content_img');
 
-        if (!$page)
-            dd('Page does not exist');
-
-        $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads');
-        if (isset($data['name']) && $data['name'] != $page->name) {
-            if ($request->input('id') != 15)
-                $data['slug'] = $this->generateSlug($request->input('name'));
+        if (isset($data['name'])) {
+            if ($id != 15) {
+                $data['slug'] = $this->generateSlug($data['name']);
+            }
         }
 
-        $data['created_at'] = strtotime($request->input('created_at'));
+        if (isset($data['created_at']) && $data['created_at']) {
+            $data['created_at'] = date('Y-m-d H:i:s', strtotime($data['created_at']));
+        }
 
-        unset($data['slug']); // Delete slug from update
-        $newPage = $page->update($data);
+        $data['additional2_content_en'] = is_array($request->additional2_content_en) ? json_encode($request->additional2_content_en) : null;
+        $data['additional2_content_ar'] = is_array($request->additional2_content_ar) ? json_encode($request->additional2_content_ar) : null;
+        $data['additional2_content_img'] = $img_encoded;
 
-        if ($page->parent) {
-            if ($page->parent->id != $request->input('page_id')) {
-                $currentParent = $page->parent()->first();
+        if ($request->has('preview_mode') && $request->preview_mode == 'draft') {
+            $page->fill($data);
+            $is_preview = true;
+            $data = Post::where('page_id', $page->id)->where('active', 1)->paginate(5);
+            return view('pages.preview', compact('page', 'data', 'is_preview'));
+        }
 
-                DB::table('page_parents')
-                    ->where('page_id', $currentParent->page_id)
-                    ->delete();
-
-                $page->parent()->create(['page_parent_id' => $request->input('page_id')]);
-            }
+        if (!$id) {
+            $page = $this->model->create($data);
         } else {
-            if ($request->input('page_id'))
-                $page->parent()->create(['page_parent_id' => $request->input('page_id')]);
+            $page->update($data);
+        }
+
+        if ($request->input('page_id')) {
+            $page->parent()->updateOrCreate([], ['page_parent_id' => $request->input('page_id')]);
         }
 
         $files = $request->file('images');
-        $uploads = $request->file('uploads');
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if ($request->has('uploads')) {
-            $uploads = $request->input('uploads');
-
-            foreach ($uploads as $upload) {
-                $target = Upload::find($upload['id']);
-
-                if ($target) {
-                    $target->update([
-                        'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
-                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
-                    ]);
+        if (is_array($request->input('uploads'))) {
+            foreach ($request->input('uploads') as $upload) {
+                if (isset($upload['id'])) {
+                    $target = Upload::find($upload['id']);
+                    if ($target) {
+                        $target->update([
+                            'caption' => $upload['EN'] ?? ($upload['caption'] ?? ($target->caption ?? '')),
+                            'caption_ar' => $upload['AR'] ?? ($upload['caption_ar'] ?? ($target->caption_ar ?? ''))
+                        ]);
+                    }
                 }
             }
         }
 
         if ($page) {
-
-            $uploads = $request->file('uploads');
-
-            if ($uploads) {
-                foreach ($request->file('uploads') as $uploadid => $upload) {
+            $uploadsFiles = $request->file('uploads');
+            if (is_array($uploadsFiles)) {
+                foreach ($uploadsFiles as $uploadid => $upload) {
                     if ($upload) {
                         $target = Upload::find($uploadid);
-
                         if ($target) {
                             $targetSlide = PageImageSlide::find($target->uploadable_id);
+                            if ($targetSlide) {
+                                if ($target->template == "square")
+                                    $photo = $this->uploader->upload($upload);
+                                else
+                                    $photo = $this->luploader->upload($upload);
 
-                            if ($target->template == "square")
-                                $photo = $this->uploader->upload($upload);
-                            else
-                                $photo = $this->luploader->upload($upload);
-
-                            if ($photo) {
-                                $newUpload = $targetSlide->uploads()->create($photo[0]);
-
-                                if (isset($uploadCaptions[$target->id])) {
-                                    $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-                                    unset($uploadCaptions[$target->id]);
+                                if ($photo && isset($photo[0])) {
+                                    $newUpload = $targetSlide->uploads()->create($photo[0]);
+                                    if (isset($uploadCaptions[$target->id])) {
+                                        $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                        unset($uploadCaptions[$target->id]);
+                                    }
                                 }
                                 $target->delete();
                             }
@@ -295,34 +253,25 @@ class PageController extends Controller
                 }
             }
 
-            if ($files) {
+            if (is_array($files)) {
                 foreach ($files as $index => $file) {
                     $hasSquare = isset($file['square']) && $file['square'];
                     $hasLandscape = isset($file['landscape']) && $file['landscape'];
-                    
                     if ($hasSquare || $hasLandscape) {
                         $slide = $page->sliders()->create([]);
-
                         if ($hasSquare) {
-                            // Square Image
                             $photo = $this->uploader->upload($file['square']);
-
-                            if ($photo) {
-                                $photo[0]['caption'] = isset($captions[$index]['EN']) ? $captions[$index]['EN'] : '';
-                                $photo[0]['caption_ar'] = isset($captions[$index]['AR']) ? $captions[$index]['AR'] : '';
-
+                            if ($photo && isset($photo[0])) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
                                 $slide->uploads()->create($photo[0]);
                             }
                         }
-
                         if ($hasLandscape) {
-                            // Landscape Image
                             $photo = $this->luploader->upload($file['landscape']);
-
-                            if ($photo) {
-                                $photo[0]['caption'] = isset($captions[$index]['EN']) ? $captions[$index]['EN'] : '';
-                                $photo[0]['caption_ar'] = isset($captions[$index]['AR']) ? $captions[$index]['AR'] : '';
-
+                            if ($photo && isset($photo[0])) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
                                 $slide->uploads()->create($photo[0]);
                             }
                         }
@@ -331,59 +280,49 @@ class PageController extends Controller
             }
 
             $newUploads = $request->file('newUploads');
-            $hasNewSquare = $newUploads && isset($newUploads['square']) && $newUploads['square'];
-            $hasNewLandscape = $newUploads && isset($newUploads['landscape']) && $newUploads['landscape'];
-
-            if ($hasNewSquare || $hasNewLandscape) {
-
+            if (is_array($newUploads) && isset($request->input('newUploads')['slide_id'])) {
                 $slide = PageImageSlide::find($request->input('newUploads')['slide_id']);
-
-                if ($hasNewSquare) {
-                    // Square Image
-                    $photo = $this->uploader->upload($newUploads['square']);
-                    if ($photo) {
-                        $slide->uploads()->create($photo[0]);
+                if ($slide) {
+                    if (isset($newUploads['square']) && $newUploads['square']) {
+                        $photo = $this->uploader->upload($newUploads['square']);
+                        if ($photo && isset($photo[0])) {
+                            $slide->uploads()->create($photo[0]);
+                        }
                     }
-                }
-
-                if ($hasNewLandscape) {
-                    // Landscape Image
-                    $photo = $this->luploader->upload($newUploads['landscape']);
-                    if ($photo) {
-                        $slide->uploads()->create($photo[0]);
+                    if (isset($newUploads['landscape']) && $newUploads['landscape']) {
+                        $photo = $this->luploader->upload($newUploads['landscape']);
+                        if ($photo && isset($photo[0])) {
+                            $slide->uploads()->create($photo[0]);
+                        }
                     }
                 }
             }
 
-            if ($uploadCaptions) {
-                foreach ($uploadCaptions as $id => $caption) {
-                    $target = Upload::find($id);
-                    if ($target)
-                        $target->update(['caption' => $caption['EN'] ?? '', 'caption_ar' => $caption['AR'] ?? '']);
+            if (is_array($uploadCaptions)) {
+                foreach ($uploadCaptions as $cap_id => $caption) {
+                    $target = Upload::find($cap_id);
+                    if ($target) {
+                        $target->update([
+                            'caption' => $caption['EN'] ?? '',
+                            'caption_ar' => $caption['AR'] ?? ''
+                        ]);
+                    }
                 }
             }
 
-            if ($request->input('delete')) {
+            if (is_array($request->input('delete'))) {
                 foreach ($request->input('delete') as $item) {
                     $target = PageImageSlide::find($item);
-                    if ($target)
-                        $target->delete();
+                    if ($target) $target->delete();
                 }
             }
         }
 
-        $page->forms()->delete();
         if ($request->input('form_id')) {
-            $page->forms()->create(['form_id' => 1]);
+            $page->forms()->updateOrCreate([], ['form_id' => $request->input('form_id')]);
+        } else {
+            $page->forms()->delete();
         }
-
-        // Start Update additional2_content
-        $page->update([
-            'additional2_content_en' => $additional2_content_en,
-            'additional2_content_ar' => $additional2_content_ar,
-            'additional2_content_img' => $img_encoded
-        ]);
-        // End Update additional2_content
 
         return redirect()->to('admin/web-pages/' . $page->id . '/edit');
     }

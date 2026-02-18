@@ -1,4 +1,4 @@
-@if (count($page->sliders) > 0)
+@if (isset($page->sliders) && count($page->sliders) > 0)
     <div class="container text-center">
         <div class="body-section contents with-img-header">
             @if (count($page->sliders) > 1)
@@ -9,7 +9,7 @@
                     </div>
                     <div class="owl-carousel owl-theme">
                         @foreach ($page->sliders as $slide)
-                            @if (optional($page->parent)->slug == 'partners')
+                            @if (isset($page->parent) && $page->parent && $page->parent->slug == 'partners')
                                 @if ($slide->original)
                                     <div class="item">
                                         <img src="{{ url('public/' . $slide->original->url) }}"
@@ -36,8 +36,8 @@
             <div class="row" dir="">
                 @if (count($page->sliders) == 1)
                     <div class="col-md-12">
-                        @if (optional($page->parent)->slug == 'partners')
-                            @if ($page->slider->original)
+                        @if (isset($page->parent) && $page->parent && $page->parent->slug == 'partners')
+                            @if ($page->slider && $page->slider->original)
                                 <img src="{{ url('public/' . $page->slider->original->url) }}" width="100%">
                                 <span class="imgcap">
                                     <span class="en float-left">{{ $page->slider->original->caption }}</span>
@@ -46,7 +46,7 @@
                                 </span>
                             @endif
                         @else
-                            @if ($page->slider->landscape)
+                            @if ($page->slider && $page->slider->landscape)
                                 <img src="{{ url('public/' . $page->slider->landscape->url) }}" width="100%"
                                     class="featured-img">
                                 <span class="imgcap">

@@ -36,17 +36,17 @@ class SpacesController extends Controller
     }
 
     public function show(){
+        $page_name = "Spaces";
         $data = $this->model->get();
-        return view('admin.spaces.show',compact('data'));
+        return view('admin.spaces.show',compact('data', 'page_name'));
     }
 
     public function preview($id, Request $request){
         if ($request->isMethod('post')) {
-            $post = $this->model->find($id) ?: new Space();
-            $post->fill($request->all());
-        } else {
-            $post = $this->model->find($id);
+            return $this->update($request);
         }
+
+        $post = $this->model->find($id);
 
         if (!$post) {
             abort(404);
@@ -65,9 +65,13 @@ class SpacesController extends Controller
     }
 
     public function edit($id){
-        $page = $this->model->find($id);
+        $page_name = "Spaces";
+        $page = $this->model->find($id) ?: new Space();
 
-        $pageType = [];
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null]
+        ];
 
         if($page->externalFiles()->where('language','en')->count()){
             $pageType['en']['type'] = "file";
@@ -89,7 +93,7 @@ class SpacesController extends Controller
 
         $forms = Form::select('id', 'title')->get();
 
-        return view('admin.spaces.edit',compact('page','pageType','forms'));
+        return view('admin.spaces.edit',compact('page','pageType','forms', 'page_name'));
     }
 
     public function delete($id){
@@ -102,8 +106,9 @@ class SpacesController extends Controller
     }
 
     public function create(){
+        $page_name = "Spaces";
         $forms = Form::select('id', 'title')->get();
-        return view('admin.spaces.create', compact('forms'));
+        return view('admin.spaces.create',compact('forms', 'page_name'));
     }
 
     public function store(Request $request){
@@ -115,68 +120,67 @@ class SpacesController extends Controller
         $newPage = $this->model->create($data);
 
         $files = $request->file('images');
-        $images = $request->file('slides');
         $captions = $request->input('captions');
 
-        if($newPage && $files){
+        if($newPage && $files && is_array($files)){
             foreach ($files as $index=>$file){
-                if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape']))
+                if((isset($file['square']) && $file['square']) || (isset($file['landscape']) && $file['landscape'])) {
                     $slide = $newPage->sliders()->create([]);
 
-                if(isset($file['square']) && $file['square']){
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
-                }
+                    if(isset($file['square']) && $file['square']){
+                        // Square Image
+                        $photo = $this->uploader->upload($file['square']);
+                        if ($photo) {
+                            $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                            $slide->uploads()->create($photo[0]);
+                        }
+                    }
 
-                if(isset($file['landscape']) && $file['landscape']) {
-                    // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
+                    if(isset($file['landscape']) && $file['landscape']) {
+                        // Landscape Image
+                        $photo = $this->luploader->upload($file['landscape']);
+                        if ($photo) {
+                            $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                            $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                            $slide->uploads()->create($photo[0]);
+                        }
+                    }
                 }
             }
 
-            if($request->input('others'))
+            if($request->input('others') && is_array($request->input('others')))
                 $newPage->links()->create($request->input('others'));
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external');
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if($page_type_ar=="file"){
             $fileRow = $newPage->externalFiles()->create(['language'=>'ar']);
-            $files = $request->file('external_file_ar');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-
-            $fileRow->uploads()->create($photo[0]);
+            $files_ar = $request->file('external_file_ar');
+            $photo = ($files_ar != null ? $this->file_uploader->upload($files_ar) : false);
+            if ($photo) $fileRow->uploads()->create($photo[0]);
         }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank")
-            $newPage->externalLinks()->create(['language'=>'ar','url'=>$request->input('external')['ar']['value']]);
+        elseif(($page_type_ar=="url" || $page_type_ar=="blank") && isset($external['ar']['value']))
+            $newPage->externalLinks()->create(['language'=>'ar','url'=>$external['ar']['value']]);
 
         if($page_type_en=="file"){
             $fileRow = $newPage->externalFiles()->create(['language'=>'en']);
-            $files = $request->file('external_file_en');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-
-            $fileRow->uploads()->create($photo[0]);
+            $files_en = $request->file('external_file_en');
+            $photo = ($files_en != null ? $this->file_uploader->upload($files_en) : false);
+            if ($photo) $fileRow->uploads()->create($photo[0]);
         }
-        elseif($page_type_en=="url" || $page_type_en=="blank")
-            $newPage->externalLinks()->create(['language'=>'en','url'=>$request->input('external')['en']['value']]);
-//
-//
-//        if($request->input('form_id')){
-//            $newPage->forms()->delete();
-//            $newPage->forms()->create(['form_id'=>1]);
-//        }
+        elseif(($page_type_en=="url" || $page_type_en=="blank") && isset($external['en']['value']))
+            $newPage->externalLinks()->create(['language'=>'en','url'=>$external['en']['value']]);
 
         $buttonLinks = $request->input('buttonLink');
 
-        if($buttonLinks['title'] && $buttonLinks['value'] && $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
-            $newPage->buttonLinks()->create($buttonLinks);
+        if ($buttonLinks && is_array($buttonLinks)) {
+            if(($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) && ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)){
+                $newPage->buttonLinks()->create($buttonLinks);
+            }
         }
 
         return redirect()->to('admin/spaces/'.$newPage->id.'/edit');
@@ -189,12 +193,19 @@ class SpacesController extends Controller
         if(!$page)
             dd('Page does not exist');
 
-        $data = $request->except('images','id','buttonLink');
+        $data = $request->except('images','id','buttonLink', 'preview_mode');
 
-        if($data['title'] != $page->title)
+        if(isset($data['title']) && $data['title'] != $page->title)
             $data['slug'] = $this->generateSlug($request->input('title'));
 
         $data['publish_date'] = strtotime($request->input('publish_date'));
+
+        if ($request->input('preview_mode') == 'draft') {
+            $page->fill($data);
+            $post = $page;
+            $similar = Space::where('active',1)->where('slug','!=',$post->slug)->where('series',$post->series)->get();
+            return view('pages.space-preview',compact('post','similar'))->with('is_preview', true);
+        }
 
         $page->update($data);
 
@@ -204,25 +215,26 @@ class SpacesController extends Controller
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($request->has('uploads')){
-            $uploads = $request->input('uploads');
+        if($request->has('uploads') && is_array($request->input('uploads'))){
+            $uploads_data = $request->input('uploads');
 
-            foreach ($uploads as $upload){
-                $target = Upload::find($upload['id']);
-
-                if($target){
-                    $target->update([
-                        'caption' => isset($upload['EN']) ? $upload['EN'] : (isset($upload['caption']) ? $upload['caption'] : ''),
-                        'caption_ar' => isset($upload['AR']) ? $upload['AR'] : (isset($upload['caption_ar']) ? $upload['caption_ar'] : '')
-                    ]);
+            foreach ($uploads_data as $upload){
+                if (isset($upload['id'])) {
+                    $target = Upload::find($upload['id']);
+                    if($target){
+                        $target->update([
+                            'caption' => $upload['EN'] ?? '',
+                            'caption_ar' => $upload['AR'] ?? ''
+                        ]);
+                    }
                 }
             }
         }
 
         if($page){
             $uploads = $request->file('uploads');
-            if($uploads){
-                foreach ($request->file('uploads') as $uploadid => $upload){
+            if($uploads && is_array($uploads)){
+                foreach ($uploads as $uploadid => $upload){
                     if($upload){
                         $target = Upload::find($uploadid);
                         if($target){
@@ -232,10 +244,14 @@ class SpacesController extends Controller
                             else
                                 $photo = ($files != null ? $this->luploader->upload($upload) : false);
 
-                            $newUpload = $targetSlide->uploads()->create($photo[0]);
-                            $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-                            unset($uploadCaptions[$target->id]);
-                            $target->delete();
+                            if ($photo) {
+                                $newUpload = $targetSlide->uploads()->create($photo[0]);
+                                if (isset($uploadCaptions[$target->id])) {
+                                    $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                    unset($uploadCaptions[$target->id]);
+                                }
+                                $target->delete();
+                            }
                         }
                     }
                 }
@@ -247,45 +263,54 @@ class SpacesController extends Controller
                         $slide = $page->sliders()->create([]);
                         if(isset($file['square']) && $file['square']){
                             // Square Image
-                            $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                            $photo[0]['caption'] = $captions[$index]['EN'];
-                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                            $slide->uploads()->create($photo[0]);
+                            $photo = $this->uploader->upload($file['square']);
+                            if ($photo) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                                $slide->uploads()->create($photo[0]);
+                            }
                         }
                         if(isset($file['landscape']) && $file['landscape']) {
                             // Landscape Image
-                            $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-                            $photo[0]['caption'] = $captions[$index]['EN'];
-                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                            $slide->uploads()->createMany($photo);
+                            $photo = $this->luploader->upload($file['landscape']);
+                            if ($photo) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                                $slide->uploads()->createMany($photo);
+                            }
                         }
                     }
                 }
             }
 
-            if(isset($newUploads) && is_array($newUploads) && ($newUploads['square'] || $newUploads['landscape'])){
-                $slide = SpaceImageSlide::find($request->input('newUploads')['slide_id']);
-                if($newUploads['square']) {
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($newUploads['square']) : false);
-                    $slide->uploads()->create($photo[0]);
-                }
-                if($newUploads['landscape']) {
-                    // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($newUploads['landscape']) : false);
-                    $slide->uploads()->create($photo[0]);
+            if(isset($newUploads) && is_array($newUploads) && (($newUploads['square'] ?? false) || ($newUploads['landscape'] ?? false))){
+                $slide_id = $newUploads['slide_id'] ?? null;
+                if ($slide_id) {
+                    $slide = SpaceImageSlide::find($slide_id);
+                    if($slide) {
+                        if(isset($newUploads['square']) && $newUploads['square']) {
+                            // Square Image
+                            $photo = $this->uploader->upload($newUploads['square']);
+                            if ($photo) $slide->uploads()->create($photo[0]);
+                        }
+                        if(isset($newUploads['landscape']) && $newUploads['landscape']) {
+                            // Landscape Image
+                            $photo = $this->luploader->upload($newUploads['landscape']);
+                            if ($photo) $slide->uploads()->create($photo[0]);
+                        }
+                    }
                 }
             }
 
-            if($uploadCaptions){
+            if($uploadCaptions && is_array($uploadCaptions)){
                 foreach ( $uploadCaptions as $id => $caption ) {
                     $target = Upload::find($id);
                     if($target)
-                        $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
+                        $target->update(['caption'=>$caption['EN'] ?? '','caption_ar'=>$caption['AR'] ?? '']);
                 }
             }
 
-            if($request->input('delete')){
+            if($request->input('delete') && is_array($request->input('delete'))){
                 foreach ( $request->input('delete') as $item) {
                     $target = SpaceImageSlide::find($item);
                     if($target){
@@ -298,24 +323,25 @@ class SpacesController extends Controller
             }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external');
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if($page_type_ar=="file"){
             $page->externalLinks()->where('language','ar')->delete();
-            $files = $request->file('external_file_ar');
+            $files_ar = $request->file('external_file_ar');
 
-            if($files){
+            if($files_ar){
                 $page->externalFiles()->where('language','ar')->delete();
                 $fileRow = $page->externalFiles()->create(['language'=>'ar']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $photo = $this->file_uploader->upload($files_ar);
+                if ($photo) $fileRow->uploads()->create($photo[0]);
             }
         }
         elseif($page_type_ar=="url" || $page_type_ar=="blank"){
             $page->externalFiles()->where('language','ar')->delete();
             $page->externalLinks()->where('language','ar')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['ar']['value'];
+            $url = $page_type_ar=="blank" ? "#" : ($external['ar']['value'] ?? '#');
             $page->externalLinks()->create(['language'=>'ar','url'=> $url] );
         }
         elseif($page_type_ar=="page") {
@@ -325,19 +351,19 @@ class SpacesController extends Controller
 
         if($page_type_en=="file"){
             $page->externalLinks()->where('language','en')->delete();
-            $files = $request->file('external_file_en');
+            $files_en = $request->file('external_file_en');
 
-            if($files){
+            if($files_en){
                 $page->externalFiles()->where('language','en')->delete();
                 $fileRow = $page->externalFiles()->create(['language'=>'en']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+                $photo = $this->file_uploader->upload($files_en);
+                if ($photo) $fileRow->uploads()->create($photo[0]);
             }
         }
         elseif($page_type_en=="url" || $page_type_en=="blank"){
             $page->externalFiles()->where('language','en')->delete();
             $page->externalLinks()->where('language','en')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['en']['value'];
+            $url = $page_type_en=="blank" ? "#" : ($external['en']['value'] ?? '#');
             $page->externalLinks()->create(['language'=>'en','url'=> $url]);
         }
         elseif($page_type_en=="page") {
@@ -345,16 +371,13 @@ class SpacesController extends Controller
             $page->externalFiles()->where('language','en')->delete();
         }
 
-//        $page->forms()->delete();
-//        if($request->input('form_id')){
-//            $page->forms()->create(['form_id'=>1]);
-//        }
-
         $buttonLinks = $request->input('buttonLink');
 
-        $page->buttonLinks()->delete();
-        if($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
-            $page->buttonLinks()->create($buttonLinks);
+        if ($buttonLinks && is_array($buttonLinks)) {
+            $page->buttonLinks()->delete();
+            if(($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) || ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)){
+                $page->buttonLinks()->create($buttonLinks);
+            }
         }
 
         return redirect()->to('admin/spaces/'.$page->id.'/edit');

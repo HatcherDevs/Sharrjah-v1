@@ -96,283 +96,204 @@ class PostController extends Controller
         return view('admin.posts.create',compact('page_id','forms','page_name'));
     }
 
-    public function post(Request $request){
-
-        $data = $request->except('images','external','buttonLink');
-        $data['slug'] = $this->generateSlug($request->input('title'));
-
-        $data['publish_date'] = strtotime($request->input('publish_date'));
-        $newPage = $this->model->create($data);
-
-        $files = $request->file('images');
-        $captions = $request->input('captions');
-
-        if($newPage){
-            foreach ($files as $index=>$file){
-                if($file['square'] || $file['landscape'])
-                    $slide = $newPage->sliders()->create([]);
-
-                if($file['square']){
-                    // Square Image
-                    $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
-                }
-
-                if($file['landscape']) {
-                    // Landscape Image
-                    $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-                    $photo[0]['caption'] = $captions[$index]['EN'];
-                    $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                    $slide->uploads()->create($photo[0]);
-                }
-            }
-        }
-
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
-
-        if($page_type_ar=="file"){
-            $fileRow = $newPage->externalFiles()->create(['language'=>'ar']);
-            $files = $request->file('external_file_ar');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-
-            $fileRow->uploads()->create($photo[0]);
-        }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank")
-            $newPage->externalLinks()->create(['language'=>'ar','url'=>$request->input('external')['ar']['value']]);
-
-        if($page_type_en=="file"){
-            $fileRow = $newPage->externalFiles()->create(['language'=>'en']);
-            $files = $request->file('external_file_en');
-            $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-
-            $fileRow->uploads()->create($photo[0]);
-        }
-        elseif($page_type_en=="url" || $page_type_en=="blank")
-            $newPage->externalLinks()->create(['language'=>'en','url'=>$request->input('external')['en']['value']]);
-
-
-        if($request->input('form_id')){
-            $newPage->forms()->delete();
-            $newPage->forms()->create(['form_id'=>1]);
-        }
-
-        $buttonLinks = $request->input('buttonLink');
-
-        if($buttonLinks['title'] && $buttonLinks['value'] && $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
-            $newPage->buttonLinks()->create($buttonLinks);
-        }
-
-        return redirect()->to('admin/posts/'.$newPage->id.'/edit');
+    public function preview($id, Request $request)
+    {
+        return $this->update($request, $id);
     }
 
-    public function update(Request $request){
+    public function post(Request $request)
+    {
+        return $this->update($request);
+    }
 
-        $page = $this->model->find($request->input('id'));
+    public function update(Request $request, $preview_id = null)
+    {
+        $id = $request->input('id') ?: $preview_id;
+        $page = $id ? $this->model->find($id) : new $this->model;
 
-        if(!$page)
+        if (!$page && $id) {
             abort(404, 'Page does not exist');
+        }
 
-        $data = $request->except('images','id','buttonLink');
+        $data = $request->except('images', 'id', 'buttonLink', 'external');
 
-        if($data['title'] != $page->title)
-            $data['slug'] = $this->generateSlug($request->input('title'));
+        if (isset($data['title'])) {
+            $data['slug'] = $this->generateSlug($data['title']);
+        }
 
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        if (isset($data['publish_date'])) {
+            $data['publish_date'] = $data['publish_date'] ? date('Y-m-d H:i:s', strtotime($data['publish_date'])) : null;
+        }
 
-        $page->update($data);
+        if ($request->has('preview_mode') && $request->preview_mode == 'draft') {
+            $page->fill($data);
+            $relatedPages = ['pages' => [], 'posts' => []];
+            $post = $page;
+            // For Posts, we need to determine which view to use. 
+            // Usually it's 'pages.post' or similar.
+            return view('pages.post-preview', compact('post', 'relatedPages'));
+        }
+
+        if (!$id) {
+            $page = $this->model->create($data);
+        } else {
+            $page->update($data);
+        }
 
         $files = $request->file('images');
-        $uploads = $request->file('uploads');
-        $newUploads = $request->file('newUploads');
         $captions = $request->input('captions');
         $uploadCaptions = $request->input('upload-captions');
 
-        if($request->has('uploads')){
-            $uploads = $request->input('uploads');
-
-            if($uploads){
-                foreach ($uploads as $upload){
+        if ($request->has('uploads') && is_array($request->input('uploads'))) {
+            $uploadsData = $request->input('uploads');
+            foreach ($uploadsData as $upload) {
+                if (isset($upload['id'])) {
                     $target = Upload::find($upload['id']);
-
-                    if($target){
+                    if ($target) {
                         $target->update([
-                            'caption' => isset($upload['EN']) ? $upload['EN'] : '',
-                            'caption_ar' => isset($upload['AR']) ? $upload['AR'] : ''
+                            'caption' => isset($upload['EN']) ? $upload['EN'] : ($target->caption ?? ''),
+                            'caption_ar' => isset($upload['AR']) ? $upload['AR'] : ($target->caption_ar ?? '')
                         ]);
                     }
                 }
             }
         }
 
-        if($page){
-
-            $uploads = $request->file('uploads');
-            if($uploads){
-                foreach ($request->file('uploads') as $uploadid => $upload){
-                    if($upload){
+        if ($page) {
+            $uploadsFiles = $request->file('uploads');
+            if (is_array($uploadsFiles)) {
+                foreach ($uploadsFiles as $uploadid => $upload) {
+                    if ($upload) {
                         $target = Upload::find($uploadid);
-
-                        if($target){
+                        if ($target) {
                             $targetSlide = PostImageSlide::find($target->uploadable_id);
+                            if ($targetSlide) {
+                                if ($target->template == "square")
+                                    $photo = $this->uploader->upload($upload);
+                                else
+                                    $photo = $this->luploader->upload($upload);
 
-                            if($target->template=="square")
-                                $photo = ($files != null ? $this->uploader->upload($upload) : false);
-                            else
-                                $photo = ($files != null ? $this->luploader->upload($upload) : false);
-
-                            if($photo && isset($photo[0]) && is_array($photo[0])) {
-                                $newUpload = $targetSlide->uploads()->create($photo[0]);
-
-                                $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
-
-                                unset($uploadCaptions[$target->id]);
+                                if ($photo && isset($photo[0]) && is_array($photo[0])) {
+                                    $newUpload = $targetSlide->uploads()->create($photo[0]);
+                                    if (isset($uploadCaptions[$target->id])) {
+                                        $uploadCaptions[$newUpload->id] = $uploadCaptions[$target->id];
+                                        unset($uploadCaptions[$target->id]);
+                                    }
+                                }
+                                $target->delete();
                             }
-                            $target->delete();
-                        } else {
-
                         }
                     }
                 }
             }
 
-            if ($files) {
-                foreach ($files as $index=>$file){
-
-                    if($file['square'] || $file['landscape']){
+            if (is_array($files)) {
+                foreach ($files as $index => $file) {
+                    if ($file && (isset($file['square']) || isset($file['landscape']))) {
                         $slide = $page->sliders()->create([]);
-
-                        if($file['square']){
-                            // Square Image
-                            $photo = ($files != null ? $this->uploader->upload($file['square']) : false);
-
-                            $photo[0]['caption'] = $captions[$index]['EN'];
-                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
-
-                            $slide->uploads()->create($photo[0]);
+                        if (isset($file['square']) && $file['square']) {
+                            $photo = $this->uploader->upload($file['square']);
+                            if ($photo && isset($photo[0]) && is_array($photo[0])) {
+                                $photo[0]['caption'] = $captions[$index]['EN'] ?? '';
+                                $photo[0]['caption_ar'] = $captions[$index]['AR'] ?? '';
+                                $slide->uploads()->create($photo[0]);
+                            }
                         }
-
-                        if(isset($file['landscape']) && $file['landscape']) {
-                            // Landscape Image
-                            $photo = ($files != null ? $this->luploader->upload($file['landscape']) : false);
-
-                            $photo[0]['caption'] = $captions[$index]['EN'];
-                            $photo[0]['caption_ar'] = $captions[$index]['AR'];
-                            $photo[1]['caption'] = $captions[$index]['EN'];
-                        $photo[1]['caption_ar'] = $captions[$index]['AR'];
-
-                        $slide->uploads()->createMany($photo);
+                        if (isset($file['landscape']) && $file['landscape']) {
+                            $photo = $this->luploader->upload($file['landscape']);
+                            if (is_array($photo)) {
+                                foreach ($photo as $p) {
+                                    $p['caption'] = $captions[$index]['EN'] ?? '';
+                                    $p['caption_ar'] = $captions[$index]['AR'] ?? '';
+                                    $slide->uploads()->create($p);
+                                }
+                            }
+                        }
                     }
                 }
-            }
             }
 
             $newUploads = $request->file('newUploads');
-            
-            if($newUploads && (isset($newUploads['square']) || isset($newUploads['landscape']))){
-
-
+            if (is_array($newUploads) && isset($request->input('newUploads')['slide_id'])) {
                 $slide = PostImageSlide::find($request->input('newUploads')['slide_id']);
-
-                if(isset($newUploads['square']) && $newUploads['square']) {
-                    // Square Image
-                    $photo = $this->uploader->upload($newUploads['square']);
-                    if($photo && isset($photo[0]) && is_array($photo[0])) {
-                        $slide->uploads()->create($photo[0]);
+                if ($slide) {
+                    if (isset($newUploads['square']) && $newUploads['square']) {
+                        $photo = $this->uploader->upload($newUploads['square']);
+                        if ($photo && isset($photo[0]) && is_array($photo[0])) {
+                            $slide->uploads()->create($photo[0]);
+                        }
                     }
-                }
-
-                if(isset($newUploads['landscape']) && $newUploads['landscape']) {
-                    // Landscape Image
-                    $photo = $this->luploader->upload($newUploads['landscape']);
-                    if($photo && isset($photo[0]) && is_array($photo[0])) {
-                        $slide->uploads()->create($photo[0]);
+                    if (isset($newUploads['landscape']) && $newUploads['landscape']) {
+                        $photo = $this->luploader->upload($newUploads['landscape']);
+                        if ($photo && isset($photo[0]) && is_array($photo[0])) {
+                            $slide->uploads()->create($photo[0]);
+                        }
                     }
                 }
             }
 
-            if($uploadCaptions){
-                foreach ( $uploadCaptions as $id => $caption ) {
-                    $target = Upload::find($id);
-
-                    if($target)
-                        $target->update(['caption'=>$caption['EN'],'caption_ar'=>$caption['AR']]);
+            if (is_array($uploadCaptions)) {
+                foreach ($uploadCaptions as $cap_id => $caption) {
+                    $target = Upload::find($cap_id);
+                    if ($target) {
+                        $target->update([
+                            'caption' => $caption['EN'] ?? $target->caption,
+                            'caption_ar' => $caption['AR'] ?? $target->caption_ar
+                        ]);
+                    }
                 }
             }
 
-            if($request->input('delete')){
-                foreach ( $request->input('delete') as $item) {
+            if (is_array($request->input('delete'))) {
+                foreach ($request->input('delete') as $item) {
                     $target = PostImageSlide::find($item);
-
-                    if($target)
-                        $target->delete();
+                    if ($target) $target->delete();
                 }
             }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
-
-        if($page_type_ar=="file"){
-            $page->externalLinks()->where('language','ar')->delete();
-            $files = $request->file('external_file_ar');
-
-            if($files){
-                $page->externalFiles()->where('language','ar')->delete();
-                $fileRow = $page->externalFiles()->create(['language'=>'ar']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
+        // Handle external types
+        $external = $request->input('external');
+        if (is_array($external)) {
+            foreach (['en', 'ar'] as $lang) {
+                if (isset($external[$lang]['type'])) {
+                    $type = $external[$lang]['type'];
+                    if ($type == 'file') {
+                        $page->externalLinks()->where('language', $lang)->delete();
+                        $ext_file = $request->file('external_file_' . $lang);
+                        if ($ext_file) {
+                            $page->externalFiles()->where('language', $lang)->delete();
+                            $fileRow = $page->externalFiles()->create(['language' => $lang]);
+                            $photo = $this->file_uploader->upload($ext_file);
+                            if ($photo && isset($photo[0]) && is_array($photo[0])) {
+                                $fileRow->uploads()->create($photo[0]);
+                            }
+                        }
+                    } elseif ($type == 'url' || $type == 'blank') {
+                        $page->externalFiles()->where('language', $lang)->delete();
+                        $page->externalLinks()->where('language', $lang)->delete();
+                        $url = ($type == 'blank') ? "#" : ($external[$lang]['value'] ?? '#');
+                        $page->externalLinks()->create(['language' => $lang, 'url' => $url]);
+                    } elseif ($type == 'page') {
+                        $page->externalLinks()->where('language', $lang)->delete();
+                        $page->externalFiles()->where('language', $lang)->delete();
+                    }
+                }
             }
         }
-        elseif($page_type_ar=="url" || $page_type_ar=="blank"){
-            $page->externalFiles()->where('language','ar')->delete();
-            $page->externalLinks()->where('language','ar')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['ar']['value'];
-            $page->externalLinks()->create(['language'=>'ar','url'=> $url] );
-        }
-        elseif($page_type_ar=="page") {
-            $page->externalLinks()->where('language','ar')->delete();
-            $page->externalFiles()->where('language','ar')->delete();
-        }
 
-        if($page_type_en=="file"){
-            $page->externalLinks()->where('language','en')->delete();
-            $files = $request->file('external_file_en');
-
-            if($files){
-                $page->externalFiles()->where('language','en')->delete();
-                $fileRow = $page->externalFiles()->create(['language'=>'en']);
-                $photo = ($files != null ? $this->file_uploader->upload($files) : false);
-                $fileRow->uploads()->create($photo[0]);
-            }
-        }
-        elseif($page_type_en=="url" || $page_type_en=="blank"){
-            $page->externalFiles()->where('language','en')->delete();
-            $page->externalLinks()->where('language','en')->delete();
-            $url = $page_type_ar=="blank" ? "#" : $request->input('external')['en']['value'];
-            $page->externalLinks()->create(['language'=>'en','url'=> $url]);
-        }
-        elseif($page_type_en=="page") {
-            $page->externalLinks()->where('language','en')->delete();
-            $page->externalFiles()->where('language','en')->delete();
-        }
-
-
-        $page->forms()->delete();
-        if($request->input('form_id')){
-            $page->forms()->create(['form_id'=>1]);
+        if ($request->input('form_id')) {
+            $page->forms()->delete();
+            $page->forms()->create(['form_id' => $request->input('form_id')]);
         }
 
         $buttonLinks = $request->input('buttonLink');
-
-        $page->buttonLinks()->delete();
-        if($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']){
+        if (is_array($buttonLinks) && (($buttonLinks['title'] ?? null) || ($buttonLinks['title_ar'] ?? null))) {
+            $page->buttonLinks()->delete();
             $page->buttonLinks()->create($buttonLinks);
         }
 
-        return redirect()->to('admin/posts/'.$page->id.'/edit');
+        return redirect()->to('admin/posts/' . $page->id . '/edit');
     }
 
 

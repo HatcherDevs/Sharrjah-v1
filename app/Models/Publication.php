@@ -59,6 +59,11 @@ class Publication extends Model
 
     public $timestamps = false;
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\Page', 'page_id');
+    }
+
     public function sliders(){
         return $this->hasMany('App\Models\PublicationImageSlide');
     }

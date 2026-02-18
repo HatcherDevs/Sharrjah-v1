@@ -77,6 +77,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('posts/create/{slug}', 'PostController@create');
     Route::post('posts/', 'PostController@post');
     Route::get('posts/{id}/edit', 'PostController@edit');
+    Route::match(['get', 'post'], 'posts/preview/{id}', 'PostController@preview');
     Route::get('posts/{id}/delete', 'PostController@delete');
     Route::get('posts/{slug}', 'PostController@show');
     Route::post('posts/update', 'PostController@update');
@@ -134,6 +135,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('Journeys_Into_Architecture_Archives/', 'Admin\Journeys_Into_Architecture_ArchivesController@show');
     Route::post('Journeys_Into_Architecture_Archives/', 'Admin\Journeys_Into_Architecture_ArchivesController@store');
     Route::get('Journeys_Into_Architecture_Archives/{id}/edit', 'Admin\Journeys_Into_Architecture_ArchivesController@edit');
+    Route::match(['get', 'post'], 'Journeys_Into_Architecture_Archives/preview/{id}', 'Admin\Journeys_Into_Architecture_ArchivesController@preview');
     Route::get('Journeys_Into_Architecture_Archives/{id}/delete', 'Admin\Journeys_Into_Architecture_ArchivesController@delete');
 
     Route::get('create/Journeys_Into_Architecture_Archives/videos', 'Admin\Journeys_Into_Architecture_ArchivesController@createVideo');

@@ -14,7 +14,7 @@
                         <div class="breadcrumbs">
                         </div>
                         <h1>{!! $post->title_ar !!}</h1>
-                        @if (!count($post->sliders))
+                        @if (!(isset($post->sliders) && count($post->sliders)))
                             {!! $post->content_ar !!}
                         @endif
                     </div>
@@ -22,7 +22,7 @@
                         <div class="breadcrumbs en">
                         </div>
                         <h1 class="en">{!! $post->title !!}</h1>
-                        @if (!count($post->sliders))
+                        @if (!(isset($post->sliders) && count($post->sliders)))
                             {!! $post->content !!}
                         @endif
                     </div>
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        @if (count($post->sliders))
+        @if (isset($post->sliders) && count($post->sliders))
             <?php $page = $post; ?>
             @include('partials.slide-images')
         @endif
@@ -55,7 +55,7 @@
             </div>
         @endif
 
-        @if (count($relatedPages['pages']) || count($relatedPages['posts']))
+        @if (isset($relatedPages) && (count($relatedPages['pages']) || count($relatedPages['posts'])))
             <div class="container text-center">
                 <div class="body-section related-links">
                     <div class="row" dir="rtl">
@@ -99,35 +99,6 @@
                                 <a href="{{ $post->buttonLinks->value }}"><input type="submit" class="en"
                                         value="{{ $post->buttonLinks->title }}"></a>
                             @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @if (count($relatedPages['pages']) || count($relatedPages['posts']))
-            <div class="container text-center">
-                <div class="body-section related-links">
-                    <div class="row" dir="rtl">
-                        <div class="col-md-6 col-sm-6 col-xs-6 text-right">
-                            الصفحات المرتبطة
-                            <br />
-                            @foreach ($relatedPages['pages'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->name_ar }}</a><br />
-                            @endforeach
-                            @foreach ($relatedPages['posts'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->title_ar }}</a><br />
-                            @endforeach
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-6 text-left en">
-                            RELATED PAGES
-                            <br />
-                            @foreach ($relatedPages['pages'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->name }}</a><br />
-                            @endforeach
-                            @foreach ($relatedPages['posts'] as $item)
-                                <a href="{{ url($item->link) }}">{{ $item->title }}</a><br />
-                            @endforeach
                         </div>
                     </div>
                 </div>

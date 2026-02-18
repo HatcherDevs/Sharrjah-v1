@@ -9,22 +9,24 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="Re-materialize || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
     <meta itemprop="description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
-    <meta itemprop="image" content="{{ asset('public/' . $post->slider->square->url) }}">
+    <meta itemprop="image"
+        content="{{ $post->slider && $post->slider->square ? asset('public/' . $post->slider->square->url) : asset('public/img/og.JPG') }}">
 
     <!-- Twitter Card data -->
-    <meta name="twitter:card" content="http://sharjaharchitecture.org/og.JPG">
+    <meta name="twitter:card"
+        content="{{ $post->slider && $post->slider->square ? asset('public/' . $post->slider->square->url) : asset('public/img/og.JPG') }}">
     <meta name="twitter:site" content="@publisher_handle">
     <meta name="twitter:title" content="Re-materialize || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}">
     <meta name="twitter:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}">
     <meta name="twitter:creator" content="@author_handle">
     <!-- Twitter summary card with large image must be at least 280x150px -->
-    <meta name="twitter:image:src" content="{{ asset('public/' . $post->slider->square->url) }}">
+    <meta name="twitter:image:src" content="{{ $post->slider && $post->slider->square ? asset('public/' . $post->slider->square->url) : asset('public/img/og.JPG') }}">
 
     <!-- Open Graph data -->
     <meta property="og:title" content="Re-materialize || {{ isset($_GET['lang']) ? $post->title_ar : $post->title }}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="{{ url('pages/re-materialize/' . $post->slug) }}" />
-    <meta property="og:image" content="{{ asset('public/' . $post->slider->square->url) }}" />
+    <meta property="og:image" content="{{ $post->slider && $post->slider->square ? asset('public/' . $post->slider->square->url) : asset('public/img/og.JPG') }}" />
     <meta property="og:description" content="{{ isset($_GET['lang']) ? $post->excerpt_ar : $post->excerpt }}" />
     <meta property="og:site_name" content="sharjaharchitecture.org" />
     <meta property="article:published_time" content="2018-10-28T05:59:00+01:00" />
@@ -463,9 +465,9 @@
                                         <script src="https://player.vimeo.com/api/player.js"></script>
 
                                     </div>
-                                @elseif(count($page->sliders) == 1)
+                                @elseif($page->sliders && count($page->sliders) == 1)
                                     <div class="col-md-12">
-                                        @if ($page->slider->square)
+                                        @if ($page->slider && $page->slider->square)
                                             <img src="{{ asset('public/' . $page->slider->square->url) }}" width="100%" class="featured-img">
                                             <span class="imgcap">
                                                     @if (isset($_GET['lang']))
@@ -474,7 +476,7 @@
                                                     <span class="en float-left">{{ $page->slider->square->caption }}</span>
                                                 @endif
                                                 </span>
-                                        @elseif($page->slider->landscape)
+                                        @elseif($page->slider && $page->slider->landscape)
                                             <img src="{{ asset('public/' . $page->slider->landscape->url) }}" width="100%" class="featured-img">
                                             <span class="imgcap">
                                                     @if (isset($_GET['lang']))
@@ -485,7 +487,7 @@
                                                 </span>
                                         @endif
                                     </div>
-                                @elseif(count($page->sliders) > 1)
+                                @elseif($page->sliders && count($page->sliders) > 1)
                                     <div class="col-md-12">
                                         <div class="owl-carousel-holder" dir="ltr">
                                             <div class="arrows">
@@ -495,7 +497,11 @@
                                             <div class="owl-carousel owl-theme">
                                                 @foreach ($page->sliders as $slide)
                                                     <div class="item">
-                                                        <img src="{{ url('public/' . $slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
+                                                        @if ($slide->square)
+                                                            <img src="{{ url('public/' . $slide->square->url) }}" data-en="{{ $slide->square->caption }}" data-ar="{{ $slide->square->caption_ar }}">
+                                                        @elseif($slide->landscape)
+                                                            <img src="{{ url('public/' . $slide->landscape->url) }}" data-en="{{ $slide->landscape->caption }}" data-ar="{{ $slide->landscape->caption_ar }}">
+                                                        @endif
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -563,18 +569,18 @@
                             </div>
                         </div>
                         <div class="col-md-3 sideb">
-                            @if (count($similar))
+                            @if (isset($similar) && count($similar))
                                 <b>MORE</b><br/>
                                 <br/>
                                 @foreach ($similar as $pod)
                                     <a href="{{ url('pages/re-materialize/' . $pod->slug) }}{{ isset($_GET['lang']) ? '?lang=ar' : '' }}">
 
-                                        @if ($page->slider->landscape)
+                                        @if ($pod->slider && $pod->slider->landscape)
                                             <img src="{{ url('public/' . $pod->slider->landscape->url) }}" width="100%" class="featured-img"><br/>
-                                        @elseif($page->slider->square)
+                                        @elseif($pod->slider && $pod->slider->square)
                                             <img src="{{ url('public/' . $pod->slider->square->url) }}" width="100%" class="featured-img"><br/>
                                         @else
-                                            <img src="https://via.placeholder.com/250" width="100%" class="featured-img"><br/>
+                                            <img src="{{ asset('public/img/placeholder-square.jpg') }}" width="100%" class="featured-img"><br/>
                                         @endif
                                         <p style="margin-top:5px;">{{ isset($_GET['lang']) ? $pod->title_ar : $pod->title }}</p>
                                     </a>
@@ -585,7 +591,7 @@
                             @endif
                             <b>{{ isset($_GET['lang']) ? 'شارك هذا الرابط' : 'SHARE THIS' }}</b><br/>
                             <ul class="socials">
-                                <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('pages/re-materialize/' . $post->slug) }}&picture={{ url('public/' . $page->slider->square->url) }}&title={{ $post->title }}&description={{ $post->excerpt }}" class="fb"></a></li>
+                                <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('pages/re-materialize/' . $post->slug) }}&picture={{ $page->slider && $page->slider->square ? url('public/' . $page->slider->square->url) : '' }}&title={{ $post->title }}&description={{ $post->excerpt }}" class="fb"></a></li>
                                 <li><a target="_blank" href="https://twitter.com/intent/tweet?text={{ url('pages/re-materialize/' . $post->slug) }}" class="tw"></a></li>
                             </ul>
                         </div>

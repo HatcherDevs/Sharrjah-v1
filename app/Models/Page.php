@@ -63,7 +63,11 @@ class Page extends Model
         'additional2_content_img'
     ];
 
-    public $timestamps = ['publish_date'];
+    protected $casts = [
+        'publish_date' => 'datetime',
+    ];
+
+    public $timestamps = true;
 
     public function parent()
     {

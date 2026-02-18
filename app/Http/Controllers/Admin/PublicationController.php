@@ -51,7 +51,10 @@ class PublicationController extends Controller
 
         $page_name = 'Publications';
 
-        $pageType = [];
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null]
+        ];
 
         if($page->externalFiles()->where('language','en')->count()){
             $pageType['en']['type'] = "file";
@@ -92,7 +95,7 @@ class PublicationController extends Controller
 
         $data = $request->except('images','external','buttonLink');
         $data['slug'] = $this->generateSlug($request->input('title'));
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        // publish_date is cast to datetime in the model
         $newPage = $this->model->create($data);
 
         $files = $request->file('images');
@@ -159,16 +162,17 @@ class PublicationController extends Controller
         return redirect()->to('admin/publications/'.$newPage->id.'/edit');
     }
 
-    public function update(Request $request){
+    public function update(Request $request, $preview_id = null){
+        $id = $preview_id ?: $request->input('id');
+        $page = $this->model->find($id);
+
         if ($request->input('preview_mode') == 'draft') {
-            $post = $this->model->find($request->input('id'));
+            $post = $page;
             $post->fill($request->except('images', 'id', 'buttonLink'));
             $page = $post->parent;
             $is_preview = true;
             return view('pages.publication', compact('page', 'post', 'is_preview'));
         }
-
-        $page = $this->model->find($request->input('id'));
 
         if(!$page)
             dd('Page does not exist');
@@ -178,7 +182,10 @@ class PublicationController extends Controller
         if($data['title'] != $page->title)
             $data['slug'] = $this->generateSlug($request->input('title'));
 
-        $data['publish_date'] = strtotime($request->input('publish_date'));
+        // publish_date is cast to datetime in the model
+        if (isset($data['publish_date'])) {
+            $data['publish_date'] = $data['publish_date'];
+        }
 
         $page->update($data);
 
