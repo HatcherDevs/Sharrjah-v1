@@ -1,0 +1,67 @@
+# QUICK FIX - Copy & Paste into SSH Terminal
+
+## One-Line Commands (Run One at a Time)
+
+```bash
+# Change to your Laravel directory
+cd ~/websites/rZAXlsj79/public_html
+
+# Remove broken cache
+rm -rf bootstrap/cache/* && mkdir -p bootstrap/cache
+
+# Regenerate everything
+composer dump-autoload -o
+
+# Generate cache files
+php artisan config:cache && php artisan route:cache && php artisan cache:clear
+
+# Verify it works
+php artisan list | head -1 && echo "SUCCESS: App is working"
+```
+
+## All-In-One Script (Copy Entire Block)
+
+```bash
+cd ~/websites/rZAXlsj79/public_html && \
+rm -rf bootstrap/cache/* && \
+mkdir -p bootstrap/cache && \
+composer dump-autoload -o && \
+php artisan config:cache && \
+php artisan route:cache && \
+php artisan cache:clear && \
+chmod -R 755 bootstrap/cache && \
+echo "✓ Fix complete! Website should be working now"
+```
+
+## Troubleshoot If Still Not Working
+
+```bash
+cd ~/websites/rZAXlsj79/public_html
+
+# Check if .env exists
+test -f .env && echo "✓ .env found" || echo "✗ .env missing!"
+
+# Check PHP version (needs 7.4+, prefer 8.2+)
+php -v | head -1
+
+# Check critical .env values
+grep "APP_NAME\|APP_KEY\|DB_HOST\|DB_NAME" .env
+
+# Test basic artisan
+php artisan --version
+
+# View any errors
+cat storage/logs/laravel.log | tail -20
+```
+
+## Contact Hostinger If Above Doesn't Work
+
+Provide them this info:
+- Error message: "Target class [cache] does not exist"
+- App location: `/public_html/`
+- Current error: HTTP 500 at sharjaharchitecture.org
+- Request: Run the cache generation commands above
+
+---
+
+**The website should be back online immediately after running these commands.**
