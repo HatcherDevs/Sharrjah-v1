@@ -95,8 +95,12 @@ class StoreWorkshopController extends Controller
     {
         $page_name = 'SAT Design Store Workshops';
         $page = new StoreWorkshop;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
 
-        return view('admin.stores.workshops.create', compact('page_name', 'page'));
+        return view('admin.stores.workshops.create', compact('page_name', 'page', 'pageType'));
     }
 
     public function store(Request $request)

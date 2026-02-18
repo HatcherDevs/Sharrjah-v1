@@ -111,8 +111,12 @@ class StoreController extends Controller
         $page_name = 'SAT Design Store';
         $page = new Store;
         $categories = Category::orderBy('order_number')->get();
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
 
-        return view('admin.stores.create', compact('categories', 'page_name', 'page'));
+        return view('admin.stores.create', compact('categories', 'page_name', 'page', 'pageType'));
     }
 
     public function store(Request $request)
