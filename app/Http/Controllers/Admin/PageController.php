@@ -81,9 +81,17 @@ class PageController extends Controller
         return view('admin.pages.create', compact('pages', 'templates', 'forms'));
     }
 
-    public function preview($id)
+    public function preview($id, Request $request)
     {
+        if ($request->isMethod('post')) {
+            return $this->update($request, $id);
+        }
+
         $page = $this->model->find($id);
+
+        if (!$page) {
+            abort(404);
+        }
 
         $data = Post::where('page_id', $page->id)->where('active', 1)->paginate(5);
 
@@ -122,11 +130,6 @@ class PageController extends Controller
         $relatedPages = ['pages' => [], 'posts' => []];
 
         return view('pages.publication-preview', compact('post', 'relatedPages'));
-    }
-
-    public function preview($id, Request $request)
-    {
-        return $this->update($request, $id);
     }
 
     public function post(Request $request)

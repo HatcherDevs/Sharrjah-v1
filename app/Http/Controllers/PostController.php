@@ -19,6 +19,12 @@ class PostController extends Controller
 {
     use CanCreateSlug;
 
+    protected $model;
+    protected $uploader;
+    protected $luploader;
+    protected $file_uploader;
+    protected $formService;
+
     public function __construct(Post $model, PostImagesUploader $uploader, PostLandscapeImageUploader $luploader, ExternalFileUploader $file_uploader, FormService $formService)
     {
         $this->model = $model;
