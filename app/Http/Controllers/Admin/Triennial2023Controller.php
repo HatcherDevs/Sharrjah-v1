@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Forms\Form;
 use App\Models\Page;
 use App\Models\Triennial2023;
 use App\Models\Triennial2023ImageSlide;
@@ -139,8 +140,13 @@ class Triennial2023Controller extends Controller
     {
         $page_name = 'Triennial 2023';
         $page = new Triennial2023;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
 
-        return view('admin.triennial-2023.create', compact('page_name', 'page'));
+        return view('admin.triennial-2023.create', compact('page_name', 'page', 'pageType', 'forms'));
     }
 
     public function store(Request $request)

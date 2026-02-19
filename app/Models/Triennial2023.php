@@ -32,8 +32,8 @@ class Triennial2023 extends Model
             'series' => 1,
             'series_ar' => 1,
             'additional_content_top' => 1,
-            'additional_content_bottom' => 1
-        ]
+            'additional_content_bottom' => 1,
+        ],
     ];
 
     protected $fillable = [
@@ -71,7 +71,7 @@ class Triennial2023 extends Model
         'video_four_content_ar',
         'video_four_link',
         'last_content',
-        'last_content_ar'
+        'last_content_ar',
     ];
 
     protected $casts = [
@@ -80,15 +80,18 @@ class Triennial2023 extends Model
 
     public $timestamps = false;
 
-    public function links(){
+    public function links()
+    {
         return $this->hasOne('App\Models\Triennial2023Link');
     }
 
-    public function getLinksAttribute(){
+    public function getLinksAttribute()
+    {
         return $this->links()->first();
     }
 
-    public function sliders(){
+    public function sliders()
+    {
         return $this->hasMany('App\Models\Triennial2023ImageSlide');
     }
 
@@ -113,6 +116,16 @@ class Triennial2023 extends Model
     }
 
     /**
+     * An article has forms.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function forms()
+    {
+        return $this->morphOne('App\Models\PageForm', 'formable');
+    }
+
+    /**
      * An article has uploads.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -132,38 +145,46 @@ class Triennial2023 extends Model
         return $this->hasMany('App\Models\Triennial2023ExternalLink');
     }
 
-    public function getLandscapeAttribute(){
-        $data = $this->uploads()->where('template','landscape')->first();
+    public function getLandscapeAttribute()
+    {
+        $data = $this->uploads()->where('template', 'landscape')->first();
 
-        if($data==null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
 
-    public function getOriginalAttribute(){
-        $data = $this->uploads()->where('template','original')->first();
+    public function getOriginalAttribute()
+    {
+        $data = $this->uploads()->where('template', 'original')->first();
 
-        if($data==null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
 
-    public function getSquareAttribute(){
-        $data = $this->uploads()->where('template','square')->first();
+    public function getSquareAttribute()
+    {
+        $data = $this->uploads()->where('template', 'square')->first();
 
-        if($data==null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
 
-    public function getSlidersAttribute(){
+    public function getSlidersAttribute()
+    {
         return $this->sliders()->get();
     }
 
-    public function getSliderAttribute(){
+    public function getSliderAttribute()
+    {
         return $this->sliders()->first();
     }
 
@@ -176,96 +197,104 @@ class Triennial2023 extends Model
     {
         $thumb = $this->uploads()->where('template', 'square')->first();
 
-        return $thumb ? asset('public'.$thumb->url ) : 'http://placehold.it/1000x1000';
+        return $thumb ? asset('public'.$thumb->url) : 'http://placehold.it/1000x1000';
     }
 
+    public function getLinkAttribute()
+    {
 
-    public function getLinkAttribute(){
+        if ($this->linkType('en') == 'url') {
+            $file = $this->externalLinks()->where('language', 'en')->first();
 
-        if($this->linkType('en') == "url"){
-            $file = $this->externalLinks()->where('language','en')->first();
             return $file->url;
         }
-        if($this->linkType('en') == "file"){
-            $file = $this->externalFiles()->where('language','en')->first();
+        if ($this->linkType('en') == 'file') {
+            $file = $this->externalFiles()->where('language', 'en')->first();
 
             $fileLink = $file->uploads()->first();
 
-            if($fileLink)
+            if ($fileLink) {
                 return url('public'.$fileLink->url);
+            }
 
             return '#';
-        }
-        else {
+        } else {
             $link = $this->getPageLink();
         }
 
         return $link;
     }
 
-    public function getLinkArAttribute(){
+    public function getLinkArAttribute()
+    {
 
-        if($this->linkType('ar') == "url"){
-            $file = $this->externalLinks()->where('language','ar')->first();
+        if ($this->linkType('ar') == 'url') {
+            $file = $this->externalLinks()->where('language', 'ar')->first();
+
             return $file->url;
         }
-        if($this->linkType('ar') == "file"){
-            $file = $this->externalFiles()->where('language','ar')->first();
+        if ($this->linkType('ar') == 'file') {
+            $file = $this->externalFiles()->where('language', 'ar')->first();
 
             $fileLink = $file->uploads()->first();
 
-            if($fileLink)
+            if ($fileLink) {
                 return url('public'.$fileLink->url);
+            }
 
             return '#';
-        }
-        else {
+        } else {
             $link = $this->getPageLink();
         }
 
         return $link;
     }
 
-    public function getFileDataArAttribute(){
-        $file = $this->externalFiles()->where('language','ar')->first();
+    public function getFileDataArAttribute()
+    {
+        $file = $this->externalFiles()->where('language', 'ar')->first();
         $fileLink = [];
 
-        if($file)
+        if ($file) {
             $fileLink = $file->uploads()->first();
-
+        }
 
         return $fileLink;
     }
 
-    public function getFileDataAttribute(){
-        $file = $this->externalFiles()->where('language','en')->first();
+    public function getFileDataAttribute()
+    {
+        $file = $this->externalFiles()->where('language', 'en')->first();
 
         $fileLink = [];
 
-        if($file)
+        if ($file) {
             $fileLink = $file->uploads()->first();
+        }
 
         return $fileLink;
     }
 
-    public function getPageLink(){
-        $link = "pages/";
+    public function getPageLink()
+    {
+        $link = 'pages/';
 
-        if($this->page_id==0)
+        if ($this->page_id == 0) {
             $link .= 'triennial-2023/'.$this->slug;
-        else{
+        } else {
 
             $parent = $this->parent;
 
             $currentItem = $this->parent;
 
-            while($parent->parent){
+            while ($parent->parent) {
                 $link .= $currentItem->parent->slug.'/';
 
-                if($currentItem->parent->parent)
+                if ($currentItem->parent->parent) {
                     $currentItem = $currentItem->parent;
-                else
+                } else {
                     break;
+                }
             }
 
             $link .= $this->parent->slug.'/';
@@ -275,40 +304,42 @@ class Triennial2023 extends Model
         return url($link);
     }
 
-    public function getButtonLinksAttribute(){
+    public function getButtonLinksAttribute()
+    {
         return $this->buttonLinks()->first();
     }
 
-    public function getButtonLinksArAttribute(){
+    public function getButtonLinksArAttribute()
+    {
         return $this->buttonLinks()->first();
     }
 
-    public function getPageTypeAttribute(){
+    public function getPageTypeAttribute()
+    {
         $data['type'] = 'page';
         $data['value'] = [];
 
-        if($this->externalFiles()->count()){
-            $data['type'] = "file";
-            $data['value']['en'] = $this->externalFiles()->where('language','en')->first();
-            $data['value']['ar'] = $this->externalFiles()->where('language','ar')->first();
-        }
-        elseif($this->externalLinks()->count()){
-            $data['type'] = "url";
-            $data['value']['en'] = $this->externalLinks()->where('language','en')->first();
-            $data['value']['ar'] = $this->externalLinks()->where('language','ar')->first();
+        if ($this->externalFiles()->count()) {
+            $data['type'] = 'file';
+            $data['value']['en'] = $this->externalFiles()->where('language', 'en')->first();
+            $data['value']['ar'] = $this->externalFiles()->where('language', 'ar')->first();
+        } elseif ($this->externalLinks()->count()) {
+            $data['type'] = 'url';
+            $data['value']['en'] = $this->externalLinks()->where('language', 'en')->first();
+            $data['value']['ar'] = $this->externalLinks()->where('language', 'ar')->first();
         }
 
         return $data;
     }
 
-    public function linkType($lang = 'en'){
+    public function linkType($lang = 'en')
+    {
         $data = 'page';
 
-        if($this->externalFiles()->where('language',$lang)->count()){
-            $data = "file";
-        }
-        elseif($this->externalLinks()->where('language',$lang)->count()){
-            $data = "url";
+        if ($this->externalFiles()->where('language', $lang)->count()) {
+            $data = 'file';
+        } elseif ($this->externalLinks()->where('language', $lang)->count()) {
+            $data = 'url';
         }
 
         return $data;

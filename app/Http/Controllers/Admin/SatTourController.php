@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Forms\Form;
 use App\Models\Material;
 use App\Models\Page;
 use App\Models\Tour;
@@ -105,8 +106,13 @@ class SatTourController extends Controller
         $isVideo = 0;
         $isOpen = 0;
         $page = new Tour;
+        $pageType = [
+            'en' => ['type' => 'page', 'value' => null],
+            'ar' => ['type' => 'page', 'value' => null],
+        ];
+        $forms = Form::select('id', 'title')->get();
 
-        return view('admin.tours.create', compact('isVideo', 'isOpen', 'page'));
+        return view('admin.tours.create', compact('isVideo', 'isOpen', 'page', 'pageType', 'forms'));
     }
 
     public function store(Request $request)
