@@ -32,8 +32,8 @@ class StoreWorkshop extends Model
             'series' => 1,
             'series_ar' => 1,
             'additional_content_top' => 1,
-            'additional_content_bottom' => 1
-        ]
+            'additional_content_bottom' => 1,
+        ],
     ];
 
     protected $fillable = [
@@ -103,6 +103,16 @@ class StoreWorkshop extends Model
     }
 
     /**
+     * An article has forms.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function forms()
+    {
+        return $this->morphOne('App\Models\PageForm', 'formable');
+    }
+
+    /**
      * An article has uploads.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -126,8 +136,9 @@ class StoreWorkshop extends Model
     {
         $data = $this->uploads()->where('template', 'landscape')->first();
 
-        if ($data == null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
@@ -136,8 +147,9 @@ class StoreWorkshop extends Model
     {
         $data = $this->uploads()->where('template', 'original')->first();
 
-        if ($data == null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
@@ -146,8 +158,9 @@ class StoreWorkshop extends Model
     {
         $data = $this->uploads()->where('template', 'square')->first();
 
-        if ($data == null)
+        if ($data == null) {
             return [];
+        }
 
         return $data;
     }
@@ -171,24 +184,25 @@ class StoreWorkshop extends Model
     {
         $thumb = $this->uploads()->where('template', 'square')->first();
 
-        return $thumb ? asset('public' . $thumb->url) : 'http://placehold.it/1000x1000';
+        return $thumb ? asset('public'.$thumb->url) : 'http://placehold.it/1000x1000';
     }
-
 
     public function getLinkAttribute()
     {
 
-        if ($this->linkType('en') == "url") {
+        if ($this->linkType('en') == 'url') {
             $file = $this->externalLinks()->where('language', 'en')->first();
+
             return $file->url;
         }
-        if ($this->linkType('en') == "file") {
+        if ($this->linkType('en') == 'file') {
             $file = $this->externalFiles()->where('language', 'en')->first();
 
             $fileLink = $file->uploads()->first();
 
-            if ($fileLink)
-                return url('public' . $fileLink->url);
+            if ($fileLink) {
+                return url('public'.$fileLink->url);
+            }
 
             return '#';
         } else {
@@ -201,17 +215,19 @@ class StoreWorkshop extends Model
     public function getLinkArAttribute()
     {
 
-        if ($this->linkType('ar') == "url") {
+        if ($this->linkType('ar') == 'url') {
             $file = $this->externalLinks()->where('language', 'ar')->first();
+
             return $file->url;
         }
-        if ($this->linkType('ar') == "file") {
+        if ($this->linkType('ar') == 'file') {
             $file = $this->externalFiles()->where('language', 'ar')->first();
 
             $fileLink = $file->uploads()->first();
 
-            if ($fileLink)
-                return url('public' . $fileLink->url);
+            if ($fileLink) {
+                return url('public'.$fileLink->url);
+            }
 
             return '#';
         } else {
@@ -226,9 +242,9 @@ class StoreWorkshop extends Model
         $file = $this->externalFiles()->where('language', 'ar')->first();
         $fileLink = [];
 
-        if ($file)
+        if ($file) {
             $fileLink = $file->uploads()->first();
-
+        }
 
         return $fileLink;
     }
@@ -239,34 +255,36 @@ class StoreWorkshop extends Model
 
         $fileLink = [];
 
-        if ($file)
+        if ($file) {
             $fileLink = $file->uploads()->first();
+        }
 
         return $fileLink;
     }
 
     public function getPageLink()
     {
-        $link = "pages/";
+        $link = 'pages/';
 
-        if ($this->page_id == 0)
-            $link .= 'stores/workshops/' . $this->slug;
-        else {
+        if ($this->page_id == 0) {
+            $link .= 'stores/workshops/'.$this->slug;
+        } else {
 
             $parent = $this->parent;
 
             $currentItem = $this->parent;
 
             while ($parent->parent) {
-                $link .= $currentItem->parent->slug . '/';
+                $link .= $currentItem->parent->slug.'/';
 
-                if ($currentItem->parent->parent)
+                if ($currentItem->parent->parent) {
                     $currentItem = $currentItem->parent;
-                else
+                } else {
                     break;
+                }
             }
 
-            $link .= $this->parent->slug . '/';
+            $link .= $this->parent->slug.'/';
             $link .= $this->slug;
         }
 
@@ -289,11 +307,11 @@ class StoreWorkshop extends Model
         $data['value'] = [];
 
         if ($this->externalFiles()->count()) {
-            $data['type'] = "file";
+            $data['type'] = 'file';
             $data['value']['en'] = $this->externalFiles()->where('language', 'en')->first();
             $data['value']['ar'] = $this->externalFiles()->where('language', 'ar')->first();
         } elseif ($this->externalLinks()->count()) {
-            $data['type'] = "url";
+            $data['type'] = 'url';
             $data['value']['en'] = $this->externalLinks()->where('language', 'en')->first();
             $data['value']['ar'] = $this->externalLinks()->where('language', 'ar')->first();
         }
@@ -306,9 +324,9 @@ class StoreWorkshop extends Model
         $data = 'page';
 
         if ($this->externalFiles()->where('language', $lang)->count()) {
-            $data = "file";
+            $data = 'file';
         } elseif ($this->externalLinks()->where('language', $lang)->count()) {
-            $data = "url";
+            $data = 'url';
         }
 
         return $data;
