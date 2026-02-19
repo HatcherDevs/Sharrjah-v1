@@ -89,6 +89,10 @@ class Triennial2023Controller extends Controller
     public function single($slug)
     {
         $post = Triennial2023::where('slug', $slug)->first();
+        if (! $post) {
+            abort(404);
+        }
+
         $page = Page::where('slug', 'triennial-2023')->first();
         $similar = Triennial2023::where('active', 1)->where('slug', '!=', $slug)->limit(2)->where('series', $post->series)->get();
 

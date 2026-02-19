@@ -73,6 +73,10 @@ class Journeys_Into_Architecture_ArchivesController extends Controller
     public function single($slug)
     {
         $post = Material::where('slug', $slug)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->first();
+        if (! $post) {
+            abort(404);
+        }
+
         $page = Page::where('slug', 're-materialize')->first();
         $similar = Material::where('active', 1)->where('belongs_to', 'Journeys_Into_Architecture_Archives')->where('slug', '!=', $slug)->inRandomOrder()->limit(4)->get();
 

@@ -56,6 +56,10 @@ class SatTourController extends Controller
     public function single($slug)
     {
         $post = Tour::where('slug', $slug)->first();
+        if (! $post) {
+            abort(404);
+        }
+
         $page = Page::where('slug', 'sat-tours')->first();
         $similar = Tour::where('active', 1)->where('slug', '!=', $slug)->limit(2)->get();
 

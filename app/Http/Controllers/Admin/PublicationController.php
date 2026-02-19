@@ -35,6 +35,10 @@ class PublicationController extends Controller
     public function single($slug)
     {
         $post = Publication::where('slug', $slug)->first();
+        if (! $post) {
+            abort(404);
+        }
+
         $page = $post->parent;
 
         return view('pages.publication', compact('page', 'post'));

@@ -62,6 +62,10 @@ class PodcastController extends Controller
     public function single($slug)
     {
         $post = Podcast::where('slug', $slug)->first();
+        if (! $post) {
+            abort(404);
+        }
+
         $page = $post->parent;
         $similar = Podcast::where('active', 1)->where('slug', '!=', $slug)->limit(2)->where('series', $post->series)->get();
 

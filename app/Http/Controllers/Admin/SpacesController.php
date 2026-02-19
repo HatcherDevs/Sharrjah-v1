@@ -62,6 +62,11 @@ class SpacesController extends Controller
     public function single($slug)
     {
         $post = Space::where('slug', $slug)->first();
+
+        if (! $post) {
+            abort(404);
+        }
+
         $page = Page::where('slug', 'al-manakh-spaces')->first();
         $similar = Space::where('active', 1)->where('slug', '!=', $slug)->limit(2)->where('series', $post->series)->get();
 
