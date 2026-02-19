@@ -351,11 +351,11 @@
                                 </div>
 
                                 <div class="form-group" style="border-top: 3px solid #ccc;padding-top: 20px;">
-                                    @if (isset($forms) && $forms)
+                                    @if (isset($page->forms) && $page->forms)
                                         <label for="exampleTextareaa1">Add a form:</label>
                                         <select name="form_id" class="form-control">
                                             <option value="0">None</option>
-                                            @foreach ($forms as $id => $form)
+                                            @foreach ($page->forms as $id => $form)
                                                 <?php
                                                 $selectedFormId = 0;
                                                 if (isset($page)) {
