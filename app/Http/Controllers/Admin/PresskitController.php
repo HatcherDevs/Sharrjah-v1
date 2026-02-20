@@ -131,9 +131,13 @@ class PresskitController extends Controller
 
         $delete = $request->input('delete');
 
-        foreach ($delete as $id => $row) {
-            $toDelete = PressKitItem::find($id);
-            $toDelete->delete();
+        if ($delete && is_array($delete)) {
+            foreach ($delete as $id => $row) {
+                $toDelete = PressKitItem::find($id);
+                if ($toDelete) {
+                    $toDelete->delete();
+                }
+            }
         }
 
         return redirect()->back();
