@@ -91,24 +91,26 @@ class FormController extends Controller
             $form->update($formData);
             $form->questions()->delete();
 
-            foreach ($questions as $id=>$question){
+            if ($questions && is_array($questions)) {
+                foreach ($questions as $id=>$question){
 
-                $type = FormQuestionType::where('slug',$question['type'])->pluck('id')->first();
+                    $type = FormQuestionType::where('slug',$question['type'])->pluck('id')->first();
 
-                if($type){
-                    $question['form_question_type_id'] = $type;
+                    if($type){
+                        $question['form_question_type_id'] = $type;
 
-                    $newQ = $form->questions()->create($question);
+                        $newQ = $form->questions()->create($question);
 
-                    if($newQ && isset($question['choices'])){
-                        foreach($question['choices'] as $choice){
-                            $ch = $choice['choice'];
+                        if($newQ && isset($question['choices'])){
+                            foreach($question['choices'] as $choice){
+                                $ch = $choice['choice'];
 
-                            if(trim($ch['en']) && trim($ch['ar'])){
-                                $data['value'] = $ch['en'];
-                                $data['value_ar'] = $ch['ar'];
+                                if(trim($ch['en']) && trim($ch['ar'])){
+                                    $data['value'] = $ch['en'];
+                                    $data['value_ar'] = $ch['ar'];
 
-                                $newQ->choices()->create($data);
+                                    $newQ->choices()->create($data);
+                                }
                             }
                         }
                     }
