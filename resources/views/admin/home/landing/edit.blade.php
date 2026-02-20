@@ -15,7 +15,8 @@
                 </div>
             </div>
 
-            <form class="forms-sample" action="{{ url('admin/home/landing/update') }}" method="post" enctype="multipart/form-data">
+            <form class="forms-sample" action="{{ url('admin/home/landing/update') }}" method="post"
+                enctype="multipart/form-data">
                 <input type="hidden" value="{!! csrf_token() !!}" name="_token">
                 <input type="hidden" value="{{ $data->id }}" name="id">
                 <div class="row">
@@ -24,27 +25,38 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Title</label>
-                                    <input type="text" class="form-control" placeholder="Title" name="title" value="{{ $data->title }}">
+                                    <input type="text" class="form-control" placeholder="Title" name="title"
+                                        value="{{ $data->title }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Title Arabic</label>
-                                    <input type="text" class="form-control" placeholder="Title" name="title_ar" value="{{ $data->title_ar }}">
+                                    <input type="text" class="form-control" placeholder="Title" name="title_ar"
+                                        value="{{ $data->title_ar }}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleTextareaa1">Replace Image/Video<br/><br/>{{ $data->uploads()->first()->original_name }}</label>
+                                    <label for="exampleTextareaa1">Replace Image/Video<br /><br />
+                                        @if ($data->uploads()->first())
+                                            {{ $data->uploads()->first()->original_name }}
+                                        @else
+                                            <em style="color: #999;">No file uploaded yet</em>
+                                        @endif
+                                    </label>
                                     <input type="file" class="form-control" name="images[]" placeholder="Upload Image">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Background Color for Windows</label>
-                                    <input type="text" class="form-control" name="background_windows" placeholder="#000000" value="{{ $data->background_windows }}">
+                                    <input type="text" class="form-control" name="background_windows"
+                                        placeholder="#000000" value="{{ $data->background_windows }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Background Color for MacOs</label>
-                                    <input type="text" class="form-control" name="background_macos" placeholder="#000000" value="{{ $data->background_macos }}">
+                                    <input type="text" class="form-control" name="background_macos" placeholder="#000000"
+                                        value="{{ $data->background_macos }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Link</label>
-                                    <input type="text" class="form-control" name="link" placeholder="http://sharjaharchitecture.org/" value="{{ $data->link }}">
+                                    <input type="text" class="form-control" name="link"
+                                        placeholder="http://sharjaharchitecture.org/" value="{{ $data->link }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Enable Black Logos</label>
@@ -62,5 +74,4 @@
             </form>
         </div>
     </div>
-
 @endsection
