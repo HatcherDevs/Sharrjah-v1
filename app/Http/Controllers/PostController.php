@@ -312,6 +312,9 @@ class PostController extends Controller
 
     public function showFeatured($slug){
         $post = Post::where('slug', $slug)->first();
+        if (!$post) {
+            abort(404, 'Post not found');
+        }
         $page = $post->parent;
 
         return view('pages.post',compact('page','post'));
@@ -319,6 +322,9 @@ class PostController extends Controller
 
     public function showContributor($slug){
         $post = Post::where('slug', $slug)->first();
+        if (!$post) {
+            abort(404, 'Post not found');
+        }
         $page = $post->parent;
         $relatedPages['posts'] = [];
         $relatedPages['pages'] = [];
