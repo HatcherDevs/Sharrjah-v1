@@ -59,5 +59,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'https' => \App\Http\Middleware\HttpsProtocol::class,
         'admin.redirect' => \App\Http\Middleware\AdminRedirect::class,
+        'cache.response' => \App\Http\Middleware\CacheResponse::class,
     ];
 }

@@ -8,6 +8,18 @@
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
 </IfModule>
 
+# OpenLiteSpeed LSCache Configuration
+
+<IfModule Litespeed>
+    CacheLookup on
+    # Do not cache admin paths or POST requests
+    RewriteCond %{REQUEST_METHOD} ^POST$
+    RewriteRule .* - [E=Cache-Control:no-cache]
+    RewriteCond %{REQUEST_URI} ^/admin [OR]
+    RewriteCond %{REQUEST_URI} ^/login
+    RewriteRule .* - [E=Cache-Control:no-cache]
+</IfModule>
+
 # Security: Prevent PHP execution in uploads and fonts directories
 
 <DirectoryMatch "^.\*/uploads/">

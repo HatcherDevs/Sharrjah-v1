@@ -28,6 +28,8 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'response_cache' => env('RESPONSE_CACHE', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
