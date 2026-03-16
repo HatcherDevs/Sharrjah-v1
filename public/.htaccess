@@ -9,15 +9,11 @@
 </IfModule>
 
 # OpenLiteSpeed LSCache Configuration
+# IMPORTANT: CacheLookup is OFF until a proper purge is done.
+# Re-enable with "CacheLookup on" after CSRF login is verified working.
 
 <IfModule Litespeed>
-    CacheLookup on
-    # Do not cache admin paths or POST requests
-    RewriteCond %{REQUEST_METHOD} ^POST$
-    RewriteRule .* - [E=Cache-Control:no-cache]
-    RewriteCond %{REQUEST_URI} ^/admin [OR]
-    RewriteCond %{REQUEST_URI} ^/login
-    RewriteRule .* - [E=Cache-Control:no-cache]
+    CacheLookup off
 </IfModule>
 
 # Security: Prevent PHP execution in uploads and fonts directories

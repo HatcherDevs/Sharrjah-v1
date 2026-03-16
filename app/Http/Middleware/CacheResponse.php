@@ -23,7 +23,15 @@ class CacheResponse
 
         // NEVER cache admin login page or any admin route
         if ($request->is('admin*') || $request->is('login*')) {
-            return $next($request);
+            $response = $next($request);
+
+            // Explicitly tell OpenLiteSpeed and browsers NOT to cache admin pages
+            $response->headers->set('X-LiteSpeed-Cache-Control', 'no-cache, no-store');
+            $response->headers->set('X-LiteSpeed-Purge', '*');
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+
+            return $response;
         }
 
         // Skip cache for logged-in users or if session has explicit flashing (like errors/status)
