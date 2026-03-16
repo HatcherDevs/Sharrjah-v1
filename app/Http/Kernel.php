@@ -3,7 +3,6 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use MyApp\Http\Middleware\HttpsProtocol;
 
 class Kernel extends HttpKernel
 {
@@ -60,5 +59,6 @@ class Kernel extends HttpKernel
         'https' => \App\Http\Middleware\HttpsProtocol::class,
         'admin.redirect' => \App\Http\Middleware\AdminRedirect::class,
         'cache.response' => \App\Http\Middleware\CacheResponse::class,
+        'admin.purge-cache' => \App\Http\Middleware\PurgeCacheOnAdminUpdate::class,
     ];
 }

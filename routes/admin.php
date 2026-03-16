@@ -24,7 +24,7 @@ Route::get('admin/', function () {
 });
 
 // Protected admin routes
-Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin.purge-cache']], function () {
 
     // Image upload for Froala Editor
     Route::post('upload-image', 'Admin\ImageUploadController@upload');
@@ -154,7 +154,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('Journeys_Into_Architecture_Archives/update', 'Admin\Journeys_Into_Architecture_ArchivesController@update');
     // End Journeys_Into_Architecture_Archives
 
-
     Route::get('create/spaces/', 'Admin\SpacesController@create');
     Route::get('spaces/', 'Admin\SpacesController@show');
     Route::post('spaces/', 'Admin\SpacesController@store');
@@ -180,7 +179,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('stores/update', 'Admin\StoreController@update');
 
     /* -------------------------------------------------------------------------- */
-    /*                               store Category                               */
+    /*                               store Category */
     /* -------------------------------------------------------------------------- */
 
     Route::get('stores-category/create/', 'Admin\StoreController@createCategory')->name('stores.category.create');
@@ -190,8 +189,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('stores-category/{id}/delete', 'Admin\StoreController@destroyCategory')->name('stores.category.delete');
     Route::get('stores-category/{slug}', 'Admin\StoreController@show')->name('stores.category.show');
     Route::post('stores-category/update', 'Admin\StoreController@updateCategory')->name('stores.category.update');
-
-
 
     Route::get('create/triennial-2023/', 'Admin\Triennial2023Controller@create');
     Route::get('triennial-2023/', 'Admin\Triennial2023Controller@index');
