@@ -12,27 +12,33 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Facebook-link</label>
-                                    <input type="text" class="form-control" name="facebook-link"  value="{{ $data['facebook-link']  }}">
+                                    <input type="text" class="form-control" name="facebook-link"
+                                        value="{{ $data['facebook-link'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Twitter link</label>
-                                    <input type="text" class="form-control" name="twitter-link"  value="{{ $data['vimeo-link']  }}">
+                                    <input type="text" class="form-control" name="twitter-link"
+                                        value="{{ $data['twitter-link'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Instagram link</label>
-                                    <input type="text" class="form-control" name="instagram-link"  value="{{ $data['vimeo-link']  }}">
+                                    <input type="text" class="form-control" name="instagram-link"
+                                        value="{{ $data['instagram-link'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Vimeo link</label>
-                                    <input type="text" class="form-control" name="vimeo-link"  value="{{ $data['vimeo-link']  }}">
+                                    <input type="text" class="form-control" name="vimeo-link"
+                                        value="{{ $data['vimeo-link'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Copyright Left</label>
-                                    <input type="text" class="form-control" name="copyright"  value="{{ $data['copyright']  }}">
+                                    <input type="text" class="form-control" name="copyright"
+                                        value="{{ $data['copyright'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail3">Copyright Right</label>
-                                    <input type="text" class="form-control" name="copyright-right"  value="{{ $data['copyright-right']  }}">
+                                    <input type="text" class="form-control" name="copyright-right"
+                                        value="{{ $data['copyright-right'] }}">
                                 </div>
                             </div>
                         </div>
@@ -52,5 +58,4 @@
             </form>
         </div>
     </div>
-
 @endsection
