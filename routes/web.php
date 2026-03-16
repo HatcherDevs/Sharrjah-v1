@@ -33,11 +33,12 @@ if (env('ENABLE_ERROR_TEST_ROUTES', false)) {
                 '419' => 'Token Expired',
                 '429' => 'Too Many Requests',
                 '500' => 'Server Error',
-                '503' => 'Service Unavailable'
+                '503' => 'Service Unavailable',
             ];
+
             return view('errors.test-errors', compact('errors'));
         });
-        
+
         Route::get('{code}', function ($code) {
             switch ($code) {
                 case '403':
@@ -59,15 +60,15 @@ if (env('ENABLE_ERROR_TEST_ROUTES', false)) {
     });
 }
 
-// Load admin routes from separate file
-require base_path('routes/admin.php');
-
+// Admin routes are loaded separately in RouteServiceProvider (no caching)
 
 Route::group(['prefix' => 'research'], function () {
     Route::get('/', 'ResearchController@index');
     Route::get('/map', 'ResearchController@mapData')->name('researchMap');
     Route::post('/submit', 'ResearchController@submit')->middleware('throttle:5,1');
-    Route::get('/submit', function() { abort(404); });
+    Route::get('/submit', function () {
+        abort(404);
+    });
     Route::get('/get-data/{slug}', 'ResearchController@getData');
     Route::get('/repository-html/{id}', 'ResearchController@getRepositoryHtml');
     Route::get('/{slug}', 'ResearchController@single');
@@ -82,8 +83,8 @@ Route::get('pages/programs/calendar/previous-events', 'CalendarController@previo
 Route::get('pages/programs/calendar/upcoming-events', 'CalendarController@upcoming');
 
 Route::get('pages/podcasts/{slug}', 'Admin\PodcastController@single');
-Route::get('pages/re-materialize/{slug}', 'Admin\MaterialController@single'); ////////////////////////////////////////
-Route::get('pages/journeys-into-architecture-archives/{slug}', 'Admin\MaterialController@single2'); ////////////////////////////////////////
+Route::get('pages/re-materialize/{slug}', 'Admin\MaterialController@single'); // //////////////////////////////////////
+Route::get('pages/journeys-into-architecture-archives/{slug}', 'Admin\MaterialController@single2'); // //////////////////////////////////////
 Route::get('pages/spaces/{slug}', 'Admin\SpacesController@single');
 Route::get('pages/stores/{slug}', 'Admin\StoreController@single');
 Route::get('pages/stores/workshops/{slug}', 'Admin\StoreWorkshopController@single');
