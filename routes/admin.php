@@ -26,6 +26,9 @@ Route::get('admin/', function () {
 // Protected admin routes
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin.purge-cache']], function () {
 
+    // Clear all caches (Laravel + LiteSpeed + browser)
+    Route::post('clear-cache', 'HomeController@clearAllCaches')->name('admin.clear-cache');
+
     // Image upload for Froala Editor
     Route::post('upload-image', 'Admin\ImageUploadController@upload');
 

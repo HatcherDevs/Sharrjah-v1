@@ -147,8 +147,7 @@
                             All</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link"
-                            href="{{ URL('admin/posts/create/opportunities/') }}">Create </a>
+                        <a class="nav-link" href="{{ URL('admin/posts/create/opportunities/') }}">Create </a>
                     </li>
                 </ul>
             </div>
@@ -516,6 +515,15 @@
                     </li>
                 </ul>
             </div>
+        </li>
+        <li class="nav-item mt-3">
+            <form method="POST" action="{{ route('admin.clear-cache') }}" style="padding: 0 1rem;">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-block btn-sm"
+                    onclick="return confirm('Clear all caches (Laravel + LiteSpeed + Browser)?')">
+                    <i class="mdi mdi-delete-sweep"></i> Clear All Caches
+                </button>
+            </form>
         </li>
     </ul>
 </nav>

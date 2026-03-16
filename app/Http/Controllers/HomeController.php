@@ -12,6 +12,7 @@ use App\Services\Uploaders\PostImagesUploader;
 use App\Services\Uploaders\PostLandscapeImageUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class HomeController extends Controller
 {
@@ -34,6 +35,27 @@ class HomeController extends Controller
         $this->puploader = $puploader;
         $this->luploader = $luploader;
         $this->fuploader = $file_uploader;
+    }
+
+    public function clearAllCaches(): \Illuminate\Http\RedirectResponse
+    {
+        // 1. Clear Laravel application cache
+        Artisan::call('cache:clear');
+
+        // 2. Clear compiled views
+        Artisan::call('view:clear');
+
+        // 3. Clear route cache
+        Artisan::call('route:clear');
+
+        // 4. Clear config cache
+        Artisan::call('config:clear');
+
+        return redirect()->back()
+            ->header('X-LiteSpeed-Purge', '*')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Clear-Site-Data', '"cache"')
+            ->with('status', 'All caches cleared successfully (Laravel + LiteSpeed + Browser).');
     }
 
     public function index()
