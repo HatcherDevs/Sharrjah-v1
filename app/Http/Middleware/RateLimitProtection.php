@@ -193,7 +193,7 @@ class RateLimitProtection
      */
     protected function isTemporarilyBlocked(string $ip): bool
     {
-        return Cache::has("blocked_ip:{$ip}");
+        return Cache::has("blocked_ip:{$ip}") || Cache::has("temp_blocked_{$ip}");
     }
 
     /**

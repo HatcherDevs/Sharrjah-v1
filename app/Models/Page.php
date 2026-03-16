@@ -33,13 +33,11 @@ class Page extends Model
             'additional_content_bottom' => 1,
             'additional_content_ar_active' => 1,
 
-
             'additional2_content_en' => 1,
             'additional2_content_ar' => 1,
-            'additional2_content_img' => 1
+            'additional2_content_img' => 1,
 
-
-        ]
+        ],
     ];
 
     protected $fillable = [
@@ -60,7 +58,7 @@ class Page extends Model
 
         'additional2_content_en',
         'additional2_content_ar',
-        'additional2_content_img'
+        'additional2_content_img',
     ];
 
     protected $casts = [
@@ -69,14 +67,14 @@ class Page extends Model
 
     public $timestamps = true;
 
-    public function parent()
-    {
-        return $this->hasOne('App\Models\PageParent');
-    }
-
     public function children()
     {
-        return $this->hasMany('App\Models\PageParent', 'page_parent_id');
+        return $this->belongsToMany(Page::class, 'page_parents', 'page_parent_id', 'page_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsToMany(Page::class, 'page_parents', 'page_id', 'page_parent_id');
     }
 
     public function posts()
@@ -112,6 +110,7 @@ class Page extends Model
     public function getSlidersAttribute()
     {
         $result = $this->sliders()->get();
+
         return $result ?? collect([]);
     }
 
@@ -123,8 +122,9 @@ class Page extends Model
     public function getParentAttribute()
     {
         $parent = $this->parent()->first();
-        if ($parent == null)
+        if ($parent == null) {
             return null;
+        }
 
         return $this->find($parent->page_parent_id);
     }
@@ -142,23 +142,24 @@ class Page extends Model
             $children[] = $this->find($childId->page_id);
 
         return $children; **/
-
         $childrenIds = $this->children()->get();
 
-        if ($childrenIds == null)
+        if ($childrenIds == null) {
             return [];
+        }
 
         $children = [];
 
         /** foreach ($childrenIds as $childId)
             $children[] = $this->find($childId->page_id); **/
-
         $ids = [];
-        foreach ($childrenIds as $childId)
+        foreach ($childrenIds as $childId) {
             $ids[] = $childId->page_id;
+        }
 
-        if (empty($ids))
+        if (empty($ids)) {
             return [];
+        }
 
         $children = Page::whereIn('id', $ids)->orderBy('created_at', 'ASC')->get();
 
@@ -177,13 +178,13 @@ class Page extends Model
             $currentItem = $currentItem->parent;
         }
 
-        $parents[] = ['name' => "Home", 'name_ar' => "الصفحة الرئيسية", 'slug' => "", 'link' => ''];
+        $parents[] = ['name' => 'Home', 'name_ar' => 'الصفحة الرئيسية', 'slug' => '', 'link' => ''];
 
         $parents = array_reverse($parents);
-        $link = "";
+        $link = '';
 
         for ($x = 1; $x < count($parents); $x++) {
-            $link = $link . "/" . $parents[$x]['slug'];
+            $link = $link.'/'.$parents[$x]['slug'];
             $parents[$x]['link'] = $link;
         }
 
@@ -192,19 +193,21 @@ class Page extends Model
 
     public function getLinkAttribute()
     {
-        $link = "pages/";
+        $link = 'pages/';
         $currentItem = $this;
 
         while ($this->parent) {
-            $link .= $currentItem->parent->slug . '/';
+            $link .= $currentItem->parent->slug.'/';
 
-            if ($currentItem->parent->parent)
+            if ($currentItem->parent->parent) {
                 $currentItem = $currentItem->parent;
-            else
+            } else {
                 break;
+            }
         }
 
         $link .= $this->slug;
+
         return $link;
     }
 }
