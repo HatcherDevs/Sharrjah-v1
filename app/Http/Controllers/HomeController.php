@@ -73,6 +73,9 @@ class HomeController extends Controller
             $target->update(['value'=>$item]);
         }
 
+        // Clear response cache so frontend reflects updated values
+        cache()->flush();
+
         return redirect()->to('admin/home/footer');
     }
 
