@@ -121,49 +121,7 @@ class Page extends Model
 
     public function getParentAttribute()
     {
-        $parent = $this->parent()->first();
-        if ($parent == null) {
-            return null;
-        }
-
-        return $this->find($parent->page_parent_id);
-    }
-
-    public function getChildrenAttribute()
-    {
-        /** $childrenIds = $this->children()->get();
-
-        if($childrenIds==null)
-            return [];
-
-        $children = [];
-
-        foreach ($childrenIds as $childId)
-            $children[] = $this->find($childId->page_id);
-
-        return $children; **/
-        $childrenIds = $this->children()->get();
-
-        if ($childrenIds == null) {
-            return [];
-        }
-
-        $children = [];
-
-        /** foreach ($childrenIds as $childId)
-            $children[] = $this->find($childId->page_id); **/
-        $ids = [];
-        foreach ($childrenIds as $childId) {
-            $ids[] = $childId->page_id;
-        }
-
-        if (empty($ids)) {
-            return [];
-        }
-
-        $children = Page::whereIn('id', $ids)->orderBy('created_at', 'ASC')->get();
-
-        return $children;
+        return $this->parent()->first();
     }
 
     public function getBreadcrumbsAttribute()
@@ -196,7 +154,7 @@ class Page extends Model
         $link = 'pages/';
         $currentItem = $this;
 
-        while ($this->parent) {
+        while ($currentItem->parent) {
             $link .= $currentItem->parent->slug.'/';
 
             if ($currentItem->parent->parent) {
