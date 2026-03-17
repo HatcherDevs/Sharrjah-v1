@@ -274,12 +274,12 @@ class Space extends Model
 
     public function getButtonLinksAttribute()
     {
-        return $this->buttonLinks;
+        return $this->buttonLinks()->first();
     }
 
     public function getButtonLinksArAttribute()
     {
-        return $this->buttonLinks;
+        return $this->buttonLinks()->first();
     }
 
     public function getPageTypeAttribute()
