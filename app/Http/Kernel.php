@@ -60,6 +60,6 @@ class Kernel extends HttpKernel
         'https' => \App\Http\Middleware\HttpsProtocol::class,
         'admin.redirect' => \App\Http\Middleware\AdminRedirect::class,
         'cache.response' => \App\Http\Middleware\CacheResponse::class,
-        // 'admin.purge-cache' => \App\Http\Middleware\PurgeCacheOnAdminUpdate::class,
+        'admin.purge-cache' => \App\Http\Middleware\PurgeCacheOnAdminUpdate::class,
     ];
 }
