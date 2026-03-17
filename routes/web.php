@@ -61,6 +61,7 @@ if (env('ENABLE_ERROR_TEST_ROUTES', false)) {
 }
 
 // Admin routes are loaded separately in RouteServiceProvider (no caching)
+require base_path('routes/admin.php');
 
 Route::group(['prefix' => 'research'], function () {
     Route::get('/', 'ResearchController@index');
