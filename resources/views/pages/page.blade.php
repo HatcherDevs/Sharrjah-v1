@@ -97,15 +97,20 @@
                 <div class="body-section contents">
                     <div class="row">
                         <ul class="pages-list">
-                            @foreach ($page->children as $child)
-                                @if ($child->active && $child->link !== 'pages/about/open-call-exhibition-designer')
-                                    <li><a href="{{ url($child->link) }}">{{ $child->name_ar }}<br><span
-                                                class="en">{{ $child->name }}</span></a></li>
-                                @endif
-                            @endforeach
                             @php
-                                // dd($page);
+                                $activeChildren = $page->children->filter(
+                                    fn($c) => $c->active && $c->link !== 'pages/about/open-call-exhibition-designer',
+                                );
+                                $missionChild = $activeChildren->firstWhere('slug', 'mission');
+                                $otherChildren = $activeChildren
+                                    ->reject(fn($c) => $c->slug === 'mission')
+                                    ->sortByDesc('id');
+                                $orderedChildren = $missionChild ? $otherChildren->push($missionChild) : $otherChildren;
                             @endphp
+                            @foreach ($orderedChildren as $child)
+                                <li><a href="{{ url($child->link) }}">{{ $child->name_ar }}<br><span
+                                            class="en">{{ $child->name }}</span></a></li>
+                            @endforeach
                             @if ($page->slug == 'about')
                                 <li>
                                     <a href="{{ url('pages/about/opportunities') }}">
