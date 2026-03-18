@@ -22,6 +22,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
         \App\Http\Middleware\SecurityHeaders::class,
         \App\Http\Middleware\HttpsProtocol::class,
+        \App\Http\Middleware\NoCacheHeaders::class,
     ];
 
     /**
