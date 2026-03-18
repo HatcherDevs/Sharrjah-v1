@@ -21,7 +21,7 @@ class PageService
         // Eager load everything needed for the menu
         $pages = Page::whereIn('id', $pageIds)
             ->with(['children' => function ($query) {
-                $query->where('pages.active', 1)->orderBy('pages.id', 'ASC');
+                $query->where('pages.active', 1);
             }])
             ->get()
             ->keyBy('id');
@@ -33,8 +33,12 @@ class PageService
 
                 if ($page->slug === 'about') {
                     $mission = $children->firstWhere('slug', 'mission');
-                    $others = $children->reject(fn($c) => $c->slug === 'mission');
+                    $others = $children->reject(fn($c) => $c->slug === 'mission')->sortBy('id');
                     $children = $mission ? collect([$mission])->merge($others) : $others;
+                } elseif ($page->slug === 'programmes') {
+                    $children = $children->sortByDesc('id');
+                } else {
+                    $children = $children->sortBy('id');
                 }
 
                 $data[] = [

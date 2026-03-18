@@ -36,7 +36,6 @@
                     $opportunities = $pageService->getPageById(50);
                     $opportunitiesPage = $pageService->getPostById(477);
                     $opportunitiesSlug = $opportunities->slug;
-                    
                     ?>
 
                     @if ($opportunities->active == 1)
