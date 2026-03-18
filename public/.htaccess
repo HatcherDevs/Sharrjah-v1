@@ -8,12 +8,31 @@
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
 </IfModule>
 
-# OpenLiteSpeed LSCache Configuration
-# Disabled: OLS server-level cache prevents content updates from appearing.
-# Laravel application-level cache (CacheResponse middleware) handles caching instead.
-
+# OpenLiteSpeed LSCache - FULLY DISABLED
 <IfModule Litespeed>
     CacheLookup off
+    CacheEngine off
+</IfModule>
+
+# Disable ETags entirely (prevents 304 Not Modified responses)
+<IfModule mod_headers.c>
+    Header unset ETag
+    Header unset Last-Modified
+</IfModule>
+FileETag None
+
+# Force no-cache on ALL responses (HTML, CSS, JS, images, etc.)
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+    Header set X-LiteSpeed-Cache-Control "no-cache, no-store"
+    Header set X-LiteSpeed-Purge "*"
+</IfModule>
+
+# Disable mod_expires entirely
+<IfModule mod_expires.c>
+    ExpiresActive Off
 </IfModule>
 
 # Security: Prevent PHP execution in uploads and fonts directories

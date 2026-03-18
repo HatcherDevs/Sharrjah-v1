@@ -16,6 +16,9 @@ class NoCacheHeaders
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
         $response->headers->set('X-LiteSpeed-Cache-Control', 'no-cache, no-store');
+        $response->headers->set('X-LiteSpeed-Purge', '*');
+        $response->headers->remove('ETag');
+        $response->headers->remove('Last-Modified');
 
         return $response;
     }
