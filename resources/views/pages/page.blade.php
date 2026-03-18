@@ -251,7 +251,7 @@
             <div class="container text-center">
                 <div class="body-section contents with-img-header">
                     <div class="row">
-                        @foreach ($additional2_content_en as $i => $value)
+                        @foreach ($additional2_content_en ?? [] as $i => $value)
                             <div class="col-md-12">
                                 @if ($currentImgs[$i] != null)
                                     <img src="{{ url('public/' . $currentImgs[$i]) }}" class="w-100">
