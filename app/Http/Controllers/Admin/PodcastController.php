@@ -132,11 +132,12 @@ class PodcastController extends Controller
         // UPLOAD AUDIO FILE
         $audio = $request->file('audio_file');
         $destinationPath = 'uploads/podcasts/audio';
-        $audioName = Str::random('24').'.'.$audio->getClientOriginalExtension();
-        $audio->move('public/'.$destinationPath, $audioName);
+        if ($audio) {
+            $audioName = Str::random('24').'.'.$audio->getClientOriginalExtension();
+            $audio->move('public/'.$destinationPath, $audioName);
+            $data['audio_file'] = $destinationPath.'/'.$audioName;
+        }
         // END OF AUDIO UPLOAD
-
-        $data['audio_file'] = $destinationPath.'/'.$audioName;
         $newPage = $this->model->create($data);
 
         $files = $request->file('images');
@@ -166,20 +167,23 @@ class PodcastController extends Controller
                 }
             }
 
-            $newPage->links()->create($request->input('others'));
+            if ($request->input('others')) {
+                $newPage->links()->create($request->input('others'));
+            }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external', []);
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if ($page_type_ar == 'file') {
             $fileRow = $newPage->externalFiles()->create(['language' => 'ar']);
             $files = $request->file('external_file_ar');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) { $fileRow->uploads()->create($photo[0]); }
         } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
-            $newPage->externalLinks()->create(['language' => 'ar', 'url' => $request->input('external')['ar']['value']]);
+            $newPage->externalLinks()->create(['language' => 'ar', 'url' => $external['ar']['value'] ?? '']);
         }
 
         if ($page_type_en == 'file') {
@@ -187,9 +191,9 @@ class PodcastController extends Controller
             $files = $request->file('external_file_en');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) { $fileRow->uploads()->create($photo[0]); }
         } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
-            $newPage->externalLinks()->create(['language' => 'en', 'url' => $request->input('external')['en']['value']]);
+            $newPage->externalLinks()->create(['language' => 'en', 'url' => $external['en']['value'] ?? '']);
         }
         //
         //
@@ -200,7 +204,7 @@ class PodcastController extends Controller
 
         $buttonLinks = $request->input('buttonLink');
 
-        if ($buttonLinks['title'] && $buttonLinks['value'] && $buttonLinks['title_ar'] && $buttonLinks['value_ar']) {
+        if ($buttonLinks && ($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) && ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)) {
             $newPage->buttonLinks()->create($buttonLinks);
         }
 

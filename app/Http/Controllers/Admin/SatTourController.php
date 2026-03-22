@@ -232,7 +232,7 @@ class SatTourController extends Controller
 
         $buttonLinks = $request->input('buttonLink');
 
-        if ($buttonLinks['title'] && $buttonLinks['value'] && $buttonLinks['title_ar'] && $buttonLinks['value_ar']) {
+        if ($buttonLinks && ($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null) && ($buttonLinks['title_ar'] ?? null) && ($buttonLinks['value_ar'] ?? null)) {
             $newPage->buttonLinks()->create($buttonLinks);
         }
 

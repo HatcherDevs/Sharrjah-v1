@@ -132,17 +132,18 @@ class PublicationController extends Controller
             }
         }
 
-        $page_type_en = $request->input('external')['en']['type'];
-        $page_type_ar = $request->input('external')['ar']['type'];
+        $external = $request->input('external', []);
+        $page_type_en = $external['en']['type'] ?? null;
+        $page_type_ar = $external['ar']['type'] ?? null;
 
         if ($page_type_ar == 'file') {
             $fileRow = $newPage->externalFiles()->create(['language' => 'ar']);
             $files = $request->file('external_file_ar');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) { $fileRow->uploads()->create($photo[0]); }
         } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
-            $newPage->externalLinks()->create(['language' => 'ar', 'url' => $request->input('external')['ar']['value']]);
+            $newPage->externalLinks()->create(['language' => 'ar', 'url' => $external['ar']['value'] ?? '']);
         }
 
         if ($page_type_en == 'file') {
@@ -150,9 +151,9 @@ class PublicationController extends Controller
             $files = $request->file('external_file_en');
             $photo = ($files != null ? $this->file_uploader->upload($files) : false);
 
-            $fileRow->uploads()->create($photo[0]);
+            if ($photo) { $fileRow->uploads()->create($photo[0]); }
         } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
-            $newPage->externalLinks()->create(['language' => 'en', 'url' => $request->input('external')['en']['value']]);
+            $newPage->externalLinks()->create(['language' => 'en', 'url' => $external['en']['value'] ?? '']);
         }
         //
         //
@@ -163,7 +164,7 @@ class PublicationController extends Controller
 
         $buttonLinks = $request->input('buttonLink');
 
-        if ($buttonLinks['title'] && $buttonLinks['value'] && $buttonLinks['title_ar'] && $buttonLinks['value_ar']) {
+        if ($buttonLinks && ($buttonLinks['title'] ?? null) && ($buttonLinks['value'] ?? null)) {
             $newPage->buttonLinks()->create($buttonLinks);
         }
 
@@ -318,8 +319,9 @@ class PublicationController extends Controller
                 }
             }
 
-            $page_type_en = $request->input('external')['en']['type'];
-            $page_type_ar = $request->input('external')['ar']['type'];
+            $external = $request->input('external', []);
+            $page_type_en = $external['en']['type'] ?? null;
+            $page_type_ar = $external['ar']['type'] ?? null;
 
             if ($page_type_ar == 'file') {
                 $page->externalLinks()->where('language', 'ar')->delete();
@@ -334,7 +336,7 @@ class PublicationController extends Controller
             } elseif ($page_type_ar == 'url' || $page_type_ar == 'blank') {
                 $page->externalFiles()->where('language', 'ar')->delete();
                 $page->externalLinks()->where('language', 'ar')->delete();
-                $url = $page_type_ar == 'blank' ? '#' : $request->input('external')['ar']['value'];
+                $url = $page_type_ar == 'blank' ? '#' : ($external['ar']['value'] ?? '');
                 $page->externalLinks()->create(['language' => 'ar', 'url' => $url]);
             } elseif ($page_type_ar == 'page') {
                 $page->externalLinks()->where('language', 'ar')->delete();
@@ -354,7 +356,7 @@ class PublicationController extends Controller
             } elseif ($page_type_en == 'url' || $page_type_en == 'blank') {
                 $page->externalFiles()->where('language', 'en')->delete();
                 $page->externalLinks()->where('language', 'en')->delete();
-                $url = $page_type_ar == 'blank' ? '#' : $request->input('external')['en']['value'];
+                $url = $page_type_en == 'blank' ? '#' : ($external['en']['value'] ?? '');
                 $page->externalLinks()->create(['language' => 'en', 'url' => $url]);
             } elseif ($page_type_en == 'page') {
                 $page->externalLinks()->where('language', 'en')->delete();
@@ -369,7 +371,7 @@ class PublicationController extends Controller
             $buttonLinks = $request->input('buttonLink');
 
             $page->buttonLinks()->delete();
-            if ($buttonLinks['title'] && $buttonLinks['value'] || $buttonLinks['title_ar'] && $buttonLinks['value_ar']) {
+            if ($buttonLinks && (($buttonLinks['title'] ?? null) || ($buttonLinks['title_ar'] ?? null))) {
                 $page->buttonLinks()->create($buttonLinks);
             }
         }
