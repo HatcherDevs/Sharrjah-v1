@@ -37,20 +37,6 @@ FileETag None
 
 # Security: Prevent PHP execution in uploads and fonts directories
 
-<DirectoryMatch "^.\*/uploads/">
-<FilesMatch "\.php$">
-Order allow,deny
-Deny from all
-</FilesMatch>
-</DirectoryMatch>
-
-<DirectoryMatch "^.\*/fonts/">
-<FilesMatch "\.php$">
-Order allow,deny
-Deny from all
-</FilesMatch>
-</DirectoryMatch>
-
 # Protect favicon.ico
 
 <Files "favicon.ico"> # Allow access but prevent modification via web

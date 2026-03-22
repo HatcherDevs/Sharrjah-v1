@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Page extends Model
 {
-    use SearchableTrait;
+    use HasFactory, SearchableTrait;
 
     /**
      * Searchable rules.

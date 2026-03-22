@@ -33,7 +33,7 @@ class PageService
 
                 if ($page->slug === 'about') {
                     $mission = $children->firstWhere('slug', 'mission');
-                    $others = $children->reject(fn($c) => $c->slug === 'mission')->sortBy('id');
+                    $others = $children->reject(fn ($c) => $c->slug === 'mission')->sortBy('id');
                     $children = $mission ? collect([$mission])->merge($others) : $others;
                 } elseif ($page->slug === 'programmes') {
                     $children = $children->sortByDesc('id');
@@ -105,7 +105,7 @@ class PageService
             return $data->value;
         }
 
-        return [];
+        return '';
     }
 
     public function getArabicDate($d, $index, $y)
