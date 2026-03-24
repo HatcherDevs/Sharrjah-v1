@@ -31,6 +31,7 @@ class BackupWebsite extends Command
         $this->clearAllBackups($backupDir);
 
         $phar = new PharData($tarPath);
+        $filesAdded = 0;
 
         if (! $onlyFiles) {
             $this->info('Dumping database...');
@@ -39,8 +40,19 @@ class BackupWebsite extends Command
             if ($sqlPath) {
                 $phar->addFile($sqlPath, 'db-dump.sql');
                 $this->info('  Database dump added.');
+                $filesAdded++;
             } else {
                 $this->warn('  Database dump failed — skipping.');
+
+                if ($onlyDb) {
+                    unset($phar);
+                    if (file_exists($tarPath)) {
+                        unlink($tarPath);
+                    }
+                    $this->error('Nothing to backup. Aborting.');
+
+                    return self::FAILURE;
+                }
             }
         }
 
@@ -49,6 +61,17 @@ class BackupWebsite extends Command
             $publicPath = public_path();
             $this->addDirToTar($phar, $publicPath, 'public');
             $this->info('  public/ added.');
+            $filesAdded++;
+        }
+
+        if ($filesAdded === 0) {
+            unset($phar);
+            if (file_exists($tarPath)) {
+                unlink($tarPath);
+            }
+            $this->error('Nothing was added to the backup. Aborting.');
+
+            return self::FAILURE;
         }
 
         $phar->compress(Phar::GZ);
@@ -62,6 +85,12 @@ class BackupWebsite extends Command
         // remove temp sql file
         if (isset($sqlPath) && $sqlPath && file_exists($sqlPath)) {
             unlink($sqlPath);
+        }
+
+        if (! file_exists($archivePath)) {
+            $this->error("Compression failed — archive not found: {$archivePath}");
+
+            return self::FAILURE;
         }
 
         $sizeMb = round(filesize($archivePath) / 1024 / 1024, 2);
@@ -129,9 +158,9 @@ class BackupWebsite extends Command
         $mysqldump = $this->findMysqldump();
 
         if (! $mysqldump) {
-            $this->warn('  mysqldump not found in PATH or common locations.');
+            $this->warn('  mysqldump not found — trying PDO fallback...');
 
-            return null;
+            return $this->dumpDatabaseViaPdo($backupDir, $timestamp);
         }
 
         $passArg = $password ? ' -p'.escapeshellarg($password) : '';
@@ -148,7 +177,75 @@ class BackupWebsite extends Command
 
         exec($cmd, $output, $exitCode);
 
-        return $exitCode === 0 ? $sqlPath : null;
+        if ($exitCode !== 0) {
+            $this->warn('  mysqldump error: '.implode(' ', $output));
+            $this->warn('  Trying PDO fallback...');
+
+            return $this->dumpDatabaseViaPdo($backupDir, $timestamp);
+        }
+
+        return $sqlPath;
+    }
+
+    /**
+     * Fallback database dump using PDO (no mysqldump binary needed).
+     */
+    private function dumpDatabaseViaPdo(string $dir, string $timestamp): ?string
+    {
+        try {
+            $host = config('database.connections.mysql.host', '127.0.0.1');
+            $port = config('database.connections.mysql.port', '3306');
+            $database = config('database.connections.mysql.database');
+            $username = config('database.connections.mysql.username');
+            $password = config('database.connections.mysql.password');
+            $sqlPath = "{$dir}/db-{$timestamp}.sql";
+
+            $pdo = new \PDO(
+                "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4",
+                $username,
+                $password,
+                [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
+            );
+
+            $handle = fopen($sqlPath, 'w');
+            fwrite($handle, "-- PDO dump: {$database} @ ".date('Y-m-d H:i:s')."\n");
+            fwrite($handle, "SET NAMES utf8mb4;\nSET FOREIGN_KEY_CHECKS=0;\n\n");
+
+            $tables = $pdo->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
+
+            foreach ($tables as $table) {
+                // Write CREATE TABLE
+                $create = $pdo->query("SHOW CREATE TABLE `{$table}`")->fetch(\PDO::FETCH_ASSOC);
+                fwrite($handle, "DROP TABLE IF EXISTS `{$table}`;\n");
+                fwrite($handle, $create['Create Table'].";\n\n");
+
+                // Write INSERT rows in chunks
+                $rows = $pdo->query("SELECT * FROM `{$table}`")->fetchAll(\PDO::FETCH_ASSOC);
+                foreach (array_chunk($rows, 500) as $chunk) {
+                    $values = array_map(function (array $row) use ($pdo): string {
+                        $escaped = array_map(
+                            fn ($v) => $v === null ? 'NULL' : $pdo->quote((string) $v),
+                            $row
+                        );
+
+                        return '('.implode(',', $escaped).')';
+                    }, $chunk);
+                    fwrite($handle, "INSERT INTO `{$table}` VALUES\n".implode(",\n", $values).";\n");
+                }
+                fwrite($handle, "\n");
+            }
+
+            fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
+            fclose($handle);
+
+            $this->info('  Database dump added (PDO fallback).');
+
+            return $sqlPath;
+        } catch (\Throwable $e) {
+            $this->warn('  PDO dump failed: '.$e->getMessage());
+
+            return null;
+        }
     }
 
     private function findMysqldump(): ?string
