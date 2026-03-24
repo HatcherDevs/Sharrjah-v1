@@ -19,8 +19,8 @@ Route::get('/', function () {
 
 // Backup webhook — protected by X-Backup-Secret header + signed download URL
 Route::post('webhook/backup', 'BackupWebhookController@trigger');
-Route::get('webhook/backup/latest', 'BackupWebhookController@latest');
-Route::get('webhook/backup/download/{file}', 'BackupWebhookController@download')
+Route::post('site/sync/status', 'BackupWebhookController@latest');
+Route::post('site/sync/fetch/{file}', 'BackupWebhookController@download')
     ->name('backup.download');
 
 Route::get('admin/posts', function () {

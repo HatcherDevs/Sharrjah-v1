@@ -57,12 +57,12 @@ class BackupWebhookController extends Controller
             'callback_url' => $callbackUrl ?? null,
             'tip' => $callbackUrl
                 ? 'You will receive a POST to your callback_url when the backup is ready.'
-                : 'No callback_url provided. Use GET /webhook/backup/latest to check when done.',
+                : 'No callback_url provided. Use POST /site/sync/status to check when done.',
         ], 202);
     }
 
     /**
-     * GET /webhook/backup/latest
+     * POST /site/sync/status
      * Check if a backup is ready and return its download link.
      * Use this after triggering a full async backup.
      */
@@ -100,7 +100,7 @@ class BackupWebhookController extends Controller
     }
 
     /**
-     * GET /webhook/backup/download/{file}?signature=...
+     * POST /site/sync/fetch/{file}?signature=...
      * Stream the zip file and delete it after download.
      */
     public function download(Request $request, string $file): BinaryFileResponse
