@@ -196,7 +196,7 @@ function downloadFile(string $url, string $savePath): bool
     fclose($fp);
 
     if ($httpCode !== 200) {
-        @unlink($savePath);
+@unlink($savePath);
 
         return false;
     }
