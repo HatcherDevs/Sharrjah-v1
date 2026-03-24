@@ -164,16 +164,33 @@ class BackupWebsite extends Command
         }
 
         $passArg = $password ? ' -p'.escapeshellarg($password) : '';
-        $cmd = sprintf(
-            '%s -h %s -P %s -u %s%s %s > %s 2>&1',
-            escapeshellarg($mysqldump),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            $passArg,
-            escapeshellarg($database),
-            escapeshellarg($sqlPath)
-        );
+
+        // Prefer Unix socket when host is localhost — avoids TCP access-denied issues
+        $socketFile = config('database.connections.mysql.unix_socket', '/var/run/mysqld/mysqld.sock');
+        $useSocket = ($host === 'localhost' || $host === '127.0.0.1') && file_exists($socketFile);
+
+        if ($useSocket) {
+            $cmd = sprintf(
+                '%s --socket=%s -u %s%s %s > %s 2>&1',
+                escapeshellarg($mysqldump),
+                escapeshellarg($socketFile),
+                escapeshellarg($username),
+                $passArg,
+                escapeshellarg($database),
+                escapeshellarg($sqlPath)
+            );
+        } else {
+            $cmd = sprintf(
+                '%s -h %s -P %s -u %s%s %s > %s 2>&1',
+                escapeshellarg($mysqldump),
+                escapeshellarg($host),
+                escapeshellarg($port),
+                escapeshellarg($username),
+                $passArg,
+                escapeshellarg($database),
+                escapeshellarg($sqlPath)
+            );
+        }
 
         exec($cmd, $output, $exitCode);
 
@@ -238,8 +255,6 @@ class BackupWebsite extends Command
             fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
             fclose($handle);
 
-            $this->info('  Database dump added (PDO fallback).');
-
             return $sqlPath;
         } catch (\Throwable $e) {
             $this->warn('  PDO dump failed: '.$e->getMessage());
@@ -256,8 +271,10 @@ class BackupWebsite extends Command
             return 'mysqldump';
         }
 
-        // Common paths on Linux/Hostinger servers
+        // Common paths — prefer mariadb-dump on MariaDB servers, then mysqldump
         $paths = [
+            '/usr/bin/mariadb-dump',
+            '/usr/local/bin/mariadb-dump',
             '/usr/bin/mysqldump',
             '/usr/local/bin/mysqldump',
             '/usr/local/mysql/bin/mysqldump',

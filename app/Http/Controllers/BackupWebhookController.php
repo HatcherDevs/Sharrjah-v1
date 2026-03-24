@@ -160,12 +160,18 @@ class BackupWebhookController extends Controller
     {
         $phpBin = PHP_BINARY;
 
-        // In web/CGI context PHP_BINARY points to php-cgi.exe; swap for php.exe (CLI).
-        if (strtolower(basename($phpBin)) === 'php-cgi.exe') {
-            $phpCliPath = dirname($phpBin).DIRECTORY_SEPARATOR.'php.exe';
-            if (file_exists($phpCliPath)) {
-                $phpBin = $phpCliPath;
+        if (PHP_OS_FAMILY === 'Windows') {
+            // In web/CGI context PHP_BINARY points to php-cgi.exe; swap for php.exe (CLI).
+            if (strtolower(basename($phpBin)) === 'php-cgi.exe') {
+                $phpCliPath = dirname($phpBin).DIRECTORY_SEPARATOR.'php.exe';
+                if (file_exists($phpCliPath)) {
+                    $phpBin = $phpCliPath;
+                }
             }
+        } else {
+            // On Linux web context PHP_BINARY may point to php-fpm or php-cgi.
+            // Find the real CLI binary (php8.2, php8.1, php, etc.).
+            $phpBin = $this->findPhpCli();
         }
 
         $artisan = base_path('artisan');
@@ -191,7 +197,29 @@ class BackupWebhookController extends Controller
             $psCmd = "Start-Process -FilePath '{$phpBinPs}' -ArgumentList {$psArgList} -WindowStyle Hidden";
             exec('powershell -NoProfile -NonInteractive -Command "'.$psCmd.'"');
         } else {
-            exec("\"{$phpBin}\" \"{$artisan}\" backup:website{$cmdArgs} >> \"{$log}\" 2>&1 &");
+            exec(escapeshellarg($phpBin).' '.escapeshellarg($artisan)." backup:website{$cmdArgs} >> ".escapeshellarg($log).' 2>&1 &');
         }
+    }
+
+    private function findPhpCli(): string
+    {
+        // Try versioned binaries first (most specific wins)
+        $candidates = [
+            '/usr/bin/php8.2',
+            '/usr/bin/php8.1',
+            '/usr/bin/php8.0',
+            '/usr/local/bin/php8.2',
+            '/usr/local/bin/php',
+            '/usr/bin/php',
+        ];
+
+        foreach ($candidates as $path) {
+            if (file_exists($path) && is_executable($path)) {
+                return $path;
+            }
+        }
+
+        // Last resort: hope 'php' is in PATH and is a CLI binary
+        return 'php';
     }
 }
