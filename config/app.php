@@ -110,6 +110,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'backup_secret' => env('BACKUP_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | Logging Configuration

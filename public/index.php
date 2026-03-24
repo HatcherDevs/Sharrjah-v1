@@ -3,7 +3,6 @@
 /**
  * Laravel - A PHP Framework For Web Artisans
  *
- * @package  Laravel
  * @author   Taylor Otwell <taylorotwell@gmail.com>
  */
 
@@ -50,7 +49,7 @@ foreach ($headersToCheck as $header) {
     if (isset($_SERVER[$header])) {
         $value = strtolower($_SERVER[$header]);
         $decodedValue = strtolower(urldecode($_SERVER[$header]));
-        
+
         foreach ($maliciousPatterns as $pattern) {
             if (strpos($value, $pattern) !== false || strpos($decodedValue, $pattern) !== false) {
                 // تسجيل الهجوم (اختياري)
@@ -60,7 +59,7 @@ foreach ($headersToCheck as $header) {
                     $header,
                     $pattern
                 ));
-                
+
                 http_response_code(400);
                 exit('Bad Request');
             }
@@ -72,8 +71,8 @@ foreach ($headersToCheck as $header) {
 if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
     $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
     $method = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
-    
-    if (!in_array($method, $allowedMethods)) {
+
+    if (! in_array($method, $allowedMethods)) {
         http_response_code(400);
         exit('Bad Request');
     }
@@ -84,9 +83,9 @@ if (isset($_SERVER['HTTP_HOST'])) {
     $host = $_SERVER['HTTP_HOST'];
     // إزالة port
     $host = preg_replace('/:\d+$/', '', $host);
-    
+
     // التحقق من أن Host صالح (فقط حروف وأرقام ونقاط وشرطات)
-    if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-\.]*[a-zA-Z0-9]$/', $host) && $host !== 'localhost') {
+    if (! preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-\.]*[a-zA-Z0-9]$/', $host) && $host !== 'localhost') {
         http_response_code(400);
         exit('Bad Request');
     }
@@ -109,7 +108,7 @@ $queryString = $_SERVER['QUERY_STRING'] ?? '';
 
 $fixedPath = preg_replace('#/([^/]+)/\1(/|$)#i', '/$1$2', $requestPath);
 if ($fixedPath !== $requestPath) {
-    $redirectUrl = $fixedPath . ($queryString ? '?' . $queryString : '');
+    $redirectUrl = $fixedPath.($queryString ? '?'.$queryString : '');
     header("Location: $redirectUrl", true, 301);
     exit;
 }
@@ -171,10 +170,15 @@ $blockedPaths = [
     '/joomla', '/drupal', '/magento', '/typo3',
 ];
 
-foreach ($blockedPaths as $path) {
-    if (stripos($requestUri, $path) !== false) {
-        http_response_code(403);
-        exit('Access Denied');
+// Skip path blocking for webhook routes (protected by X-Backup-Secret header)
+$isWebhookPath = strpos($requestUri, '/webhook/') === 0;
+
+if (! $isWebhookPath) {
+    foreach ($blockedPaths as $path) {
+        if (stripos($requestUri, $path) !== false) {
+            http_response_code(403);
+            exit('Access Denied');
+        }
     }
 }
 
@@ -188,22 +192,22 @@ $blockedBots = [
     'Exabot', 'MegaIndex', 'Majestic', 'SEOkicks', 'sistrix', 'BacklinkCrawler',
     'Screaming', 'spbot', 'Nutch', 'HTTrack', 'wget/', 'Python-urllib',
     'python-requests', 'libwww-perl', 'nikto', 'Go-http-client', 'Java/',
-    'Apache-HttpClient', 'curl/', 'Scrapy', 'DataForSeoBot', 'Applebot'
+    'Apache-HttpClient', 'curl/', 'Scrapy', 'DataForSeoBot', 'Applebot',
 ];
 
 // السماح لبوتات جوجل فقط
-$isGoogleBot = stripos($userAgent, 'Googlebot') !== false 
+$isGoogleBot = stripos($userAgent, 'Googlebot') !== false
             || stripos($userAgent, 'Google-InspectionTool') !== false
             || stripos($userAgent, 'AdsBot-Google') !== false
             || stripos($userAgent, 'Mediapartners-Google') !== false;
 
-if (!$isGoogleBot) {
+if (! $isGoogleBot) {
     // منع بدون User-Agent
     if (empty($userAgent) || $userAgent === '-') {
         http_response_code(403);
         exit('Access Denied');
     }
-    
+
     // منع البوتات الخبيثة
     foreach ($blockedBots as $bot) {
         if (stripos($userAgent, $bot) !== false) {
@@ -230,7 +234,6 @@ define('SECURITY_LOG_PATH', '/home/u211620568/logs/Sharrjah-security.log');
 if (file_exists('/home/u211620568/domains/monitor.php')) {
     require_once '/home/u211620568/domains/monitor.php';
 }
-
 
 require __DIR__.'/../bootstrap/autoload.php';
 /*

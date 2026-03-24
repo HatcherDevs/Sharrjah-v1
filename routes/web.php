@@ -17,6 +17,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Backup webhook — protected by X-Backup-Secret header + signed download URL
+Route::post('webhook/backup', 'BackupWebhookController@trigger');
+Route::get('webhook/backup/latest', 'BackupWebhookController@latest');
+Route::get('webhook/backup/download/{file}', 'BackupWebhookController@download')
+    ->name('backup.download');
+
 Route::get('admin/posts', function () {
     return view('admin.posts');
 });

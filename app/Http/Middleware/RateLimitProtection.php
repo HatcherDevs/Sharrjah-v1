@@ -47,7 +47,7 @@ class RateLimitProtection
     public function __construct()
     {
         $config = config('blocked-ips');
-        
+
         $this->permanentlyBlockedIps = $config['permanently_blocked'] ?? [];
         $this->whitelistedIps = $config['whitelisted'] ?? [];
         $this->maxRequestsPerMinute = $config['rate_limit']['max_requests_per_minute'] ?? 60;
@@ -62,7 +62,7 @@ class RateLimitProtection
     public function handle(Request $request, Closure $next)
     {
         $ip = $this->getClientIp($request);
-        
+
         // فحص whitelist أولاً
         if ($this->isWhitelisted($ip)) {
             return $next($request);
@@ -81,6 +81,7 @@ class RateLimitProtection
         // فحص Rate Limit
         if ($this->isRateLimited($ip)) {
             $this->temporarilyBlockIp($ip);
+
             return $this->blockResponse($request, $ip, 'Rate limit exceeded');
         }
 
@@ -93,10 +94,10 @@ class RateLimitProtection
         // مراقبة أخطاء CSRF
         if ($response->getStatusCode() === 419 || $this->isCsrfError($response)) {
             $this->recordCsrfError($ip);
-            
+
             if ($this->hasTooManyCsrfErrors($ip)) {
                 $this->temporarilyBlockIp($ip);
-                Log::warning("IP blocked due to too many CSRF errors", ['ip' => $ip]);
+                Log::warning('IP blocked due to too many CSRF errors', ['ip' => $ip]);
             }
         }
 
@@ -152,7 +153,7 @@ class RateLimitProtection
      */
     protected function ipInRange(string $ip, string $range): bool
     {
-        if (!str_contains($range, '/')) {
+        if (! str_contains($range, '/')) {
             return false;
         }
 
@@ -164,7 +165,7 @@ class RateLimitProtection
             return false; // IPv6 أو IP غير صحيح
         }
 
-        $mask = -1 << (32 - (int)$bits);
+        $mask = -1 << (32 - (int) $bits);
         $subnet &= $mask;
         $ip &= $mask;
 
@@ -210,9 +211,9 @@ class RateLimitProtection
             now()->addMinutes($this->autoBanDuration)
         );
 
-        Log::warning("IP temporarily blocked", [
+        Log::warning('IP temporarily blocked', [
             'ip' => $ip,
-            'duration' => $this->autoBanDuration . ' minutes',
+            'duration' => $this->autoBanDuration.' minutes',
         ]);
     }
 
@@ -222,25 +223,27 @@ class RateLimitProtection
     protected function isRateLimited(string $ip): bool
     {
         $minute = now()->format('Y-m-d-H-i');
-        $tenSeconds = now()->format('Y-m-d-H-i-') . floor(now()->second / 10);
+        $tenSeconds = now()->format('Y-m-d-H-i-').floor(now()->second / 10);
 
         // فحص الطلبات في الدقيقة
         $requestsPerMinute = Cache::get("rate_limit_minute:{$ip}:{$minute}", 0);
         if ($requestsPerMinute >= $this->maxRequestsPerMinute) {
-            Log::warning("Rate limit exceeded (per minute)", [
+            Log::warning('Rate limit exceeded (per minute)', [
                 'ip' => $ip,
                 'requests' => $requestsPerMinute,
             ]);
+
             return true;
         }
 
         // فحص الطلبات في 10 ثواني (كشف هجمات سريعة)
         $requestsPer10Sec = Cache::get("rate_limit_10sec:{$ip}:{$tenSeconds}", 0);
         if ($requestsPer10Sec >= $this->maxRequestsPer10Seconds) {
-            Log::warning("Rate limit exceeded (per 10 seconds)", [
+            Log::warning('Rate limit exceeded (per 10 seconds)', [
                 'ip' => $ip,
                 'requests' => $requestsPer10Sec,
             ]);
+
             return true;
         }
 
@@ -253,7 +256,7 @@ class RateLimitProtection
     protected function recordRequest(string $ip): void
     {
         $minute = now()->format('Y-m-d-H-i');
-        $tenSeconds = now()->format('Y-m-d-H-i-') . floor(now()->second / 10);
+        $tenSeconds = now()->format('Y-m-d-H-i-').floor(now()->second / 10);
 
         // تسجيل في الدقيقة
         $keyMinute = "rate_limit_minute:{$ip}:{$minute}";
@@ -270,7 +273,8 @@ class RateLimitProtection
     protected function isCsrfError($response): bool
     {
         $content = $response->getContent();
-        return str_contains($content, 'CSRF token mismatch') 
+
+        return str_contains($content, 'CSRF token mismatch')
             || str_contains($content, 'csrf');
     }
 
@@ -297,7 +301,7 @@ class RateLimitProtection
      */
     protected function blockResponse(Request $request, string $ip, string $reason)
     {
-        Log::warning("Request blocked", [
+        Log::warning('Request blocked', [
             'ip' => $ip,
             'reason' => $reason,
             'url' => $request->fullUrl(),

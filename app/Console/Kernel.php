@@ -16,17 +16,22 @@ class Kernel extends ConsoleKernel
         // Commands\Inspire::class,
         Commands\DeployRefresh::class,
         Commands\ManageBlockedIps::class,
+        Commands\BackupWebsite::class,
     ];
 
     /**
      * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        // backup يومي لقاعدة البيانات فقط — سريع وخفيف
+        $schedule->command('backup:website --only-db')
+            ->dailyAt('02:00')
+            ->appendOutputTo(storage_path('logs/backup.log'));
+
+        // backup أسبوعي كامل (public/ + قاعدة البيانات) — كل أحد
+        $schedule->command('backup:website')
+            ->weeklyOn(0, '03:00')
+            ->appendOutputTo(storage_path('logs/backup.log'));
     }
 }
