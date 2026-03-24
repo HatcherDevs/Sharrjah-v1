@@ -160,7 +160,7 @@ class BackupWebsite extends Command
         if (! $mysqldump) {
             $this->warn('  mysqldump not found — trying PDO fallback...');
 
-            return $this->dumpDatabaseViaPdo($backupDir, $timestamp);
+            return $this->dumpDatabaseViaPdo($dir, $timestamp);
         }
 
         $passArg = $password ? ' -p'.escapeshellarg($password) : '';
@@ -181,7 +181,7 @@ class BackupWebsite extends Command
             $this->warn('  mysqldump error: '.implode(' ', $output));
             $this->warn('  Trying PDO fallback...');
 
-            return $this->dumpDatabaseViaPdo($backupDir, $timestamp);
+            return $this->dumpDatabaseViaPdo($dir, $timestamp);
         }
 
         return $sqlPath;
