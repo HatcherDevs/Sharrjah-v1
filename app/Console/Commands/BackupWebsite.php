@@ -19,8 +19,7 @@ class BackupWebsite extends Command
     {
         $timestamp = now()->format('Y-m-d-H-i-s');
         $backupDir = storage_path('app/backups');
-        $tarPath = "{$backupDir}/{$timestamp}.tar";
-        $archivePath = "{$tarPath}.gz";
+        $archivePath = "{$backupDir}/{$timestamp}.tar.gz";
         $onlyDb = $this->option('only-db');
         $onlyFiles = $this->option('only-files');
 
@@ -30,6 +29,103 @@ class BackupWebsite extends Command
 
         $this->clearAllBackups($backupDir);
 
+        // On Linux use native tar (much faster for large directories).
+        // On Windows fall back to PharData.
+        if (PHP_OS_FAMILY !== 'Windows') {
+            return $this->handleViaNativeTar($archivePath, $backupDir, $timestamp, $onlyDb, $onlyFiles);
+        }
+
+        return $this->handleViaPharData($archivePath, $backupDir, $timestamp, $onlyDb, $onlyFiles);
+    }
+
+    private function handleViaNativeTar(
+        string $archivePath,
+        string $backupDir,
+        string $timestamp,
+        bool $onlyDb,
+        bool $onlyFiles
+    ): int {
+        $publicPath = public_path();
+        $sqlPath = null;
+        $parts = [];
+
+        if (! $onlyFiles) {
+            $this->info('Dumping database...');
+            $sqlPath = $this->dumpDatabase($backupDir, $timestamp);
+
+            if ($sqlPath) {
+                $this->info('  Database dump added.');
+                // tar needs a relative path or it stores full absolute path
+                $parts[] = '-C '.escapeshellarg($backupDir).' '.escapeshellarg(basename($sqlPath));
+            } else {
+                $this->warn('  Database dump failed — skipping.');
+                if ($onlyDb) {
+                    $this->error('Nothing to backup. Aborting.');
+
+                    return self::FAILURE;
+                }
+            }
+        }
+
+        if (! $onlyDb) {
+            $this->info('Adding public/ directory...');
+            $parentDir = dirname($publicPath);
+            $publicDir = basename($publicPath);
+
+            // Exclude heavy/unwanted directories
+            $excludes = implode(' ', [
+                '--exclude='.escapeshellarg("{$publicDir}/admin"),
+                '--exclude='.escapeshellarg("{$publicDir}/froala_editor"),
+            ]);
+
+            $parts[] = "{$excludes} -C ".escapeshellarg($parentDir).' '.escapeshellarg($publicDir);
+            $this->info('  public/ added.');
+        }
+
+        if (empty($parts)) {
+            $this->error('Nothing was added to the backup. Aborting.');
+
+            return self::FAILURE;
+        }
+
+        $cmd = sprintf(
+            'tar czf %s %s 2>&1',
+            escapeshellarg($archivePath),
+            implode(' ', $parts)
+        );
+
+        exec($cmd, $output, $exitCode);
+
+        // Clean up temp sql file
+        if ($sqlPath && file_exists($sqlPath)) {
+            unlink($sqlPath);
+        }
+
+        if ($exitCode !== 0 || ! file_exists($archivePath)) {
+            $this->error('tar failed: '.implode("\n", $output));
+
+            return self::FAILURE;
+        }
+
+        $sizeMb = round(filesize($archivePath) / 1024 / 1024, 2);
+        $this->info("Backup completed: {$archivePath} ({$sizeMb} MB)");
+
+        $callbackUrl = $this->option('callback-url');
+        if ($callbackUrl) {
+            $this->sendCallback($callbackUrl, $archivePath);
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function handleViaPharData(
+        string $archivePath,
+        string $backupDir,
+        string $timestamp,
+        bool $onlyDb,
+        bool $onlyFiles
+    ): int {
+        $tarPath = str_replace('.tar.gz', '.tar', $archivePath);
         $phar = new PharData($tarPath);
         $filesAdded = 0;
 
@@ -43,7 +139,6 @@ class BackupWebsite extends Command
                 $filesAdded++;
             } else {
                 $this->warn('  Database dump failed — skipping.');
-
                 if ($onlyDb) {
                     unset($phar);
                     if (file_exists($tarPath)) {
@@ -58,8 +153,7 @@ class BackupWebsite extends Command
 
         if (! $onlyDb) {
             $this->info('Adding public/ directory...');
-            $publicPath = public_path();
-            $this->addDirToTar($phar, $publicPath, 'public');
+            $this->addDirToTar($phar, public_path(), 'public');
             $this->info('  public/ added.');
             $filesAdded++;
         }
@@ -77,12 +171,10 @@ class BackupWebsite extends Command
         $phar->compress(Phar::GZ);
         unset($phar);
 
-        // remove the uncompressed .tar
         if (file_exists($tarPath)) {
             unlink($tarPath);
         }
 
-        // remove temp sql file
         if (isset($sqlPath) && $sqlPath && file_exists($sqlPath)) {
             unlink($sqlPath);
         }
@@ -96,7 +188,6 @@ class BackupWebsite extends Command
         $sizeMb = round(filesize($archivePath) / 1024 / 1024, 2);
         $this->info("Backup completed: {$archivePath} ({$sizeMb} MB)");
 
-        // Notify callback URL if provided
         $callbackUrl = $this->option('callback-url');
         if ($callbackUrl) {
             $this->sendCallback($callbackUrl, $archivePath);
