@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use ZipArchive;
+use Phar;
+use PharData;
 
 class BackupWebsite extends Command
 {
@@ -18,7 +19,8 @@ class BackupWebsite extends Command
     {
         $timestamp = now()->format('Y-m-d-H-i-s');
         $backupDir = storage_path('app/backups');
-        $zipPath = "{$backupDir}/{$timestamp}.zip";
+        $tarPath = "{$backupDir}/{$timestamp}.tar";
+        $archivePath = "{$tarPath}.gz";
         $onlyDb = $this->option('only-db');
         $onlyFiles = $this->option('only-files');
 
@@ -28,20 +30,14 @@ class BackupWebsite extends Command
 
         $this->clearAllBackups($backupDir);
 
-        $zip = new ZipArchive;
-
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            $this->error("Cannot create zip file: {$zipPath}");
-
-            return self::FAILURE;
-        }
+        $phar = new PharData($tarPath);
 
         if (! $onlyFiles) {
             $this->info('Dumping database...');
             $sqlPath = $this->dumpDatabase($backupDir, $timestamp);
 
             if ($sqlPath) {
-                $zip->addFile($sqlPath, 'db-dump.sql');
+                $phar->addFile($sqlPath, 'db-dump.sql');
                 $this->info('  Database dump added.');
             } else {
                 $this->warn('  Database dump failed — skipping.');
@@ -49,26 +45,32 @@ class BackupWebsite extends Command
         }
 
         if (! $onlyDb) {
-            $this->info('Zipping public/ directory...');
+            $this->info('Adding public/ directory...');
             $publicPath = public_path();
-            $this->addDirToZip($zip, $publicPath, 'public');
+            $this->addDirToTar($phar, $publicPath, 'public');
             $this->info('  public/ added.');
         }
 
-        $zip->close();
+        $phar->compress(Phar::GZ);
+        unset($phar);
+
+        // remove the uncompressed .tar
+        if (file_exists($tarPath)) {
+            unlink($tarPath);
+        }
 
         // remove temp sql file
         if (isset($sqlPath) && $sqlPath && file_exists($sqlPath)) {
             unlink($sqlPath);
         }
 
-        $sizeMb = round(filesize($zipPath) / 1024 / 1024, 2);
-        $this->info("Backup completed: {$zipPath} ({$sizeMb} MB)");
+        $sizeMb = round(filesize($archivePath) / 1024 / 1024, 2);
+        $this->info("Backup completed: {$archivePath} ({$sizeMb} MB)");
 
         // Notify callback URL if provided
         $callbackUrl = $this->option('callback-url');
         if ($callbackUrl) {
-            $this->sendCallback($callbackUrl, $zipPath);
+            $this->sendCallback($callbackUrl, $archivePath);
         }
 
         return self::SUCCESS;
@@ -124,9 +126,18 @@ class BackupWebsite extends Command
         $password = config('database.connections.mysql.password');
         $sqlPath = "{$dir}/db-{$timestamp}.sql";
 
-        $passArg = $password ? '-p'.escapeshellarg($password) : '';
+        $mysqldump = $this->findMysqldump();
+
+        if (! $mysqldump) {
+            $this->warn('  mysqldump not found in PATH or common locations.');
+
+            return null;
+        }
+
+        $passArg = $password ? ' -p'.escapeshellarg($password) : '';
         $cmd = sprintf(
-            'mysqldump -h %s -P %s -u %s %s %s > %s 2>&1',
+            '%s -h %s -P %s -u %s%s %s > %s 2>&1',
+            escapeshellarg($mysqldump),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -140,7 +151,32 @@ class BackupWebsite extends Command
         return $exitCode === 0 ? $sqlPath : null;
     }
 
-    private function addDirToZip(ZipArchive $zip, string $dir, string $zipPrefix): void
+    private function findMysqldump(): ?string
+    {
+        // Check if mysqldump is directly available
+        exec('mysqldump --version 2>&1', $out, $code);
+        if ($code === 0) {
+            return 'mysqldump';
+        }
+
+        // Common paths on Linux/Hostinger servers
+        $paths = [
+            '/usr/bin/mysqldump',
+            '/usr/local/bin/mysqldump',
+            '/usr/local/mysql/bin/mysqldump',
+            '/opt/plesk/mysql/bin/mysqldump',
+        ];
+
+        foreach ($paths as $path) {
+            if (file_exists($path) && is_executable($path)) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
+    private function addDirToTar(PharData $phar, string $dir, string $prefix): void
     {
         $skip = [
             realpath(public_path('admin')),
@@ -149,41 +185,41 @@ class BackupWebsite extends Command
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
+            \RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         foreach ($iterator as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
             $realPath = $file->getRealPath();
 
-            // skip excluded directories
             foreach ($skip as $skipPath) {
                 if ($skipPath && str_starts_with($realPath, $skipPath)) {
                     continue 2;
                 }
             }
 
-            // build clean zip entry path using forward slashes
-            $relativePath = $zipPrefix.'/'.str_replace(
+            $relativePath = $prefix.'/'.str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
                 substr($realPath, strlen($dir) + 1)
             );
 
-            if ($file->isDir()) {
-                $zip->addEmptyDir($relativePath);
-            } else {
-                $zip->addFile($realPath, $relativePath);
-            }
+            $phar->addFile($realPath, $relativePath);
         }
     }
 
     private function clearAllBackups(string $dir): void
     {
-        $zips = glob("{$dir}/*.zip") ?: [];
+        $patterns = ['*.tar.gz', '*.tar', '*.zip'];
 
-        foreach ($zips as $old) {
-            unlink($old);
-            $this->info('Cleared old backup: '.basename($old));
+        foreach ($patterns as $pattern) {
+            foreach (glob("{$dir}/{$pattern}") ?: [] as $old) {
+                unlink($old);
+                $this->info('Cleared old backup: '.basename($old));
+            }
         }
     }
 }

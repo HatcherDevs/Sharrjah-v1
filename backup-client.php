@@ -16,7 +16,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** URL of the main server's backup webhook */
-const WEBHOOK_URL = 'https://satv1.test/webhook/backup';
+const WEBHOOK_URL = 'https://sharjaharchitecture-591518.hostingersite.com/webhook/backup';
 
 /** Must match BACKUP_SECRET in the main server's .env */
 const BACKUP_SECRET = 'vTOrzBORtlq2YCR113FuHELIqCJQMm3HABMdPo3acMI';
@@ -27,7 +27,7 @@ const BACKUP_SECRET = 'vTOrzBORtlq2YCR113FuHELIqCJQMm3HABMdPo3acMI';
  *   'https://remote-server.com/backup-client.php'
  * Set to null to disable the callback (you can poll /webhook/backup/latest instead).
  */
-const CALLBACK_URL = null; // e.g. 'https://remote-server.com/backup-client.php'
+const CALLBACK_URL = 'https://lightskyblue-pheasant-191750.hostingersite.com/backup-client.php';
 
 /** Directory to save the downloaded backup zip */
 const DOWNLOAD_DIR = __DIR__.'/backups';
