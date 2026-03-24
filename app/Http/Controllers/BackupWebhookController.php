@@ -100,7 +100,7 @@ class BackupWebhookController extends Controller
     }
 
     /**
-     * POST /site/sync/fetch/{file}?signature=...
+     * GET /site/sync/fetch/{file}?signature=...
      * Stream the zip file and delete it after download.
      */
     public function download(Request $request, string $file): BinaryFileResponse

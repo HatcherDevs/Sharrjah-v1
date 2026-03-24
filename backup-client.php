@@ -20,8 +20,15 @@ const ACCESS_TOKEN = 'BkT9mXpL2wQzRnV5hJeYcA3sDfUoG7Ki';
 /** URL of the main server's backup webhook (POST trigger) */
 const WEBHOOK_URL = 'https://sharjaharchitecture-591518.hostingersite.com/webhook/backup';
 
-/** URL to poll for backup completion status (GET) */
+/** URL to poll for backup completion status (POST) */
 const STATUS_URL = 'https://sharjaharchitecture-591518.hostingersite.com/site/sync/status';
+
+/**
+ * Public URL of THIS file on the remote server.
+ * When set, the main server will POST the download link here when backup is ready.
+ * This avoids CDN polling issues between Hostinger servers.
+ */
+const CALLBACK_URL = 'https://lightskyblue-pheasant-191750.hostingersite.com/backup-client.php';
 
 /** Must match BACKUP_SECRET in the main server's .env */
 const BACKUP_SECRET = 'vTOrzBORtlq2YCR113FuHELIqCJQMm3HABMdPo3acMI';
@@ -89,13 +96,17 @@ if (! $isCli && $_SERVER['REQUEST_METHOD'] === 'POST') {
 $onlyDb = $isCli ? in_array('--only-db', $argv ?? []) : isset($_GET['only_db']);
 $onlyFiles = $isCli ? in_array('--only-files', $argv ?? []) : isset($_GET['only_files']);
 
-// For HTTP full backups, send this file's URL as callback so the main server can POST back
+// For full backups, always use callback URL (avoids CDN polling blocks between Hostinger servers)
 $callbackUrl = null;
-if (! $isCli && ! $onlyDb) {
-    $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? '';
-    $path = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
-    $callbackUrl = $host ? "{$scheme}://{$host}{$path}" : null;
+if (! $onlyDb) {
+    if ($isCli && defined('CALLBACK_URL') && CALLBACK_URL) {
+        $callbackUrl = CALLBACK_URL;
+    } elseif (! $isCli) {
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $path = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
+        $callbackUrl = $host ? "{$scheme}://{$host}{$path}" : (defined('CALLBACK_URL') ? CALLBACK_URL : null);
+    }
 }
 
 $payload = [];
@@ -139,9 +150,8 @@ if ($httpCode === 200 && isset($data['download_url'])) {
 // Full / files-only backup runs async on main server
 if ($httpCode === 202) {
     if ($isCli) {
-        // CLI: poll /webhook/backup/latest until the backup appears, then download
-        logMsg('Backup running in background. Polling for completion (max 15 min)...');
-        pollAndDownload();
+        logMsg('Backup started. Main server will POST callback to: '.$callbackUrl);
+        logMsg('Check '.DOWNLOAD_DIR.'/backup-client.log for updates.');
     } else {
         // HTTP: callback will POST back to this file when backup is ready
         logMsg('Backup started. Will download automatically via callback when ready.');
@@ -280,6 +290,10 @@ function downloadFile(string $url, string $savePath): bool
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => 0,
         CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HTTPHEADER => [
+            'User-Agent: BackupClient/1.0',
+            'X-Backup-Secret: '.BACKUP_SECRET,
+        ],
     ]);
 
     curl_exec($ch);

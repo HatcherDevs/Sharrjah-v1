@@ -16,5 +16,6 @@ class VerifyCsrfToken extends BaseVerifier
         //    '/admin/posts/*',
         //    '/research/submit',
         'webhook/backup',
+        'site/sync/status',
     ];
 }
