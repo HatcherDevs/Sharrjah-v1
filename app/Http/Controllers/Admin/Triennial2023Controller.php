@@ -101,7 +101,7 @@ class Triennial2023Controller extends Controller
 
     public function edit($id)
     {
-        $page = $this->model->find($id);
+        $page = $this->model->findOrFail($id);
 
         $page_name = 'Triennial 2023';
 
