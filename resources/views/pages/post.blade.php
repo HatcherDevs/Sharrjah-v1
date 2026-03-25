@@ -9,7 +9,7 @@
                         <div class="breadcrumbs en">
                             @include('partials.breadcrumbs')
                         </div>
-                        @if ($post->parent->slug == 'partners' || $post->parent->slug == 'calendar')
+                        @if ($post->parent?->slug == 'partners' || $post->parent?->slug == 'calendar')
                             <h1 class="en">{!! $post->description !!}</h1>
                         @else
                             <h1 class="en">{!! $post->title !!}</h1>
@@ -23,14 +23,14 @@
                             @include('partials.breadcrumbs-ar')
                         </div>
 
-                        @if ($post->parent->slug == 'partners' || $post->parent->slug == 'calendar')
+                        @if ($post->parent?->slug == 'partners' || $post->parent?->slug == 'calendar')
                             <h1>{!! $post->description_ar !!}</h1>
                         @else
                             <h1>{!! $post->title_ar !!}</h1>
                         @endif
 
                         @if (!count($post->sliders ?? []))
-                            @if ($post->parent->slug == 'open-call-exhibition-designer')
+                            @if ($post->parent?->slug == 'open-call-exhibition-designer')
                                 <style>
                                     .innerpage .contents .text-right span {
                                         font-family: 'Cairo' !important;

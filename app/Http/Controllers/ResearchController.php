@@ -64,7 +64,16 @@ class ResearchController extends Controller
     public function single($slug)
     {
         $data = $this->model->where('slug', $slug)->first();
-        return view('pages.research.single', compact('data'));
+
+        $lang = (isset($_GET['lang']) && $_GET['lang'] === 'ar') ? 'ar' : 'en';
+
+        $conts = ResearchContent::get();
+        $content = [];
+        foreach ($conts as $c) {
+            $content[$c->slug] = $c;
+        }
+
+        return view('pages.research.single', compact('data', 'lang', 'content'));
     }
 
     public function submit(Request $request)
