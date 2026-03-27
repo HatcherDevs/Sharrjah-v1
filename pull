@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+$steps = [
+    '1. Pull latest v10'          => 'git pull origin v10',
+    '2. Clear cache'              => 'php artisan cache:clear',
+    '3. Clear config'             => 'php artisan config:clear',
+    '4. Clear routes'             => 'php artisan route:clear',
+    '5. Clear views'              => 'php artisan view:clear',
+    '6. Clear events'             => 'php artisan event:clear',
+    '7. Reset to HEAD'            => 'git reset --hard HEAD',
+    '8. Pull again'               => 'git pull origin v10',
+    '9. Composer install'         => 'composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev',
+    '10. Cache config'            => 'php artisan config:cache',
+    '11. Cache routes'            => 'php artisan route:cache',
+    '12. Cache views'             => 'php artisan view:cache',
+    '13. Cache events'            => 'php artisan event:cache',
+];
+
+foreach ($steps as $label => $cmd) {
+    echo "\n\033[33m▶ $label\033[0m\n  $ $cmd\n";
+    passthru($cmd, $code);
+    if ($code !== 0) {
+        echo "\033[31m✗ Failed at: $label (exit code $code)\033[0m\n";
+        exit($code);
+    }
+}
+
+echo "\n\033[32m✅ Deploy done.\033[0m\n";
