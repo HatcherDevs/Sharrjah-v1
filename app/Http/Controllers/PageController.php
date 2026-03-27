@@ -282,7 +282,9 @@ class PageController extends Controller
 
         $formdata = $this->formService->getForm($page);
 
-        return view('pages.page', compact('page', 'formdata'));
+        $data = null;
+
+        return view('pages.page', compact('page', 'formdata', 'data'));
     }
 
     public function showAllPages()

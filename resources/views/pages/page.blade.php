@@ -149,7 +149,7 @@
             <div class="container text-center">
                 <div class="body-section contents">
                     <ul class="figure-list full full-items">
-                        @foreach ($data as $child)
+                        @foreach ($data ?? [] as $child)
                             <li class="al-right">
                                 <div class="colm titles">
                                     @if (trim($child->title_ar))
