@@ -305,6 +305,9 @@ class PostController extends Controller
 
     public function showPartner($slug){
         $post = Post::where('slug', $slug)->first();
+        if (!$post) {
+            abort(404, 'Post not found');
+        }
         $page = $post->parent;
 
         return view('pages.post',compact('page','post'));
