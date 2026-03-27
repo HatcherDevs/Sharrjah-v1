@@ -97,7 +97,7 @@ class RateLimitProtection
 
             if ($this->hasTooManyCsrfErrors($ip)) {
                 $this->temporarilyBlockIp($ip);
-                Log::warning('IP blocked due to too many CSRF errors', ['ip' => $ip]);
+                Log::channel('ip_blocks')->warning('IP blocked due to too many CSRF errors', ['ip' => $ip]);
             }
         }
 
@@ -211,7 +211,7 @@ class RateLimitProtection
             now()->addMinutes($this->autoBanDuration)
         );
 
-        Log::warning('IP temporarily blocked', [
+        Log::channel('ip_blocks')->warning('IP temporarily blocked', [
             'ip' => $ip,
             'duration' => $this->autoBanDuration.' minutes',
         ]);
@@ -228,7 +228,7 @@ class RateLimitProtection
         // فحص الطلبات في الدقيقة
         $requestsPerMinute = Cache::get("rate_limit_minute:{$ip}:{$minute}", 0);
         if ($requestsPerMinute >= $this->maxRequestsPerMinute) {
-            Log::warning('Rate limit exceeded (per minute)', [
+            Log::channel('ip_blocks')->warning('Rate limit exceeded (per minute)', [
                 'ip' => $ip,
                 'requests' => $requestsPerMinute,
             ]);
@@ -239,7 +239,7 @@ class RateLimitProtection
         // فحص الطلبات في 10 ثواني (كشف هجمات سريعة)
         $requestsPer10Sec = Cache::get("rate_limit_10sec:{$ip}:{$tenSeconds}", 0);
         if ($requestsPer10Sec >= $this->maxRequestsPer10Seconds) {
-            Log::warning('Rate limit exceeded (per 10 seconds)', [
+            Log::channel('ip_blocks')->warning('Rate limit exceeded (per 10 seconds)', [
                 'ip' => $ip,
                 'requests' => $requestsPer10Sec,
             ]);
@@ -301,7 +301,7 @@ class RateLimitProtection
      */
     protected function blockResponse(Request $request, string $ip, string $reason)
     {
-        Log::warning('Request blocked', [
+        Log::channel('ip_blocks')->warning('Request blocked', [
             'ip' => $ip,
             'reason' => $reason,
             'url' => $request->fullUrl(),

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BlockBadBots
 {
@@ -65,8 +66,6 @@ class BlockBadBots
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -75,6 +74,11 @@ class BlockBadBots
 
         // منع الطلبات بدون User-Agent
         if (empty($userAgent) || $userAgent === '-') {
+            Log::channel('ip_blocks')->warning('Request blocked: missing User-Agent', [
+                'ip' => $request->ip(),
+                'url' => $request->fullUrl(),
+            ]);
+
             return $this->blockResponse();
         }
 
@@ -88,6 +92,13 @@ class BlockBadBots
         // منع البوتات الخبيثة
         foreach ($this->blockedBots as $blockedBot) {
             if (stripos($userAgent, $blockedBot) !== false) {
+                Log::channel('ip_blocks')->warning('Bot blocked', [
+                    'bot' => $blockedBot,
+                    'user_agent' => $userAgent,
+                    'ip' => $request->ip(),
+                    'url' => $request->fullUrl(),
+                ]);
+
                 return $this->blockResponse();
             }
         }

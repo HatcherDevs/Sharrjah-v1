@@ -34,7 +34,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['daily'],
             'ignore_exceptions' => false,
         ],
 
@@ -97,6 +97,26 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | Custom Channels: IP Blocks & Errors (daily split by date)
+        |----------------------------------------------------------------------
+        */
+
+        'ip_blocks' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ip-blocks/ip-blocks.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
+        'errors' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/errors/errors.log'),
+            'level' => 'debug',
+            'days' => 30,
         ],
     ],
 

@@ -21,7 +21,7 @@ class BlockMaliciousRequests
         '/\%24\%7B/i', // URL encoded ${
         '/\%24\{/i',   // Partial URL encoded
         '/\$\%7B/i',   // Partial URL encoded
-        
+
         // LDAP/RMI Injection
         '/ldap:/i',
         '/rmi:/i',
@@ -29,21 +29,21 @@ class BlockMaliciousRequests
         '/iiop:/i',
         '/corba:/i',
         '/jndi:/i',
-        
+
         // Shell injection patterns
         '/\$\(.*\)/i',
         '/`[^`]+`/',
-        
+
         // Path traversal
         '/\.\.\//',
         '/\.\.\\\\/',
         '/\%2e\%2e/i',
-        
+
         // SQL Injection patterns في headers
         '/union\s+select/i',
         '/exec\s*\(/i',
         '/xp_cmdshell/i',
-        
+
         // Common scanner signatures
         '/scanner-fortirecon/i',
         '/acunetix/i',
@@ -71,21 +71,21 @@ class BlockMaliciousRequests
         '.svn',
         'web.config',
         'wp-config.php',
-        
+
         // محاولات استغلال
         'getcmd',
         'dologin.action',
         'login.action',
         'setup.action',
-        
+
         // Livewire/Laravel exploits
         'livewire/update',
         'livewire/message',
-        
+
         // API endpoints مشبوهة
         'api/agent',
         '_profiler',
-        
+
         // مسارات أخرى مشبوهة
         'mcp',
         'sse',
@@ -131,8 +131,6 @@ class BlockMaliciousRequests
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -145,7 +143,7 @@ class BlockMaliciousRequests
         // فحص جميع Headers المهمة
         foreach ($this->headersToCheck as $header) {
             $value = $request->header($header);
-            
+
             if ($value && $this->containsMaliciousContent($value)) {
                 return $this->blockRequest($request, $header, $value);
             }
@@ -162,14 +160,14 @@ class BlockMaliciousRequests
         if ($this->isSuspiciousPath($path)) {
             return $this->blockRequest($request, 'SuspiciousPath', $path);
         }
-        
+
         if ($this->containsMaliciousContent($path)) {
             return $this->blockRequest($request, 'Path', $path);
         }
 
         // التحقق من صحة Host header
         $host = $request->header('Host');
-        if ($host && !$this->isValidHost($host)) {
+        if ($host && ! $this->isValidHost($host)) {
             return $this->blockRequest($request, 'Host', $host);
         }
 
@@ -198,11 +196,12 @@ class BlockMaliciousRequests
             if (isset($_SERVER[$var])) {
                 $value = $_SERVER[$var];
                 if ($this->containsMaliciousContent($value)) {
-                    Log::warning('Malicious content in raw header', [
+                    Log::channel('ip_blocks')->warning('Malicious content in raw header', [
                         'header' => $var,
                         'value' => substr($value, 0, 200),
                         'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
                     ]);
+
                     return true;
                 }
             }
@@ -217,14 +216,14 @@ class BlockMaliciousRequests
     protected function isSuspiciousPath(string $path): bool
     {
         $path = strtolower(trim($path, '/'));
-        
+
         foreach ($this->suspiciousPaths as $suspiciousPath) {
-            if ($path === strtolower($suspiciousPath) || 
+            if ($path === strtolower($suspiciousPath) ||
                 strpos($path, strtolower($suspiciousPath)) === 0) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -267,7 +266,7 @@ class BlockMaliciousRequests
 
         // يجب أن يكون hostname عادي أو IP address
         // لا يجب أن يحتوي على ${...} أو أي patterns خبيثة
-        
+
         // رفض أي شيء يحتوي على ${ (JNDI injection)
         if (strpos($host, '${') !== false) {
             return false;
@@ -281,7 +280,7 @@ class BlockMaliciousRequests
         // التحقق من أن Host صالح (hostname أو IP)
         // يسمح بـ: localhost, domain.com, sub.domain.com, 192.168.1.1
         $validHostPattern = '/^[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$/';
-        
+
         return preg_match($validHostPattern, $host) === 1;
     }
 
@@ -291,7 +290,7 @@ class BlockMaliciousRequests
     protected function blockRequest(Request $request, string $source, string $value)
     {
         // تسجيل محاولة الهجوم
-        Log::warning('Blocked malicious request', [
+        Log::channel('ip_blocks')->warning('Blocked malicious request', [
             'ip' => $request->ip(),
             'source' => $source,
             'value' => substr($value, 0, 500), // قص القيمة لتجنب ملء السجلات

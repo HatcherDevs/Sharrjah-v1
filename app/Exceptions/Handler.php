@@ -3,13 +3,13 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -29,9 +29,9 @@ class Handler extends ExceptionHandler
      * امتدادات الملفات الثابتة التي يجب تجاهلها
      */
     protected $ignoredExtensions = [
-        'js', 'css', 'map', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'ico', 
-        'woff', 'woff2', 'ttf', 'eot', 'otf', 'mp4', 'webm', 'mp3', 
-        'pdf', 'zip', 'rar'
+        'js', 'css', 'map', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'ico',
+        'woff', 'woff2', 'ttf', 'eot', 'otf', 'mp4', 'webm', 'mp3',
+        'pdf', 'zip', 'rar',
     ];
 
     /**
@@ -44,14 +44,12 @@ class Handler extends ExceptionHandler
 
     /**
      * التحقق من أن الطلب لملف ثابت (static file)
-     *
-     * @return bool
      */
     protected function isStaticFileRequest(): bool
     {
         $path = request()->path() ?? '';
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        
+
         // تجاهل الملفات الثابتة
         if (in_array($extension, $this->ignoredExtensions)) {
             return true;
@@ -59,11 +57,11 @@ class Handler extends ExceptionHandler
 
         // تجاهل مسارات الملفات الثابتة
         $ignoredPaths = [
-            'js/', 'css/', 'img/', 'fonts/', 'uploads/', 
+            'js/', 'css/', 'img/', 'fonts/', 'uploads/',
             'public/js/', 'public/css/', 'public/img/', 'public/fonts/',
-            'froala_editor/', 'mapStyle/', 'files/'
+            'froala_editor/', 'mapStyle/', 'files/',
         ];
-        
+
         foreach ($ignoredPaths as $ignoredPath) {
             if (strpos($path, $ignoredPath) !== false) {
                 return true;
@@ -76,7 +74,6 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $exception
      * @return void
      *
      * @throws \Exception
@@ -85,26 +82,25 @@ class Handler extends ExceptionHandler
     {
         // تنفيذ أمر مخصص عند حدوث خطأ 500 (مع throttling)
         $this->handleCriticalError($exception);
-        
+
         parent::report($exception);
     }
 
     /**
      * Handle critical errors (500) with throttling
      *
-     * @param \Throwable $exception
      * @return void
      */
     protected function handleCriticalError(\Throwable $exception)
     {
         // فقط للأخطاء الحرجة (500)
-        if (!$this->isCriticalError($exception)) {
+        if (! $this->isCriticalError($exception)) {
             return;
         }
 
         // إنشاء مفتاح فريد للخطأ بناءً على نوع الخطأ والرسالة والملف
         $errorKey = $this->generateErrorKey($exception);
-        $cacheKey = 'error_throttle_' . $errorKey;
+        $cacheKey = 'error_throttle_'.$errorKey;
 
         // التحقق من أن الأمر لم يُنفذ مؤخراً
         if (Cache::has($cacheKey)) {
@@ -121,9 +117,6 @@ class Handler extends ExceptionHandler
     /**
      * Check if error should trigger notification
      * تجاهل الملفات الثابتة وإرسال تنبيه للصفحات فقط
-     *
-     * @param \Throwable $exception
-     * @return bool
      */
     protected function isCriticalError(\Throwable $exception): bool
     {
@@ -131,7 +124,7 @@ class Handler extends ExceptionHandler
         if ($this->isStaticFileRequest()) {
             return false;
         }
-        
+
         // إرسال تنبيه لأخطاء الصفحات فقط
         return true;
     }
@@ -139,17 +132,14 @@ class Handler extends ExceptionHandler
     /**
      * Generate unique key for error (based on PAGE path and error code)
      * مفتاح فريد بناءً على الصفحة وكود الخطأ
-     *
-     * @param \Throwable $exception
-     * @return string
      */
     protected function generateErrorKey(\Throwable $exception): string
     {
         $path = request()->path() ?? 'unknown';
         $errorCode = $this->getErrorCode($exception);
-        
+
         // مفتاح بناءً على الصفحة والكود فقط (ليس تفاصيل الخطأ)
-        return md5($path . '_' . $errorCode);
+        return md5($path.'_'.$errorCode);
     }
 
     /**
@@ -171,7 +161,6 @@ class Handler extends ExceptionHandler
     /**
      * Send message to Telegram
      *
-     * @param string $message
      * @return void
      */
     protected function sendTelegram(string $message)
@@ -179,14 +168,14 @@ class Handler extends ExceptionHandler
         try {
             $token = $this->getTelegramBotToken();
             $chatId = $this->getTelegramChatId();
-            
+
             // لا ترسل إذا لم يتم تكوين Telegram
             if (empty($token) || empty($chatId)) {
                 return;
             }
-            
+
             $url = "https://api.telegram.org/bot{$token}/sendMessage";
-            
+
             $data = [
                 'chat_id' => $chatId,
                 'text' => $message,
@@ -203,7 +192,7 @@ class Handler extends ExceptionHandler
             curl_exec($ch);
             curl_close($ch);
         } catch (\Exception $e) {
-            Log::error('Failed to send Telegram message: ' . $e->getMessage());
+            Log::channel('errors')->error('Failed to send Telegram message: '.$e->getMessage());
         }
     }
 
@@ -211,7 +200,6 @@ class Handler extends ExceptionHandler
      * Execute custom action when error occurs
      * إرسال تنبيه Telegram للصفحات فقط (ملخص مختصر)
      *
-     * @param \Throwable $exception
      * @return void
      */
     protected function executeCustomAction(\Throwable $exception)
@@ -220,29 +208,29 @@ class Handler extends ExceptionHandler
             $path = request()->path() ?? 'Unknown';
             $date = now()->format('Y-m-d H:i:s');
             $appName = env('APP_NAME', 'Website');
-            
+
             // تحديد كود الخطأ
             $errorCode = $this->getErrorCode($exception);
             $emoji = $this->getErrorEmoji($errorCode);
-            
+
             // جمع معلومات الزائر
             $ip = $this->getClientIp();
             $locationData = $this->getIpLocationWithCoords($ip);
             $deviceInfo = $this->getDeviceInfo();
-            
+
             // رسالة مختصرة ومفيدة
             $message = "{$emoji} *{$appName}*\n\n";
             $message .= "📄 *Page:* `/{$path}`\n";
-            $message .= "❌ *Error {$errorCode}:*\n`" . $this->truncate($exception->getMessage(), 200) . "`\n\n";
+            $message .= "❌ *Error {$errorCode}:*\n`".$this->truncate($exception->getMessage(), 200)."`\n\n";
             $message .= "👤 *Visitor Info:*\n";
             $message .= "🌐 *IP:* `{$ip}`\n";
             $message .= "📍 *Location:* {$locationData['location']}\n";
-            
+
             // إضافة رابط Google Maps لو في إحداثيات
-            if (!empty($locationData['maps_link'])) {
+            if (! empty($locationData['maps_link'])) {
                 $message .= "🗺️ *Map:* [Open in Google Maps]({$locationData['maps_link']})\n";
             }
-            
+
             $message .= "💻 *Device:* `{$deviceInfo['device']}`\n";
             $message .= "🖥️ *OS:* `{$deviceInfo['os']}`\n";
             $message .= "🌍 *Browser:* `{$deviceInfo['browser']}`\n\n";
@@ -251,8 +239,8 @@ class Handler extends ExceptionHandler
             // إرسال الرسالة
             $this->sendTelegram($message);
 
-            // تسجيل في الـ log (استخدام default channel)
-            Log::error("Error {$errorCode} - Alert Sent", [
+            // تسجيل في قناة الأخطاء المخصصة
+            Log::channel('errors')->error("Error {$errorCode} - Alert Sent", [
                 'code' => $errorCode,
                 'path' => $path,
                 'error' => $exception->getMessage(),
@@ -265,40 +253,34 @@ class Handler extends ExceptionHandler
 
     /**
      * Get HTTP error code from exception
-     *
-     * @param \Throwable $exception
-     * @return int
      */
     protected function getErrorCode(\Throwable $exception): int
     {
         if ($exception instanceof HttpException) {
             return $exception->getStatusCode();
         }
-        
+
         if ($exception instanceof ModelNotFoundException) {
             return 404;
         }
-        
+
         if ($exception instanceof AuthorizationException) {
             return 403;
         }
-        
+
         if ($exception instanceof ValidationException) {
             return 422;
         }
-        
+
         return 500;
     }
 
     /**
      * Get emoji based on error code
-     *
-     * @param int $code
-     * @return string
      */
     protected function getErrorEmoji(int $code): string
     {
-        return match($code) {
+        return match ($code) {
             400 => '⚠️',
             401 => '🔐',
             403 => '🚫',
@@ -315,31 +297,26 @@ class Handler extends ExceptionHandler
 
     /**
      * Truncate string to avoid Telegram message limit
-     *
-     * @param string $text
-     * @param int $length
-     * @return string
      */
     protected function truncate(string $text, int $length): string
     {
         // إزالة الأسطر الجديدة المتعددة والمسافات
         $text = preg_replace('/\s+/', ' ', trim($text));
-        
+
         if (strlen($text) <= $length) {
             return $text;
         }
-        return substr($text, 0, $length) . '...';
+
+        return substr($text, 0, $length).'...';
     }
 
     /**
      * Get the real client IP address
-     *
-     * @return string
      */
     protected function getClientIp(): string
     {
         $request = request();
-        
+
         // Check for proxied IP addresses
         $headers = [
             'HTTP_CF_CONNECTING_IP',     // Cloudflare
@@ -348,85 +325,87 @@ class Handler extends ExceptionHandler
             'HTTP_CLIENT_IP',            // Some proxies
             'REMOTE_ADDR',               // Direct connection
         ];
-        
+
         foreach ($headers as $header) {
             $ip = $request->server($header);
             if ($ip) {
                 // X-Forwarded-For may contain multiple IPs, take the first one
                 $ips = explode(',', $ip);
                 $ip = trim($ips[0]);
-                
+
                 // Validate IP
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     return $ip;
                 }
             }
         }
-        
+
         return $request->ip() ?? 'Unknown';
     }
 
     /**
      * Get location info from IP using multiple free APIs for better accuracy
-     *
-     * @param string $ip
-     * @return string
      */
     protected function getIpLocation(string $ip): string
     {
         $data = $this->getIpLocationWithCoords($ip);
+
         return $data['location'];
     }
 
     /**
      * Get location info with coordinates from IP
      *
-     * @param string $ip
      * @return array ['location' => string, 'maps_link' => string|null]
      */
     protected function getIpLocationWithCoords(string $ip): array
     {
         $default = ['location' => 'Unknown', 'maps_link' => null];
-        
+
         try {
             // Skip for local/private IPs
             if ($this->isPrivateIp($ip)) {
                 return ['location' => 'Local Network', 'maps_link' => null];
             }
-            
+
             // Try ipgeolocation.io first (most accurate with coordinates)
             $result = $this->tryIpGeolocationIoWithCoords($ip);
-            if ($result) return $result;
-            
+            if ($result) {
+                return $result;
+            }
+
             // Fallback APIs (without coordinates)
             $location = $this->tryIpApiCo($ip);
-            if ($location) return ['location' => $location, 'maps_link' => null];
-            
+            if ($location) {
+                return ['location' => $location, 'maps_link' => null];
+            }
+
             $location = $this->tryIpWhois($ip);
-            if ($location) return ['location' => $location, 'maps_link' => null];
-            
+            if ($location) {
+                return ['location' => $location, 'maps_link' => null];
+            }
+
             $location = $this->tryIpApi($ip);
-            if ($location) return ['location' => $location, 'maps_link' => null];
-            
+            if ($location) {
+                return ['location' => $location, 'maps_link' => null];
+            }
+
         } catch (\Exception $e) {
             // Silently fail
         }
-        
+
         return $default;
     }
 
     /**
      * Try ipgeolocation.io with coordinates - Most accurate (district level)
      * Free: 1000 requests/day, 30000/month
-     *
-     * @param string $ip
-     * @return array|null
      */
     protected function tryIpGeolocationIoWithCoords(string $ip): ?array
     {
         try {
             $apiKey = env('IPGEOLOCATION_API_KEY', '816d3e6dd7fb47b0b2b85f9a5b027ea0');
-            
+
             $ch = curl_init();
             curl_setopt_array($ch, [
                 CURLOPT_URL => "https://api.ipgeolocation.io/v2/ipgeo?apiKey={$apiKey}&ip={$ip}",
@@ -439,11 +418,11 @@ class Handler extends ExceptionHandler
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_SSL_VERIFYPEER => false,
             ]);
-            
+
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
-            
+
             if ($httpCode === 200 && $response) {
                 $data = json_decode($response, true);
                 if ($data && isset($data['location'])) {
@@ -452,24 +431,24 @@ class Handler extends ExceptionHandler
                         $loc['district'] ?? '',
                         $loc['city'] ?? '',
                         $loc['state_prov'] ?? '',
-                        $loc['country_name'] ?? ''
+                        $loc['country_name'] ?? '',
                     ]);
-                    
-                    if (!empty($parts)) {
+
+                    if (! empty($parts)) {
                         $emoji = $loc['country_emoji'] ?? '';
-                        $locationStr = $emoji . ' ' . implode(', ', $parts);
-                        
+                        $locationStr = $emoji.' '.implode(', ', $parts);
+
                         // Build Google Maps link if coordinates available
                         $mapsLink = null;
-                        if (!empty($loc['latitude']) && !empty($loc['longitude'])) {
+                        if (! empty($loc['latitude']) && ! empty($loc['longitude'])) {
                             $lat = $loc['latitude'];
                             $lng = $loc['longitude'];
                             $mapsLink = "https://www.google.com/maps?q={$lat},{$lng}";
                         }
-                        
+
                         return [
                             'location' => $locationStr,
-                            'maps_link' => $mapsLink
+                            'maps_link' => $mapsLink,
                         ];
                     }
                 }
@@ -477,28 +456,24 @@ class Handler extends ExceptionHandler
         } catch (\Exception $e) {
             // Try next API
         }
+
         return null;
     }
 
     /**
      * Try ipgeolocation.io - Most accurate (district level)
      * Free: 1000 requests/day, 30000/month
-     *
-     * @param string $ip
-     * @return string|null
      */
     protected function tryIpGeolocationIo(string $ip): ?string
     {
         $result = $this->tryIpGeolocationIoWithCoords($ip);
+
         return $result ? $result['location'] : null;
     }
 
     /**
      * Try ipapi.co - More accurate for Middle East/Africa
      * Free: 1000 requests/day
-     *
-     * @param string $ip
-     * @return string|null
      */
     protected function tryIpApiCo(string $ip): ?string
     {
@@ -513,16 +488,16 @@ class Handler extends ExceptionHandler
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
-            
+
             if ($httpCode === 200 && $response) {
                 $data = json_decode($response, true);
-                if ($data && !isset($data['error'])) {
+                if ($data && ! isset($data['error'])) {
                     $parts = array_filter([
                         $data['city'] ?? '',
                         $data['region'] ?? '',
-                        $data['country_name'] ?? ''
+                        $data['country_name'] ?? '',
                     ]);
-                    if (!empty($parts)) {
+                    if (! empty($parts)) {
                         return implode(', ', $parts);
                     }
                 }
@@ -530,15 +505,13 @@ class Handler extends ExceptionHandler
         } catch (\Exception $e) {
             // Try next API
         }
+
         return null;
     }
 
     /**
      * Try ipwhois.io - Good accuracy, includes ISP info
      * Free: 10000 requests/month
-     *
-     * @param string $ip
-     * @return string|null
      */
     protected function tryIpWhois(string $ip): ?string
     {
@@ -552,16 +525,16 @@ class Handler extends ExceptionHandler
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
-            
+
             if ($httpCode === 200 && $response) {
                 $data = json_decode($response, true);
                 if ($data && ($data['success'] ?? true) !== false) {
                     $parts = array_filter([
                         $data['city'] ?? '',
                         $data['region'] ?? '',
-                        $data['country'] ?? ''
+                        $data['country'] ?? '',
                     ]);
-                    if (!empty($parts)) {
+                    if (! empty($parts)) {
                         return implode(', ', $parts);
                     }
                 }
@@ -569,15 +542,13 @@ class Handler extends ExceptionHandler
         } catch (\Exception $e) {
             // Try next API
         }
+
         return null;
     }
 
     /**
      * Try ip-api.com - Fallback option
      * Free: 45 requests/minute
-     *
-     * @param string $ip
-     * @return string|null
      */
     protected function tryIpApi(string $ip): ?string
     {
@@ -589,16 +560,16 @@ class Handler extends ExceptionHandler
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
             $response = curl_exec($ch);
             curl_close($ch);
-            
+
             if ($response) {
                 $data = json_decode($response, true);
                 if ($data && $data['status'] === 'success') {
                     $parts = array_filter([
                         $data['city'] ?? '',
                         $data['regionName'] ?? '',
-                        $data['country'] ?? ''
+                        $data['country'] ?? '',
                     ]);
-                    if (!empty($parts)) {
+                    if (! empty($parts)) {
                         return implode(', ', $parts);
                     }
                 }
@@ -606,18 +577,16 @@ class Handler extends ExceptionHandler
         } catch (\Exception $e) {
             // All APIs failed
         }
+
         return null;
     }
 
     /**
      * Check if IP is private/local
-     *
-     * @param string $ip
-     * @return bool
      */
     protected function isPrivateIp(string $ip): bool
     {
-        return !filter_var(
+        return ! filter_var(
             $ip,
             FILTER_VALIDATE_IP,
             FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
@@ -626,13 +595,11 @@ class Handler extends ExceptionHandler
 
     /**
      * Get device information from User Agent
-     *
-     * @return array
      */
     protected function getDeviceInfo(): array
     {
         $userAgent = request()->userAgent() ?? '';
-        
+
         return [
             'device' => $this->detectDevice($userAgent),
             'os' => $this->detectOS($userAgent),
@@ -642,59 +609,53 @@ class Handler extends ExceptionHandler
 
     /**
      * Detect device type from User Agent
-     *
-     * @param string $userAgent
-     * @return string
      */
     protected function detectDevice(string $userAgent): string
     {
         $userAgent = strtolower($userAgent);
-        
+
         // Check for tablets first (before mobile)
         if (preg_match('/tablet|ipad|playbook|silk/i', $userAgent)) {
             return '📱 Tablet';
         }
-        
+
         // Check for mobile devices
         if (preg_match('/mobile|android|iphone|ipod|blackberry|opera mini|iemobile|wpdesktop/i', $userAgent)) {
             return '📱 Mobile';
         }
-        
+
         // Check for bots/crawlers
         if (preg_match('/bot|crawl|spider|slurp|googlebot|bingbot|yandex/i', $userAgent)) {
             return '🤖 Bot/Crawler';
         }
-        
+
         return '🖥️ Desktop';
     }
 
     /**
      * Detect operating system from User Agent
-     *
-     * @param string $userAgent
-     * @return string
      */
     protected function detectOS(string $userAgent): string
     {
         $osList = [
-            '/windows nt 10/i'      => 'Windows 10/11',
-            '/windows nt 6.3/i'     => 'Windows 8.1',
-            '/windows nt 6.2/i'     => 'Windows 8',
-            '/windows nt 6.1/i'     => 'Windows 7',
-            '/windows nt 6.0/i'     => 'Windows Vista',
-            '/windows phone/i'      => 'Windows Phone',
+            '/windows nt 10/i' => 'Windows 10/11',
+            '/windows nt 6.3/i' => 'Windows 8.1',
+            '/windows nt 6.2/i' => 'Windows 8',
+            '/windows nt 6.1/i' => 'Windows 7',
+            '/windows nt 6.0/i' => 'Windows Vista',
+            '/windows phone/i' => 'Windows Phone',
             '/macintosh|mac os x/i' => 'macOS',
-            '/mac_powerpc/i'        => 'Mac OS 9',
-            '/iphone/i'             => 'iOS (iPhone)',
-            '/ipad/i'               => 'iOS (iPad)',
-            '/ipod/i'               => 'iOS (iPod)',
-            '/android/i'            => 'Android',
-            '/linux/i'              => 'Linux',
-            '/ubuntu/i'             => 'Ubuntu',
-            '/blackberry/i'         => 'BlackBerry',
-            '/webos/i'              => 'webOS',
+            '/mac_powerpc/i' => 'Mac OS 9',
+            '/iphone/i' => 'iOS (iPhone)',
+            '/ipad/i' => 'iOS (iPad)',
+            '/ipod/i' => 'iOS (iPod)',
+            '/android/i' => 'Android',
+            '/linux/i' => 'Linux',
+            '/ubuntu/i' => 'Ubuntu',
+            '/blackberry/i' => 'BlackBerry',
+            '/webos/i' => 'webOS',
         ];
-        
+
         foreach ($osList as $pattern => $os) {
             if (preg_match($pattern, $userAgent)) {
                 // Try to get version for Android
@@ -703,34 +664,32 @@ class Handler extends ExceptionHandler
                 }
                 // Try to get version for iOS
                 if (strpos($os, 'iOS') !== false && preg_match('/os\s([\d_]+)/i', $userAgent, $matches)) {
-                    return str_replace('_', '.', $os . ' ' . $matches[1]);
+                    return str_replace('_', '.', $os.' '.$matches[1]);
                 }
+
                 return $os;
             }
         }
-        
+
         return 'Unknown OS';
     }
 
     /**
      * Detect browser from User Agent
-     *
-     * @param string $userAgent
-     * @return string
      */
     protected function detectBrowser(string $userAgent): string
     {
         $browserList = [
-            '/edge|edg/i'           => 'Microsoft Edge',
-            '/opr|opera/i'          => 'Opera',
-            '/chrome|crios/i'       => 'Chrome',
-            '/firefox|fxios/i'      => 'Firefox',
-            '/safari/i'             => 'Safari',
-            '/msie|trident/i'       => 'Internet Explorer',
-            '/samsung/i'            => 'Samsung Browser',
-            '/ucbrowser/i'          => 'UC Browser',
+            '/edge|edg/i' => 'Microsoft Edge',
+            '/opr|opera/i' => 'Opera',
+            '/chrome|crios/i' => 'Chrome',
+            '/firefox|fxios/i' => 'Firefox',
+            '/safari/i' => 'Safari',
+            '/msie|trident/i' => 'Internet Explorer',
+            '/samsung/i' => 'Samsung Browser',
+            '/ucbrowser/i' => 'UC Browser',
         ];
-        
+
         foreach ($browserList as $pattern => $browser) {
             if (preg_match($pattern, $userAgent)) {
                 // Try to get version
@@ -741,17 +700,17 @@ class Handler extends ExceptionHandler
                     'Safari' => '/version\/([\d.]+)/i',
                     'Opera' => '/(?:opr|opera)[\/\s]([\d.]+)/i',
                 ];
-                
+
                 foreach ($versionPatterns as $name => $vPattern) {
                     if (stripos($browser, $name) !== false && preg_match($vPattern, $userAgent, $matches)) {
                         return "{$browser} {$matches[1]}";
                     }
                 }
-                
+
                 return $browser;
             }
         }
-        
+
         return 'Unknown Browser';
     }
 
@@ -759,7 +718,6 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
      * @return \Illuminate\Http\Response
      *
      * @throws \Throwable
