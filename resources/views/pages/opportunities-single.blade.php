@@ -277,13 +277,12 @@
                     @endif
 
                     <div class="row" dir="">
-                        @if ($page->sliders && count($page->sliders) == 1)
+                        @if ($page?->sliders && count($page->sliders) == 1)
                             <div class="col-md-12">
-                                @if ($page->parent->slug == 'partners')
-                                    @if ($page->slider->original)
+                                @if ($page?->parent?->slug == 'partners')
+                                    @if ($page?->slider?->original)
                                         <img src="{{ url('public/' . $page->slider->original->url) }}" width="100%">
                                         <span class="imgcap">
-
                                             @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
                                                 <span dir="rtl"
                                                     class="">{{ $page->slider->original->caption_ar }}</span>
@@ -293,7 +292,7 @@
                                         </span>
                                     @endif
                                 @else
-                                    @if ($page->slider->landscape)
+                                    @if ($page?->slider?->landscape)
                                         <img src="{{ url('public/' . $page->slider->landscape->url) }}" width="100%"
                                             class="featured-img">
                                         <span class="imgcap">
@@ -320,9 +319,9 @@
                         </div>
 
                         <!--   <div class="col-md-6 </?php echo isset($_GET['lang']) ? 'text-right cairo' : 'text-left'; ?>" </?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                                                            {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
-                                                            </div>
-                                        -->
+                                                                {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
+                                                                </div>
+                                            -->
                     </div>
                 </div>
             </div>
@@ -335,10 +334,10 @@
                         </div>
                         <br />
                         <!--
-                        // ! ||--------------------------------------------------------------------------------||
-                        // ! ||                  this comment to hide bottom for opportunities                 ||
-                        // ! ||--------------------------------------------------------------------------------||
-                        -->
+                            // ! ||--------------------------------------------------------------------------------||
+                            // ! ||                  this comment to hide bottom for opportunities                 ||
+                            // ! ||--------------------------------------------------------------------------------||
+                            -->
                         {{-- <div class="row"> --}}
                         {{-- @foreach ($data as $item) --}}
                         {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
@@ -464,12 +463,25 @@
     @endif
 
 
-    @if ($page->additional_content_bottom)
+
+    @if ($page?->additional_content_bottom)
         <div class="container text-center">
             <div class="body-section contents with-img-header">
                 <div class="row" dir="rtl">
                     <div class="col-md-12 text-left">
                         {!! $page->additional_content_bottom !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if ($page?->additional_content_ar_bottom)
+        <div class="container text-center">
+            <div class="body-section contents with-img-header">
+                <div class="row" dir="rtl">
+                    <div class="col-md-12 text-left">
+                        {!! $page->additional_content_ar_bottom !!}
                     </div>
                 </div>
             </div>
