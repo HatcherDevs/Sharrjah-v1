@@ -188,8 +188,12 @@ class PageController extends Controller
         $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads', 'additional2_content_en', 'additional2_content_ar', 'additional2_content_img');
 
         if (isset($data['name'])) {
+            $data['name'] = trim($data['name']);
+
             if ($id != 15) {
-                $data['slug'] = $this->generateSlug($data['name']);
+                if (! $id || $page->name !== $data['name']) {
+                    $data['slug'] = $this->generateSlug($data['name'], $id);
+                }
             }
         }
 
