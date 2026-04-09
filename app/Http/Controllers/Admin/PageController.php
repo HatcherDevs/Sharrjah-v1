@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use File;
-use Carbon\Carbon;
-use App\Models\Page;
-use App\Models\Post;
-use App\Http\Requests;
-use App\Models\Upload;
-use App\Models\Forms\Form;
-use App\Models\Contributor;
-use App\Models\Publication;
-use Illuminate\Support\Arr;
-use App\Models\PageTemplate;
-use Illuminate\Http\Request;
-use App\Traits\CanCreateSlug;
-use App\Models\PageImageSlide;
-
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
+use App\Models\Contributor;
+use App\Models\Forms\Form;
+use App\Models\Page;
+use App\Models\PageImageSlide;
+use App\Models\PageTemplate;
+use App\Models\Post;
+use App\Models\Publication;
+use App\Models\Upload;
 use App\Services\Uploaders\PageImagesUploader;
-use App\Services\Uploaders\PageLandscapeImageUploader;
 use App\Services\Uploaders\PageImagesUploaderFullWidth;
+use App\Services\Uploaders\PageLandscapeImageUploader;
+use App\Traits\CanCreateSlug;
+use File;
+use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
@@ -36,7 +30,6 @@ class PageController extends Controller
         $this->uploaderFullWidth = $uploaderFullWidth;
     }
 
-
     public function contributors()
     {
 
@@ -49,6 +42,7 @@ class PageController extends Controller
     public function show()
     {
         $pages = $this->model->get();
+
         return view('admin.pages.show', compact('pages'));
     }
 
@@ -57,6 +51,12 @@ class PageController extends Controller
         $page = $this->model->find($id);
         $pages = $this->model->where('page_type', 'main')->select('id', 'name')->get();
         $templates = PageTemplate::select('slug', 'name')->get();
+        if (! $templates->contains('slug', 'list-one-lang-v2')) {
+            $templates->push((object) [
+                'slug' => 'list-one-lang-v2',
+                'name' => 'List with one language (new)',
+            ]);
+        }
         $forms = Form::select('id', 'title')->get();
 
         return view('admin.pages.edit', compact('page', 'pages', 'templates', 'forms'));
@@ -66,8 +66,9 @@ class PageController extends Controller
     {
         $page = $this->model->find($id);
 
-        if ($page)
+        if ($page) {
             $page->delete();
+        }
 
         return redirect()->back();
     }
@@ -76,6 +77,12 @@ class PageController extends Controller
     {
         $pages = $this->model->where('page_type', 'main')->select('id', 'name')->get();
         $templates = PageTemplate::select('slug', 'name')->get();
+        if (! $templates->contains('slug', 'list-one-lang-v2')) {
+            $templates->push((object) [
+                'slug' => 'list-one-lang-v2',
+                'name' => 'List with one language (new)',
+            ]);
+        }
         $forms = Form::select('id', 'title')->get();
 
         return view('admin.pages.create', compact('pages', 'templates', 'forms'));
@@ -89,7 +96,7 @@ class PageController extends Controller
 
         $page = $this->model->find($id);
 
-        if (!$page) {
+        if (! $page) {
             abort(404);
         }
 
@@ -101,29 +108,30 @@ class PageController extends Controller
     public function previewPost($id, Request $request)
     {
         if ($request->isMethod('post')) {
-            $post = Post::find($id) ?: new Post();
+            $post = Post::find($id) ?: new Post;
             $post->fill($request->all());
         } else {
             $post = Post::find($id);
         }
 
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
         $relatedPages = ['pages' => [], 'posts' => []];
+
         return view('pages.post-preview', compact('post', 'relatedPages'));
     }
 
     public function previewPublication($id, Request $request)
     {
         if ($request->isMethod('post')) {
-            $post = Publication::find($id) ?: new Publication();
+            $post = Publication::find($id) ?: new Publication;
             $post->fill($request->all());
         } else {
             $post = Publication::find($id);
         }
 
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
 
@@ -142,7 +150,7 @@ class PageController extends Controller
         $id = $request->input('id') ?: $preview_id;
         $page = $id ? $this->model->find($id) : new $this->model;
 
-        if (!$page && $id) {
+        if (! $page && $id) {
             abort(404, 'Page does not exist');
         }
 
@@ -155,7 +163,7 @@ class PageController extends Controller
                 foreach ($currentImgs as $img) {
                     if ($img && in_array($img, $requestedImgs)) {
                         array_push($additional2_imgs_page, $img);
-                    } else if ($img) {
+                    } elseif ($img) {
                         if (File::exists(public_path($img))) {
                             File::delete(public_path($img));
                         }
@@ -170,12 +178,12 @@ class PageController extends Controller
                 if ($img) {
                     $s = $this->uploaderFullWidth->upload($img);
                     if ($s && isset($s[0])) {
-                        array_push($additional2_imgs_page, $s[0]['path'] . '/' . $s[0]['file_name']);
+                        array_push($additional2_imgs_page, $s[0]['path'].'/'.$s[0]['file_name']);
                     }
                 }
             }
         }
-        $img_encoded = !empty($additional2_imgs_page) ? json_encode($additional2_imgs_page) : null;
+        $img_encoded = ! empty($additional2_imgs_page) ? json_encode($additional2_imgs_page) : null;
 
         $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads', 'additional2_content_en', 'additional2_content_ar', 'additional2_content_img');
 
@@ -197,10 +205,11 @@ class PageController extends Controller
             $page->fill($data);
             $is_preview = true;
             $data = Post::where('page_id', $page->id)->where('active', 1)->paginate(5);
+
             return view('pages.preview', compact('page', 'data', 'is_preview'));
         }
 
-        if (!$id) {
+        if (! $id) {
             $page = $this->model->create($data);
         } else {
             $page->update($data);
@@ -221,7 +230,7 @@ class PageController extends Controller
                     if ($target) {
                         $target->update([
                             'caption' => $upload['EN'] ?? ($upload['caption'] ?? ($target->caption ?? '')),
-                            'caption_ar' => $upload['AR'] ?? ($upload['caption_ar'] ?? ($target->caption_ar ?? ''))
+                            'caption_ar' => $upload['AR'] ?? ($upload['caption_ar'] ?? ($target->caption_ar ?? '')),
                         ]);
                     }
                 }
@@ -237,10 +246,11 @@ class PageController extends Controller
                         if ($target) {
                             $targetSlide = PageImageSlide::find($target->uploadable_id);
                             if ($targetSlide) {
-                                if ($target->template == "square")
+                                if ($target->template == 'square') {
                                     $photo = $this->uploader->upload($upload);
-                                else
+                                } else {
                                     $photo = $this->luploader->upload($upload);
+                                }
 
                                 if ($photo && isset($photo[0])) {
                                     $newUpload = $targetSlide->uploads()->create($photo[0]);
@@ -307,7 +317,7 @@ class PageController extends Controller
                     if ($target) {
                         $target->update([
                             'caption' => $caption['EN'] ?? '',
-                            'caption_ar' => $caption['AR'] ?? ''
+                            'caption_ar' => $caption['AR'] ?? '',
                         ]);
                     }
                 }
@@ -316,7 +326,9 @@ class PageController extends Controller
             if (is_array($request->input('delete'))) {
                 foreach ($request->input('delete') as $item) {
                     $target = PageImageSlide::find($item);
-                    if ($target) $target->delete();
+                    if ($target) {
+                        $target->delete();
+                    }
                 }
             }
         }
@@ -327,6 +339,6 @@ class PageController extends Controller
             $page->forms()->delete();
         }
 
-        return redirect()->to('admin/web-pages/' . $page->id . '/edit');
+        return redirect()->to('admin/web-pages/'.$page->id.'/edit');
     }
 }

@@ -249,7 +249,9 @@ class PageController extends Controller
             return view('pages.materials', compact('page', 'videos', 'upcoming', 'past', 'openCalls'));
         }
 
-        return view('pages.page', compact('page', 'data'));
+        $view = $this->resolvePageTemplateView($page->page_type);
+
+        return view($view, compact('page', 'data'));
     }
 
     public function goToFeatured($slug)
@@ -284,7 +286,22 @@ class PageController extends Controller
 
         $data = null;
 
-        return view('pages.page', compact('page', 'formdata', 'data'));
+        if (in_array($page->page_type, ['list', 'list-one-lang', 'list-image', 'list-one-lang-v2'])) {
+            $data = Post::where('page_id', $page->id)->where('active', 1)->orderBy('publish_date', 'DESC')->paginate(5);
+        }
+
+        $view = $this->resolvePageTemplateView($page->page_type);
+
+        return view($view, compact('page', 'formdata', 'data'));
+    }
+
+    private function resolvePageTemplateView(string $pageType): string
+    {
+        if ($pageType === 'list-one-lang-v2') {
+            return 'pages.list-one-lang';
+        }
+
+        return 'pages.page';
     }
 
     public function showAllPages()

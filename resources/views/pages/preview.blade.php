@@ -72,6 +72,9 @@
                 </div>
             </div>
         @elseif($page->page_type == 'list-one-lang')
+            @php
+                $isArabicListOneLangPreview = isset($_GET['lang']) && $_GET['lang'] == 'ar';
+            @endphp
             <div class="container text-center">
                 <div class="body-section contents">
                     <ul class="figure-list full full-items">
@@ -79,13 +82,12 @@
                             @foreach ($data as $child)
                                 <li class="al-right">
                                     <div class="colm titles">
-                                        @if ($child->title_ar)
+                                        @if ($isArabicListOneLangPreview)
                                             <div class="title clearfix" dir="rtl">
                                                 <a href="{{ $child->linkAr }}">
                                                     <strong><span
                                                             class="ar">{{ $child->title_ar }}</span></strong><br />
-                                                    <span class="ar">{{ $child->description_ar }}</span>
-                                                    {{ $child->description }}<br />
+                                                    <span class="ar">{{ $child->description_ar }}</span><br />
                                                     @if ($child->publish_date)
                                                         <span
                                                             class="ar">{{ $pageService->getArabicDate($child->publish_date->format('d'), intval($child->publish_date->format('m')), $child->publish_date->format('Y')) }}</span>
