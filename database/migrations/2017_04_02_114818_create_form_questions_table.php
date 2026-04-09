@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateFormQuestionsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateFormQuestionsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('form_questions')) {
+            return;
+        }
+
         Schema::create('form_questions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('form_id')->unsigned()->index();
@@ -34,6 +38,10 @@ class CreateFormQuestionsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('form_questions')) {
+            return;
+        }
+
         Schema::drop('form_questions');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateRepositoryImagesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateRepositoryImagesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('repository_images')) {
+            return;
+        }
+
         Schema::create('repository_images', function (Blueprint $table) {
             $table->increments('id');
             $table->string('image');
@@ -28,6 +32,10 @@ class CreateRepositoryImagesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('repository_images')) {
+            return;
+        }
+
         Schema::drop('repository_images');
     }
 }

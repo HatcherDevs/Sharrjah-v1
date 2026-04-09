@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddFieldsToLandingElementsTable extends Migration
 {
@@ -12,6 +12,10 @@ class AddFieldsToLandingElementsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('landing_elements')) {
+            return;
+        }
+
         Schema::table('landing_elements', function (Blueprint $table) {
             $table->string('background_windows')->before('created_at')->nullable();
             $table->string('background_macos')->before('created_at')->nullable();
@@ -26,6 +30,10 @@ class AddFieldsToLandingElementsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('landing_elements')) {
+            return;
+        }
+
         Schema::table('landing_elements', function (Blueprint $table) {
             $table->dropColumn('background_windows');
             $table->dropColumn('background_macos');

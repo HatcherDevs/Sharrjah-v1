@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('pages') || Schema::hasColumn('pages', 'builder_rows')) {
+            return;
+        }
+
         Schema::table('pages', function (Blueprint $table) {
             $table->longText('builder_rows')->nullable()->after('additional2_content_img');
         });
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('pages') || ! Schema::hasColumn('pages', 'builder_rows')) {
+            return;
+        }
+
         Schema::table('pages', function (Blueprint $table) {
             $table->dropColumn('builder_rows');
         });

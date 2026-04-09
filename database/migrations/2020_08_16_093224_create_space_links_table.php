@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateSpaceLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateSpaceLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('space_links')) {
+            return;
+        }
+
         Schema::create('space_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('space_id')->unsigned()->index();
@@ -30,6 +34,10 @@ class CreateSpaceLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('space_links')) {
+            return;
+        }
+
         Schema::drop('space_links');
     }
 }

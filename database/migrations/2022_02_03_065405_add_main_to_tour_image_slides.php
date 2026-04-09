@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddMainToTourImageSlides extends Migration
 {
@@ -12,6 +12,10 @@ class AddMainToTourImageSlides extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('tour_image_slides')) {
+            return;
+        }
+
         Schema::table('tour_image_slides', function (Blueprint $table) {
             $table->tinyInteger('is_main')->default(0);
         });
@@ -24,6 +28,10 @@ class AddMainToTourImageSlides extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('tour_image_slides')) {
+            return;
+        }
+
         Schema::table('tour_image_slides', function (Blueprint $table) {
             $table->dropColumn('is_main');
         });

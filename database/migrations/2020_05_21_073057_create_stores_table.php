@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class CreateStoresTable extends Migration
@@ -13,6 +13,10 @@ class CreateStoresTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('stores')) {
+            return;
+        }
+
         Schema::create('stores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -48,6 +52,10 @@ class CreateStoresTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('podcasts')) {
+            return;
+        }
+
         Schema::drop('podcasts');
     }
 }

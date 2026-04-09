@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateRepositoryTypesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateRepositoryTypesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('repository_types')) {
+            return;
+        }
+
         Schema::create('repository_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -32,6 +36,10 @@ class CreateRepositoryTypesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('repository_types')) {
+            return;
+        }
+
         Schema::drop('repository_types');
     }
 }

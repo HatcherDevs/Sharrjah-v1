@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePageFormsTable extends Migration
 {
@@ -15,6 +15,10 @@ class CreatePageFormsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('page_forms')) {
+            return;
+        }
+
         Schema::create('page_forms', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('formable_id')->unsigned()->index()->nullable();
@@ -31,6 +35,10 @@ class CreatePageFormsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('page_forms')) {
+            return;
+        }
+
         Schema::drop('page_forms');
     }
 }

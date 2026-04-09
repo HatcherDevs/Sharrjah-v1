@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateStoreExternalLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateStoreExternalLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('store_external_links')) {
+            return;
+        }
+
         Schema::create('store_external_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('store_id')->unsigned()->index();
@@ -28,6 +32,10 @@ class CreateStoreExternalLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('store_external_links')) {
+            return;
+        }
+
         Schema::drop('store_external_links');
     }
 }

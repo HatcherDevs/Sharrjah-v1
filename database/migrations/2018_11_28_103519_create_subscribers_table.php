@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateSubscribersTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateSubscribersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('subscribers')) {
+            return;
+        }
+
         Schema::create('subscribers', function (Blueprint $table) {
             // ['EMAIL','FNAME','LNAME','MMERGE5','MMERGE6'];
             $table->increments('id');
@@ -31,6 +35,10 @@ class CreateSubscribersTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('subscribers')) {
+            return;
+        }
+
         Schema::drop('subscribers');
     }
 }

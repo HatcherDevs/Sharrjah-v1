@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateResearchTypesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateResearchTypesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('research_types')) {
+            return;
+        }
+
         Schema::create('research_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -22,7 +26,6 @@ class CreateResearchTypesTable extends Migration
 
             $table->string('slug')->unique();
             $table->string('color');
-
 
             $table->longText('pre-1960')->nullable();
             $table->longText('pre-1960_ar')->nullable();
@@ -55,6 +58,10 @@ class CreateResearchTypesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('research_types')) {
+            return;
+        }
+
         Schema::drop('research_types');
     }
 }

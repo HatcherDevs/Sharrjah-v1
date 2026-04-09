@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePublicationsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreatePublicationsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('publications')) {
+            return;
+        }
+
         Schema::create('publications', function (Blueprint $table) {
             //        'title',
             //        'title_ar',
@@ -61,6 +65,10 @@ class CreatePublicationsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('publications')) {
+            return;
+        }
+
         Schema::drop('publications');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateStoreWorkshopLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateStoreWorkshopLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('store_workshop_links')) {
+            return;
+        }
+
         Schema::create('store_workshop_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('store_workshop_id')->unsigned()->index();
@@ -30,6 +34,10 @@ class CreateStoreWorkshopLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('store_workshop_links')) {
+            return;
+        }
+
         Schema::drop('store_workshop_links');
     }
 }

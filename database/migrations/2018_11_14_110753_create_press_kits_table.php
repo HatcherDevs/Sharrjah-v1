@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePressKitsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreatePressKitsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('press_kits')) {
+            return;
+        }
+
         Schema::create('press_kits', function (Blueprint $table) {
             $table->increments('id');
             $table->string('username');
@@ -34,6 +38,10 @@ class CreatePressKitsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('press_kits')) {
+            return;
+        }
+
         Schema::drop('press_kits');
     }
 }

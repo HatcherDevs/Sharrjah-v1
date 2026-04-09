@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateMaterialsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateMaterialsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('materials')) {
+            return;
+        }
+
         Schema::create('materials', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -39,6 +43,10 @@ class CreateMaterialsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('podcasts')) {
+            return;
+        }
+
         Schema::drop('podcasts');
     }
 }

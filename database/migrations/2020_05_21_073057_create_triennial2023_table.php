@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateTriennial2023Table extends Migration
 {
@@ -12,6 +12,10 @@ class CreateTriennial2023Table extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('triennial2023s')) {
+            return;
+        }
+
         Schema::create('triennial2023s', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -60,6 +64,10 @@ class CreateTriennial2023Table extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('triennial2023s')) {
+            return;
+        }
+
         Schema::drop('triennial2023s');
     }
 }

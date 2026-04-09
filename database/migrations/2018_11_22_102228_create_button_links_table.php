@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateButtonLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateButtonLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('button_links')) {
+            return;
+        }
+
         Schema::create('button_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('linkable_id')->unsigned()->index()->nullable();
@@ -30,6 +34,10 @@ class CreateButtonLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('button_links')) {
+            return;
+        }
+
         Schema::drop('button_links');
     }
 }

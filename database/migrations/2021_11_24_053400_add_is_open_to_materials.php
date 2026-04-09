@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddIsOpenToMaterials extends Migration
 {
@@ -12,6 +12,10 @@ class AddIsOpenToMaterials extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('materials')) {
+            return;
+        }
+
         Schema::table('materials', function (Blueprint $table) {
             $table->tinyInteger('is_open')->default(0);
         });
@@ -24,6 +28,10 @@ class AddIsOpenToMaterials extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('materials')) {
+            return;
+        }
+
         Schema::table('materials', function (Blueprint $table) {
             $table->dropColumn('is_open');
         });

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePageParentsTable extends Migration
 {
@@ -13,6 +13,10 @@ class CreatePageParentsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('page_parents')) {
+            return;
+        }
+
         Schema::create('page_parents', function (Blueprint $table) {
             $table->integer('page_id')->unsigned()->index();
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');

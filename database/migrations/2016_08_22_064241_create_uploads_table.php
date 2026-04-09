@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateUploadsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -13,8 +12,11 @@ class CreateUploadsTable extends Migration
      */
     public function up()
     {
-        Schema::create('uploads', function(Blueprint $table)
-        {
+        if (Schema::hasTable('uploads')) {
+            return;
+        }
+
+        Schema::create('uploads', function (Blueprint $table) {
             $table->increments('id');
             $table->string('path');
             $table->string('original_name');
@@ -37,6 +39,10 @@ class CreateUploadsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('uploads')) {
+            return;
+        }
+
         Schema::drop('uploads');
     }
 }

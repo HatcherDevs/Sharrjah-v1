@@ -13,6 +13,10 @@ class CreateCollectionCategoriesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('collection_categories')) {
+            return;
+        }
+
         Schema::create('collection_categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
@@ -29,6 +33,10 @@ class CreateCollectionCategoriesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('collection_categories')) {
+            return;
+        }
+
         Schema::drop('collection_categories');
     }
 }

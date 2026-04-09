@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateSpacesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateSpacesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('spaces')) {
+            return;
+        }
+
         Schema::create('spaces', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -45,6 +49,10 @@ class CreateSpacesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('podcasts')) {
+            return;
+        }
+
         Schema::drop('podcasts');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateStoreWorkshopExternalFilesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateStoreWorkshopExternalFilesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('store_workshop_external_files')) {
+            return;
+        }
+
         Schema::create('store_workshop_external_files', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('store_workshop_id')->unsigned()->index();
@@ -29,6 +33,10 @@ class CreateStoreWorkshopExternalFilesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('store_workshop_external_files')) {
+            return;
+        }
+
         Schema::drop('store_workshop_external_files');
     }
 }

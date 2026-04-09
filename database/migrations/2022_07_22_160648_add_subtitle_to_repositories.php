@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddSubtitleToRepositories extends Migration
 {
@@ -12,6 +12,10 @@ class AddSubtitleToRepositories extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('repositories')) {
+            return;
+        }
+
         Schema::table('repositories', function (Blueprint $table) {
             $table->string('subtitle')->nullable();
             $table->string('subtitle_ar')->nullable();
@@ -25,6 +29,10 @@ class AddSubtitleToRepositories extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('repositories')) {
+            return;
+        }
+
         Schema::table('repositories', function (Blueprint $table) {
             $table->dropColumn('subtitle');
             $table->dropColumn('subtitle_ar');

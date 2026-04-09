@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateLandingElementsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateLandingElementsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('landing_elements')) {
+            return;
+        }
+
         Schema::create('landing_elements', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -30,6 +34,10 @@ class CreateLandingElementsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('landing_elements')) {
+            return;
+        }
+
         Schema::drop('landing_elements');
     }
 }

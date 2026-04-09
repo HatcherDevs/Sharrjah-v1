@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePublicationExternalFilesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreatePublicationExternalFilesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('publication_external_files')) {
+            return;
+        }
+
         Schema::create('publication_external_files', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('publication_id')->unsigned()->index();
@@ -28,6 +32,10 @@ class CreatePublicationExternalFilesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('publication_external_files')) {
+            return;
+        }
+
         Schema::drop('publication_external_files');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateTriennial2023ExternalLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateTriennial2023ExternalLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('triennial2023_external_links')) {
+            return;
+        }
+
         Schema::create('triennial2023_external_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('triennial2023_id')->unsigned()->index();
@@ -28,6 +32,10 @@ class CreateTriennial2023ExternalLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('triennial2023_external_links')) {
+            return;
+        }
+
         Schema::drop('triennial2023_external_links');
     }
 }

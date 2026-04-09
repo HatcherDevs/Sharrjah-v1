@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('posts')) {
+            return;
+        }
+
         Schema::table('posts', function (Blueprint $table) {
             $table->string('link')->nullable()->after('title_ar');
             $table->string('link_ar')->nullable()->after('link');
@@ -24,6 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('posts')) {
+            return;
+        }
+
         Schema::table('posts', function (Blueprint $table) {
             $table->dropColumn(['link', 'link_ar', 'is_external', 'content_additional']);
         });

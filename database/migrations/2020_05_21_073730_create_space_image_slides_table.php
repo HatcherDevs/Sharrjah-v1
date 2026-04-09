@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateSpaceImageSlidesTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateSpaceImageSlidesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('space_image_slides')) {
+            return;
+        }
+
         Schema::create('space_image_slides', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('space_id')->unsigned()->index();
@@ -27,6 +31,10 @@ class CreateSpaceImageSlidesTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('space_image_slides')) {
+            return;
+        }
+
         Schema::drop('space_image_slides');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateResearchContentsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateResearchContentsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('research_contents')) {
+            return;
+        }
+
         Schema::create('research_contents', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -34,6 +38,10 @@ class CreateResearchContentsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('research_contents')) {
+            return;
+        }
+
         Schema::drop('research_contents');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddUrlToSpaceExternalLinksTable extends Migration
 {
@@ -12,7 +12,11 @@ class AddUrlToSpaceExternalLinksTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('space_external_links', 'url')) {
+        if (! Schema::hasTable('space_external_links')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('space_external_links', 'url')) {
             Schema::table('space_external_links', function (Blueprint $table) {
                 $table->string('url')->after('language')->nullable();
             });
@@ -26,6 +30,10 @@ class AddUrlToSpaceExternalLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('space_external_links')) {
+            return;
+        }
+
         if (Schema::hasColumn('space_external_links', 'url')) {
             Schema::table('space_external_links', function (Blueprint $table) {
                 $table->dropColumn('url');

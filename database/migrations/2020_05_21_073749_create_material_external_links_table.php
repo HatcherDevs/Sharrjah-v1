@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateMaterialExternalLinksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateMaterialExternalLinksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('material_external_links')) {
+            return;
+        }
+
         Schema::create('material_external_links', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('material_id')->unsigned()->index();
@@ -28,6 +32,10 @@ class CreateMaterialExternalLinksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('material_external_links')) {
+            return;
+        }
+
         Schema::drop('material_external_links');
     }
 }

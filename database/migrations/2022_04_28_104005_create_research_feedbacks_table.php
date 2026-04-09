@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateResearchFeedbacksTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateResearchFeedbacksTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('research_feedbacks')) {
+            return;
+        }
+
         Schema::create('research_feedbacks', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -30,6 +34,10 @@ class CreateResearchFeedbacksTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('research_feedbacks')) {
+            return;
+        }
+
         Schema::drop('research_feedbacks');
     }
 }

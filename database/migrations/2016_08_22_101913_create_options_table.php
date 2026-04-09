@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateOptionsTable extends Migration
 {
@@ -12,6 +12,10 @@ class CreateOptionsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('options')) {
+            return;
+        }
+
         Schema::create('options', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -27,6 +31,10 @@ class CreateOptionsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('options')) {
+            return;
+        }
+
         Schema::drop('options');
     }
 }
