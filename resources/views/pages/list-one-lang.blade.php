@@ -141,6 +141,8 @@
             </div>
         @endif
 
+        @include('partials.builder-rows-one-lang')
+
         @if (($isArabic && $page->additional_content_ar_bottom) || (!$isArabic && $page->additional_content_bottom))
             <div class="container text-center">
                 <div class="body-section contents with-img-header">

@@ -37,6 +37,7 @@ class Page extends Model
             'additional2_content_en' => 1,
             'additional2_content_ar' => 1,
             'additional2_content_img' => 1,
+            'builder_rows' => 1,
 
         ],
     ];
@@ -60,6 +61,7 @@ class Page extends Model
         'additional2_content_en',
         'additional2_content_ar',
         'additional2_content_img',
+        'builder_rows',
     ];
 
     protected $casts = [

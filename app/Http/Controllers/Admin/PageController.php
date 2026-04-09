@@ -185,7 +185,7 @@ class PageController extends Controller
         }
         $img_encoded = ! empty($additional2_imgs_page) ? json_encode($additional2_imgs_page) : null;
 
-        $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads', 'additional2_content_en', 'additional2_content_ar', 'additional2_content_img');
+        $data = $request->except('images', 'page_id', 'id', 'captions', 'uploads', 'additional2_content_en', 'additional2_content_ar', 'additional2_content_img', 'builder_rows', 'builder_rows_uploads');
 
         if (isset($data['name'])) {
             $data['name'] = trim($data['name']);
@@ -204,6 +204,8 @@ class PageController extends Controller
         $data['additional2_content_en'] = is_array($request->additional2_content_en) ? json_encode($request->additional2_content_en) : null;
         $data['additional2_content_ar'] = is_array($request->additional2_content_ar) ? json_encode($request->additional2_content_ar) : null;
         $data['additional2_content_img'] = $img_encoded;
+        $builderRows = $this->attachBuilderRowsUploads($request->input('builder_rows'), $request->file('builder_rows_uploads'));
+        $data['builder_rows'] = $this->normalizeBuilderRows($builderRows);
 
         if ($request->has('preview_mode') && $request->preview_mode == 'draft') {
             $page->fill($data);
@@ -344,5 +346,98 @@ class PageController extends Controller
         }
 
         return redirect()->to('admin/web-pages/'.$page->id.'/edit');
+    }
+
+    private function normalizeBuilderRows($rows): ?string
+    {
+        if (! is_array($rows)) {
+            return null;
+        }
+
+        $normalizedRows = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $type = trim((string) ($row['type'] ?? ''));
+
+            if ($type === '') {
+                continue;
+            }
+
+            $normalizedRow = [
+                'type' => $type,
+                'title_en' => trim((string) ($row['title_en'] ?? '')),
+                'title_ar' => trim((string) ($row['title_ar'] ?? '')),
+                'subtitle_en' => trim((string) ($row['subtitle_en'] ?? '')),
+                'subtitle_ar' => trim((string) ($row['subtitle_ar'] ?? '')),
+                'items' => [],
+            ];
+
+            if (is_array($row['items'] ?? null)) {
+                foreach ($row['items'] as $item) {
+                    if (! is_array($item)) {
+                        continue;
+                    }
+
+                    $normalizedItem = [
+                        'image' => trim((string) ($item['image'] ?? '')),
+                        'url' => trim((string) ($item['url'] ?? '')),
+                        'title_en' => trim((string) ($item['title_en'] ?? '')),
+                        'title_ar' => trim((string) ($item['title_ar'] ?? '')),
+                        'subtitle_en' => trim((string) ($item['subtitle_en'] ?? '')),
+                        'subtitle_ar' => trim((string) ($item['subtitle_ar'] ?? '')),
+                        'date' => trim((string) ($item['date'] ?? '')),
+                        'description_en' => trim((string) ($item['description_en'] ?? '')),
+                        'description_ar' => trim((string) ($item['description_ar'] ?? '')),
+                    ];
+
+                    $hasContent = collect($normalizedItem)->contains(function ($value) {
+                        return $value !== '';
+                    });
+
+                    if ($hasContent) {
+                        $normalizedRow['items'][] = $normalizedItem;
+                    }
+                }
+            }
+
+            $normalizedRows[] = $normalizedRow;
+        }
+
+        if (count($normalizedRows) === 0) {
+            return null;
+        }
+
+        return json_encode($normalizedRows);
+    }
+
+    private function attachBuilderRowsUploads($rows, $uploads): array
+    {
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        foreach ($rows as $rowIndex => $row) {
+            if (! is_array($row) || ! is_array($row['items'] ?? null)) {
+                continue;
+            }
+
+            foreach ($row['items'] as $itemIndex => $item) {
+                $file = $uploads[$rowIndex][$itemIndex] ?? null;
+
+                if ($file) {
+                    $uploaded = $this->uploaderFullWidth->upload($file);
+
+                    if ($uploaded && isset($uploaded[0]['path'], $uploaded[0]['file_name'])) {
+                        $rows[$rowIndex]['items'][$itemIndex]['image'] = $uploaded[0]['path'].'/'.$uploaded[0]['file_name'];
+                    }
+                }
+            }
+        }
+
+        return $rows;
     }
 }

@@ -319,9 +319,9 @@
                         </div>
 
                         <!--   <div class="col-md-6 </?php echo isset($_GET['lang']) ? 'text-right cairo' : 'text-left'; ?>" </?php echo isset($_GET['lang']) ? 'dir="rtl"' : ''; ?>>
-                                                                {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
-                                                                </div>
-                                            -->
+                                                                    {!! isset($_GET['lang']) ? $post->content_ar : $post->content !!}
+                                                                    </div>
+                                                -->
                     </div>
                 </div>
             </div>
@@ -334,10 +334,10 @@
                         </div>
                         <br />
                         <!--
-                            // ! ||--------------------------------------------------------------------------------||
-                            // ! ||                  this comment to hide bottom for opportunities                 ||
-                            // ! ||--------------------------------------------------------------------------------||
-                            -->
+                                // ! ||--------------------------------------------------------------------------------||
+                                // ! ||                  this comment to hide bottom for opportunities                 ||
+                                // ! ||--------------------------------------------------------------------------------||
+                                -->
                         {{-- <div class="row"> --}}
                         {{-- @foreach ($data as $item) --}}
                         {{-- @if (isset($_GET['lang']) && $_GET['lang'] == 'ar')
@@ -461,6 +461,11 @@
             </div>
         </div>
     @endif
+
+    @include('partials.builder-rows-one-lang', [
+        'page' => $post,
+        'isArabic' => isset($_GET['lang']) && $_GET['lang'] == 'ar',
+    ])
 
 
 
