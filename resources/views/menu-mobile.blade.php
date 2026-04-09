@@ -85,7 +85,8 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var mobileRoot = document.querySelector('#menu .mobile');
-        var mobileCols = Array.prototype.slice.call(document.querySelectorAll('#menu .mobile .mobile-menu-col'));
+        var mobileCols = Array.prototype.slice.call(document.querySelectorAll(
+        '#menu .mobile .mobile-menu-col'));
         var backLink = document.getElementById('mobile-menu-back');
         var backWrapper = backLink ? backLink.closest('.menu-mobile-back') : null;
 
