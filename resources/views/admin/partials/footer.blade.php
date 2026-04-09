@@ -348,6 +348,10 @@
         var originalAction = form.attr('action');
         var originalTarget = form.attr('target');
 
+        // Add preview_mode hidden input
+        var previewModeInput = $('<input type="hidden" name="preview_mode" value="draft" />');
+        form.append(previewModeInput);
+
         form.attr('action', url);
         form.attr('target', '_blank');
         form.submit();
@@ -359,6 +363,9 @@
         } else {
             form.removeAttr('target');
         }
+
+        // Remove the temporary input
+        previewModeInput.remove();
     }
 </script>
 
