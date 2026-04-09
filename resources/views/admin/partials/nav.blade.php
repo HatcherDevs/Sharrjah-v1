@@ -20,8 +20,23 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ URL('admin/home/footer') }}">Footer Settings</a>
                     </li>
+                </ul>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#menu-manager" aria-expanded="true"
+                aria-controls="menu-manager">
+                <i class="menu-icon mdi mdi-format-list-bulleted"></i>
+                <span class="menu-title">Menu</span>
+                <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse show" id="menu-manager">
+                <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ URL('admin/home/menu') }}">Menu</a>
+                        <a class="nav-link" href="{{ URL('admin/menus') }}">Desktop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ URL('admin/menus/mobile') }}">Mobile</a>
                     </li>
                 </ul>
             </div>
@@ -82,7 +97,8 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#partners" aria-expanded="false" aria-controls="partners">
+            <a class="nav-link" data-toggle="collapse" href="#partners" aria-expanded="false"
+                aria-controls="partners">
                 <i class="menu-icon mdi mdi-content-copy"></i>
                 <span class="menu-title">Partners</span>
                 <i class="menu-arrow"></i>

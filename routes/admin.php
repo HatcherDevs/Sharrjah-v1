@@ -42,6 +42,33 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin.purge-cache']
     Route::post('home/footer', 'HomeController@updateFooter');
     Route::get('home/menu', 'HomeController@menu');
     Route::post('home/menu', 'HomeController@updateMenu');
+    Route::post('menus/order', 'Admin\MenuController@updateOrder')->name('admin.menus.order');
+    Route::get('menus', 'Admin\MenuController@index')->name('admin.menus.index');
+    Route::get('menus/export', 'Admin\MenuController@exportDesktopMenus')->name('admin.menus.export');
+    Route::post('menus/import', 'Admin\MenuController@importDesktopMenus')->name('admin.menus.import');
+    Route::get('menus/create', 'Admin\MenuController@create')->name('admin.menus.create');
+    Route::post('menus', 'Admin\MenuController@store')->name('admin.menus.store');
+    Route::get('menus/{menu}/edit', 'Admin\MenuController@edit')->name('admin.menus.edit');
+    Route::put('menus/{menu}', 'Admin\MenuController@update')->name('admin.menus.update');
+    Route::get('menus/{menu}/delete', 'Admin\MenuController@delete')->name('admin.menus.delete');
+
+    Route::get('menus/mobile', 'Admin\MenuController@mobileIndex')->name('admin.menus.mobile.index');
+    Route::get('menus/mobile/export', 'Admin\MenuController@exportMobileMenus')->name('admin.menus.mobile.export');
+    Route::post('menus/mobile/import', 'Admin\MenuController@importMobileMenus')->name('admin.menus.mobile.import');
+    Route::get('menus/mobile/create', 'Admin\MenuController@mobileCreate')->name('admin.menus.mobile.create');
+    Route::post('menus/mobile', 'Admin\MenuController@mobileStore')->name('admin.menus.mobile.store');
+    Route::get('menus/mobile/{menu}/edit', 'Admin\MenuController@mobileEdit')->name('admin.menus.mobile.edit');
+    Route::put('menus/mobile/{menu}', 'Admin\MenuController@mobileUpdate')->name('admin.menus.mobile.update');
+    Route::get('menus/mobile/{menu}/delete', 'Admin\MenuController@mobileDelete')->name('admin.menus.mobile.delete');
+
+    Route::post('menus/{menu}/items/order', 'Admin\MenuController@updateItemOrder')->name('admin.menus.item.order');
+    Route::post('menus/{menu}/items/bulk-store', 'Admin\MenuController@bulkStoreItems')->name('admin.menus.item.bulk-store');
+    Route::post('menus/{menu}/items/bulk-delete', 'Admin\MenuController@bulkDeleteItems')->name('admin.menus.item.bulk-delete');
+    Route::get('menus/{menu}/items/create', 'Admin\MenuController@createItem')->name('admin.menus.item.create');
+    Route::post('menus/{menu}/items', 'Admin\MenuController@storeItem')->name('admin.menus.item.store');
+    Route::get('menus/{menu}/items/{item}/edit', 'Admin\MenuController@editItem')->name('admin.menus.item.edit');
+    Route::put('menus/{menu}/items/{item}', 'Admin\MenuController@updateItem')->name('admin.menus.item.update');
+    Route::get('menus/{menu}/items/{item}/delete', 'Admin\MenuController@deleteItem')->name('admin.menus.item.delete');
     Route::get('home/create/featured', 'HomeController@createFeatured');
     Route::post('home/featured/post', 'HomeController@storeFeatured');
     Route::get('home/landing', 'HomeController@landing');

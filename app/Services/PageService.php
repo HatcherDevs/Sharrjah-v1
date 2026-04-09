@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\LandingElement;
 use App\Models\MaterialSeriesContent;
+use App\Models\Menu;
 use App\Models\Option;
 use App\Models\Page;
 use App\Models\Post;
@@ -94,6 +95,68 @@ class PageService
     public function getGetJourneys_into_Architecture_ArchivesSeriesContent()
     {
         return MaterialSeriesContent::find(2);
+    }
+
+    public function getDesktopMenus()
+    {
+        return Menu::where('active', 1)
+            ->where(function ($query) {
+                $query->where('menu_type', 'desktop')->orWhereNull('menu_type');
+            })
+            ->orderBy('order')
+            ->with(['items' => function ($query) {
+                $query->where('active', 1)->orderBy('order');
+            }])
+            ->get()
+            ->map(function ($menu) {
+                $allItems = $menu->items;
+                $rootItems = $this->buildMenuTree($allItems);
+
+                $menu->setRelation('root_items', $rootItems);
+
+                return $menu;
+            });
+    }
+
+    public function getMobileMenus()
+    {
+        return Menu::where('active', 1)
+            ->where('menu_type', 'mobile')
+            ->orderBy('order')
+            ->with(['items' => function ($query) {
+                $query->where('active', 1)->orderBy('order');
+            }])
+            ->get()
+            ->map(function ($menu) {
+                $allItems = $menu->items;
+                $rootItems = $this->buildMenuTree($allItems);
+
+                $menu->setRelation('root_items', $rootItems);
+
+                return $menu;
+            });
+    }
+
+    protected function buildMenuTree($allItems, $parentId = null)
+    {
+        $items = $allItems
+            ->filter(function ($item) use ($parentId) {
+                $itemParentId = $item->parent_id;
+
+                if (is_null($parentId)) {
+                    return is_null($itemParentId) || (int) $itemParentId === 0;
+                }
+
+                return (int) $itemParentId === (int) $parentId;
+            })
+            ->sortBy('order')
+            ->values();
+
+        $items->each(function ($item) use ($allItems) {
+            $item->setRelation('children', $this->buildMenuTree($allItems, $item->id));
+        });
+
+        return $items;
     }
 
     public function getOption($slug)

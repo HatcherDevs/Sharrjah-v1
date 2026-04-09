@@ -41,7 +41,6 @@ class ValidateRequestInputs
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -50,8 +49,8 @@ class ValidateRequestInputs
         if ($request->has('sort')) {
             $sort = $request->input('sort');
             $allowedColumns = $this->getAllowedColumns($request);
-            
-            if (!in_array($sort, $allowedColumns)) {
+
+            if (! in_array($sort, $allowedColumns)) {
                 // Default to 'id' if invalid
                 $request->merge(['sort' => 'id']);
             }
@@ -59,23 +58,43 @@ class ValidateRequestInputs
 
         // Validate and sanitize order parameter
         if ($request->has('order')) {
-            $order = strtolower($request->input('order'));
-            
-            if (!in_array($order, ['asc', 'desc'])) {
-                // Default to 'desc' if invalid
-                $request->merge(['order' => 'desc']);
+            $order = $request->input('order');
+
+            if (is_string($order)) {
+                $order = trim($order);
+
+                // Empty order field is valid for nullable numeric form inputs.
+                if ($order === '') {
+                    $request->request->remove('order');
+                } elseif ($request->has('sort')) {
+                    // Treat order as sort direction only when sort context exists.
+                    $direction = strtolower($order);
+                    if (! in_array($direction, ['asc', 'desc'])) {
+                        $request->merge(['order' => 'desc']);
+                    } else {
+                        $request->merge(['order' => $direction]);
+                    }
+                } elseif (is_numeric($order)) {
+                    // Keep numeric order values for form submissions (e.g. menu order).
+                    $request->merge(['order' => (int) $order]);
+                }
+            } elseif (is_array($order)) {
+                // Keep array payloads (e.g. drag-drop ordering) and normalize to integer values.
+                $request->merge([
+                    'order' => array_values(array_map('intval', $order)),
+                ]);
             }
         }
 
         // Validate and normalize lang parameter
-        if ($request->has('lang')) {
+        if ($request->has('lang') && is_string($request->input('lang'))) {
             $lang = strtolower($request->input('lang'));
-            
+
             // Normalize Arabic language variants (arArabic, ar-SA, arabic, etc.) to 'ar'
             if (strpos($lang, 'ar') === 0 || $lang === 'arabic') {
                 $request->merge(['lang' => 'ar']);
                 $_GET['lang'] = 'ar'; // Also update $_GET for backward compatibility
-            } elseif (!in_array($lang, ['ar', 'en'])) {
+            } elseif (! in_array($lang, ['ar', 'en'])) {
                 // Remove invalid lang parameter
                 $request->request->remove('lang');
                 unset($_GET['lang']);
@@ -84,14 +103,14 @@ class ValidateRequestInputs
 
         // Sanitize other string inputs to prevent XSS
         foreach ($request->all() as $key => $value) {
-            if (is_string($value) && !in_array($key, ['sort', 'order', '_token', 'id', 'publish_date', 'created_at', 'external'])) {
+            if (is_string($value) && ! in_array($key, ['sort', 'order', '_token', 'id', 'publish_date', 'created_at', 'external'])) {
                 // Skip HTML-allowed fields (WYSIWYG editors)
                 if (in_array($key, $this->htmlAllowedFields)) {
                     continue;
                 }
                 // Basic XSS protection for non-HTML fields
                 $request->merge([
-                    $key => strip_tags($value)
+                    $key => strip_tags($value),
                 ]);
             }
         }
@@ -102,7 +121,6 @@ class ValidateRequestInputs
     /**
      * Get allowed columns based on request context
      *
-     * @param  Request  $request
      * @return array
      */
     protected function getAllowedColumns(Request $request)

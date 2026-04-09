@@ -1,115 +1,27 @@
 <div class="mobile clearfix">
     <ul>
         @inject('pageService', 'App\Services\PageService')
-        @foreach ($pageService->getPages() as $page)
-            @if ($page['page']->slug != 'triennial-2019')
-                <li>
-                    <a href="#" alt="{{ url($page['page']->link) }}">
-                        <span class="cat"><span
-                                class="ar">{{ $page['page']->name_ar }}</span><br />{{ $page['page']->name }}</span>
-                    </a>
-                    <ul>
-                        @foreach ($page['children'] ?? [] as $child)
-                            @if ($child->slug != 'open-call-exhibition-designer')
-                                <li><a href="{{ url($child->link) }}"><span
-                                            class="ar">{{ $child->name_ar }}</span><br />{{ $child->name }}</a></li>
-                            @endif
+        @php
+            $mobileMenus = $pageService->getMobileMenus();
+        @endphp
 
-                            @if ($child->slug == 'sat-talks-architecture')
-                                <?php $research = $pageService->getPageBySlug('research'); ?>
-                                @if ($research->active == 1)
-                                    <li><a href="{{ url('pages/research') }}"><span class="ar">برنامج أبحاث
-                                                الترينالي</span><br />SAT Research Initiative</a></li>
-                                @else
-                                    <li><a href="{{ url('research') }}"><span class="ar">برنامج أبحاث
-                                                الترينالي</span><br />SAT Research Initiative</a></li>
-                                @endif
-                            @endif
+        @foreach ($mobileMenus as $menu)
+            <li class="mobile-menu-col">
+                <a href="{{ $menu->root_items->isNotEmpty() ? '#' : url($menu->href ?: '#') }}"
+                    alt="{{ url($menu->href ?: '#') }}"
+                    data-has-items="{{ $menu->root_items->isNotEmpty() ? '1' : '0' }}">
+                    <span class="mobile-cat"><span
+                            class="ar">{{ $menu->title_ar }}</span><br />{{ $menu->title_en }}</span>
+                </a>
 
-                            @if ($child->slug == 'team-1')
-                                <?php
-                                $opportunities = $pageService->getPageById(50);
-                                
-                                $opportunitiesPage = $pageService->getPostById(477);
-                                $opportunitiesSlug = $opportunities->slug;
-                                
-                                ?>
-
-                                @if ($opportunities->active == 1)
-                                    {{-- Only show if active is NOT 1 --}}
-                                    <li>
-                                        <a href="{{ url('pages/about/' . $opportunitiesSlug) }}">
-                                            <span class="ar">فرص العمل</span><br />Opportunities
-                                        </a>
-                                    </li>
-                                @endif
-                            @endif
-                            @if ($child->slug == 'open-call-exhibition-designer')
-                                <?php $research = $pageService->getPageBySlug('opportunitiesi'); ?>
-                                {{-- @if ($opportunitiesi->active == 1)
-                                    <li>
-                                        <p>
-                                            <a id="toggleButton" onclick="toggleIcon()" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                                                <span class="ar">فرص العمل</span><br />Opportunities
-                                                <i id="icon" class="fa-solid fa-plus" style="padding: 10px;transform: translate(20px,-15px);"></i>
-                                            </a>
-                                        </p>
-                                        <div class="collapse" id="collapseExample">
-                                            <div class="card card-body">
-                                              <a href="" class="d-block">Link #1</a>
-                                              <a href="" class="d-block">Link #2</a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                @else
-                                    <li>
-                                            <p>
-                                                <a id="toggleButtonMobile" onclick="toggleIcon()" data-toggle="collapse" href="#collapseExampleMobile" role="button" aria-expanded="false" aria-controls="collapseExampleMobile">
-                                                    <span class="ar">فرص العمل</span><br />Opportunities
-                                                    <i id="iconMobile" class="fa-solid fa-plus" style="padding: 10px;transform: translate(20px,-15px);"></i>
-                                                </a>
-                                            </p>
-                                            <div class="collapse" id="collapseExampleMobile">
-                                                <div class="card card-body">
-                                                    <a href="/pages/social-media-coordinator" class="d-block"><span
-                                                        class="ar">منسق
-                                                        وسائل التواصل الاجتماعي</span><br />Social Media Coordinator
-                                                </a>
-                                                <a href="/pages/store-coordinator" class="d-block"><span class="ar">منسق
-                                                        المتجر</span><br />Store Coordinator</a>
-                                                </div>
-                                            </div>
-                                    </li>
-                                @endif --}}
-                            @endif
-                        @endforeach
+                @if ($menu->root_items->isNotEmpty())
+                    <ul class="mobile-root-items">
+                        @include('partials.menu-mobile-items', ['items' => $menu->root_items])
                     </ul>
-                </li>
-                {{--		@if ($page['page']->slug == 'programs') --}}
-                {{--			<li> --}}
-                {{--				<a href="#" alt="{{ url('/research') }}"> --}}
-                {{--					<span class="cat"><span class="ar">أبحاث</span><br/>Research</span> --}}
-                {{--				</a> --}}
-                {{--			</li> --}}
-                {{--		@endif --}}
-            @endif
+                @endif
+            </li>
         @endforeach
-        <li>
-            <a target="_blank" href="#" alt="#" sstyle="pointer-events: none;">
-                <span class="cat"><span class="ar">إصدار ترينالي</span><br />Triennial Edition </span>
-            </a>
-            <ul>
-                <li class="nav-item"> <a target="_blank" href="https://2019.sharjaharchitecture.org/"
-                        class="mainlink"><span class="ar">ترينالي
-                            2019</span><br />Triennial 2019 </a>
-                </li>
-                <li class="nav-item"> <a href="https://2023.sharjaharchitecture.org/{{-- url('/pages/triennial-2023') --}}"
-                        class="mainlink"><span class="ar">ترينالي 2023</span><br />Triennial 2023</a>
-                </li>
 
-            </ul>
-
-        </li>
     </ul>
     <div class="menu-mobile-back"><a href="#" id="mobile-menu-back"><span class="ar">رجوع</span><br />BACK</a>
     </div>
@@ -118,21 +30,186 @@
     #menu .menu-holder {
         overflow-y: auto;
     }
+
+    #menu .mobile .submenu-list {
+        display: none;
+    }
+
+    #menu .mobile .mobile-cat {
+        width: 100%;
+        background-color: #fff;
+        display: inline-block;
+        line-height: 25px;
+        border-top: 1px solid #000;
+        margin-bottom: 10px;
+    }
+
+    #menu .mobile .mobile-root-items {
+        display: none;
+    }
+
+    #menu .mobile .mobile-root-items.is-open {
+        display: block;
+    }
+
+    #menu .mobile .mobile-menu-col.is-hidden {
+        display: none;
+    }
+
+    #menu .mobile .submenu-list.is-open {
+        display: block;
+    }
+
+    #menu .mobile .submenu-toggle {
+        -webkit-appearance: none;
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: #000;
+        font-size: 24px;
+        line-height: 1;
+        padding: 0 8px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    #menu .mobile .submenu-toggle:focus,
+    #menu .mobile .submenu-toggle:focus-visible,
+    #menu .mobile .submenu-toggle:active {
+        outline: none;
+        box-shadow: none;
+    }
 </style>
 <script>
-    function toggleIcon() {
-        var iconElement = document.getElementById("iconMobile");
-        var collapseExample = document.getElementById("collapseExampleMobile");
+    document.addEventListener('DOMContentLoaded', function() {
+        var mobileRoot = document.querySelector('#menu .mobile');
+        var mobileCols = Array.prototype.slice.call(document.querySelectorAll('#menu .mobile .mobile-menu-col'));
+        var backLink = document.getElementById('mobile-menu-back');
+        var backWrapper = backLink ? backLink.closest('.menu-mobile-back') : null;
 
-        console.log(collapseExample);
-        if (iconElement.classList.contains("fa-plus")) {
-            iconElement.classList.remove("fa-plus");
-            iconElement.classList.add("fa-minus");
-            collapseExample.classList.add("d-block");
-        } else {
-            iconElement.classList.remove("fa-minus");
-            collapseExample.classList.remove("d-block");
-            iconElement.classList.add("fa-plus");
+        function showBack() {
+            if (backWrapper) {
+                backWrapper.style.display = 'block';
+            }
+
+            if (backLink) {
+                backLink.style.display = 'inline-block';
+            }
         }
-    }
+
+        function hideBack() {
+            if (backWrapper) {
+                backWrapper.style.display = 'none';
+            }
+
+            if (backLink) {
+                backLink.style.display = 'none';
+            }
+        }
+
+        function resetMobileMenuState() {
+            mobileCols.forEach(function(col) {
+                col.classList.remove('is-hidden');
+                col.style.display = '';
+            });
+
+            document.querySelectorAll('#menu .mobile .mobile-root-items').forEach(function(list) {
+                list.classList.remove('is-open');
+                list.style.display = '';
+            });
+
+            document.querySelectorAll('#menu .mobile .submenu-list').forEach(function(list) {
+                list.classList.remove('is-open');
+                list.style.display = '';
+            });
+
+            document.querySelectorAll('#menu .mobile .submenu-toggle').forEach(function(button) {
+                button.textContent = '+';
+                button.setAttribute('aria-expanded', 'false');
+            });
+
+            if (mobileRoot) {
+                mobileRoot.classList.remove('is-drilled-down');
+            }
+
+            hideBack();
+        }
+
+        hideBack();
+
+        document.querySelectorAll('#menu .mobile .mobile-menu-col > a[data-has-items="1"]').forEach(function(
+            link) {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var parentItem = link.closest('.mobile-menu-col');
+                if (!parentItem) {
+                    return;
+                }
+
+                var itemsList = parentItem.querySelector('.mobile-root-items');
+                if (!itemsList) {
+                    return;
+                }
+
+                mobileCols.forEach(function(col) {
+                    col.classList.toggle('is-hidden', col !== parentItem);
+                });
+
+                document.querySelectorAll('#menu .mobile .mobile-root-items').forEach(function(
+                    list) {
+                    list.classList.remove('is-open');
+                });
+
+                itemsList.classList.add('is-open');
+                itemsList.style.display = 'block';
+
+                if (mobileRoot) {
+                    mobileRoot.classList.add('is-drilled-down');
+                }
+
+                showBack();
+            });
+        });
+
+        if (backLink) {
+            backLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof event.stopImmediatePropagation === 'function') {
+                    event.stopImmediatePropagation();
+                }
+                resetMobileMenuState();
+            });
+        }
+
+        document.querySelectorAll('#menu .mobile .submenu-toggle').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var listItem = button.closest('li');
+                if (!listItem) {
+                    return;
+                }
+
+                var submenu = null;
+                Array.prototype.forEach.call(listItem.children, function(child) {
+                    if (!submenu && child.tagName === 'UL' && child.classList.contains(
+                            'submenu-list')) {
+                        submenu = child;
+                    }
+                });
+
+                if (!submenu) {
+                    return;
+                }
+
+                var isOpen = submenu.classList.toggle('is-open');
+                button.textContent = isOpen ? '-' : '+';
+                button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+        });
+    });
 </script>
