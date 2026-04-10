@@ -108,7 +108,7 @@
 
                                         @if ($isArabic)
                                             @if (!empty($item['title_ar']))
-                                                <div class="title ar">{{ $item['title_ar'] }}</div>
+                                                <div class="title ar pt-2">{{ $item['title_ar'] }}</div>
                                             @endif
                                             @if (!empty($item['subtitle_ar']))
                                                 <div class="author ar">{{ $item['subtitle_ar'] }}</div>
@@ -118,7 +118,7 @@
                                             @endif
                                         @else
                                             @if (!empty($item['title_en']))
-                                                <div class="title en">{{ $item['title_en'] }}</div>
+                                                <div class="title en pt-2">{{ $item['title_en'] }}</div>
                                             @endif
                                             @if (!empty($item['subtitle_en']))
                                                 <div class="author en">{{ $item['subtitle_en'] }}</div>
