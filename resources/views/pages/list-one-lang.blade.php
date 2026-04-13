@@ -5,13 +5,15 @@
         .lang-switch {
             font-size: 12px;
         }
+
+  
     </style>
 @endsection
 
 @section('content')
     @php
         $isArabic = isset($_GET['lang']) && $_GET['lang'] == 'ar';
-                //  dd();
+        //  dd();
     @endphp
 
     <div class="innerpage">
@@ -43,7 +45,7 @@
                 <div class="row">
                     @if ($isArabic)
                         <div class="col-md-12 text-right">
-                            <h1>{!! $page->name_ar !!}</h1>
+                            <h1 style="width: 60rem;">{!! $page->name_ar !!}</h1>
                         </div>
                     @else
                         <div class="col-md-12 text-left">
