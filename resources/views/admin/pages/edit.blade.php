@@ -246,10 +246,10 @@
                 var imagePath = escapeHtml(item && item.image);
                 var previewStyle = imagePath ? '' : 'display:none;';
 
-                return '<div class="card row-item shadow-sm" style="margin-bottom:20px; border: 1px solid #ced4da; border-radius: 8px;">' +
+                return '<div class="card row-item shadow-sm" draggable="true" style="margin-bottom:20px; border: 1px solid #ced4da; border-radius: 8px; cursor: move;">' +
                     '<div class="card-body" style="padding: 20px;">' +
                     '<div style="display:flex;justify-content:space-between;align-items:center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6;">' +
-                    '<h5 style="margin:0; font-weight: bold; color: #374151; font-size: 15px;">Item Entry</h5>' +
+                    '<h5 style="margin:0; font-weight: bold; color: #374151; font-size: 15px;">Item Entry (Drag to Reorder)</h5>' +
                     '<button type="button" class="btn btn-outline-danger btn-sm remove-item" style="border-radius: 4px;">&times; Remove Item</button>' +
                     '</div>' +
                     '<div class="row">' +
@@ -282,7 +282,7 @@
 
                     '<div class="col-md-6"><div class="form-group"><label style="font-weight: 600;">Redirect URL (Link)</label><input type="url" class="form-control" data-item-field="url" placeholder="https://example.com" value="' +
                     escapeHtml(item && item.url) + '"></div></div>' +
-                    '<div class="col-md-6"><div class="form-group"><label style="font-weight: 600;">Item Date</label><input type="date" class="form-control" data-item-field="date" value="' +
+                    '<div class="col-md-6"><div class="form-group"><label style="font-weight: 600;">Item Date</label><input type="text" class="form-control" data-item-field="date" placeholder="e.g. 14-04-2026" value="' +
                     escapeHtml(item && item.date) + '"></div></div>' +
                     '</div>' +
                     '</div>' + // end col-md-8
@@ -338,6 +338,28 @@
                         });
                     });
                 });
+            }
+
+            function getDragAfterElement(itemsContainer, y) {
+                var draggableItems = Array.prototype.slice.call(itemsContainer.querySelectorAll(
+                    '.row-item:not(.dragging)'));
+
+                return draggableItems.reduce(function(closest, child) {
+                    var box = child.getBoundingClientRect();
+                    var offset = y - box.top - box.height / 2;
+
+                    if (offset < 0 && offset > closest.offset) {
+                        return {
+                            offset: offset,
+                            element: child
+                        };
+                    }
+
+                    return closest;
+                }, {
+                    offset: Number.NEGATIVE_INFINITY,
+                    element: null
+                }).element;
             }
 
             addRowButton.addEventListener('click', function() {
@@ -401,6 +423,46 @@
                 if (noImageText) {
                     noImageText.style.display = 'none';
                 }
+            });
+
+            container.addEventListener('dragstart', function(e) {
+                var itemEl = e.target.closest('.row-item');
+                if (!itemEl) {
+                    return;
+                }
+
+                itemEl.classList.add('dragging');
+                if (e.dataTransfer) {
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
+
+            container.addEventListener('dragover', function(e) {
+                var itemsContainer = e.target.closest('.row-items');
+                var draggingItem = container.querySelector('.row-item.dragging');
+
+                if (!itemsContainer || !draggingItem) {
+                    return;
+                }
+
+                e.preventDefault();
+                var afterElement = getDragAfterElement(itemsContainer, e.clientY);
+
+                if (!afterElement) {
+                    itemsContainer.appendChild(draggingItem);
+                } else {
+                    itemsContainer.insertBefore(draggingItem, afterElement);
+                }
+            });
+
+            container.addEventListener('dragend', function(e) {
+                var itemEl = e.target.closest('.row-item');
+                if (!itemEl) {
+                    return;
+                }
+
+                itemEl.classList.remove('dragging');
+                refreshFieldNames();
             });
 
             if (initialRows.length > 0) {

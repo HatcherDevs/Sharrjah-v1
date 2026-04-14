@@ -49,7 +49,7 @@
     <div class="container text-center builder-rows-container">
         @foreach ($builderRows as $row)
             @if (isset($row['type']) && $row['type'] == 'boxes')
-                <div class="body-section contents" style="margin-top: 40px; margin-bottom: 40px;">
+                <div class="body-section contents" style="margin-top: 20px; margin-bottom: 20px;">
 
                     {{-- Row Header --}}
                     @if (

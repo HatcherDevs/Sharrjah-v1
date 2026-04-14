@@ -68,32 +68,14 @@
             </div>
         @endif
 
-        <div class="container text-center">
-            <div class="body-section contents with-img-header">
-                <div class="row">
-                    @if ($isArabic)
-                        <div class="col-md-12 text-right cairo">
-                            @if (!$page->sliders || $page->sliders->count() == 0)
-                                {!! $page->content_ar !!}
-                            @endif
-                        </div>
-                    @else
-                        <div class="col-md-12 text-left">
-                            @if (!$page->sliders || $page->sliders->count() == 0)
-                                {!! $page->content !!}
-                            @endif
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+
 
         @if ($page->sliders && $page->sliders->count() > 0)
             @include('partials.slide-images-one-lang')
         @endif
 
-        @inject('pageService', 'App\Services\PageService')
-        <div class="container text-center">
+        {{-- @inject('pageService', 'App\Services\PageService')
+        <div class="container text-center">.
             <div class="body-section contents">
                 <ul class="figure-list full full-items">
                     @foreach ($data ?? [] as $child)
@@ -133,7 +115,7 @@
                     {{ $data->links('vendor.pagination.bootstrap-3') }}
                 @endif
             </div>
-        </div>
+        </div> --}}
 
         @if (isset($formdata) && $formdata)
             <div class="container text-center">
