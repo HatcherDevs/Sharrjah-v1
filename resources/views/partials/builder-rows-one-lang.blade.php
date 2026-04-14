@@ -93,7 +93,7 @@
                                     @php
                                         $itemUrl = !empty($item['url']) ? $item['url'] : 'javascript:void(0)';
                                     @endphp
-                                    <a href="{{ $itemUrl }}" {{ !empty($item['url']) ? 'target="_blank"' : '' }}>
+                                    <a href="{{ $itemUrl }}">
                                         @if (!empty($item['image']))
                                             <img src="{{ url('public/' . $item['image']) }}" width="100%"
                                                 alt="Image">
