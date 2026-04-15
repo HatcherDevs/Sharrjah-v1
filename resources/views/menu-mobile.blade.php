@@ -40,8 +40,17 @@
         background-color: #fff;
         display: inline-block;
         line-height: 25px;
-        border-top: 1px solid #000;
+        border-top: 0;
         margin-bottom: 10px;
+    }
+
+    #menu .mobile>ul>.mobile-menu-col>a>.mobile-cat {
+        border-top: 1px solid #000;
+    }
+
+    #menu .mobile .mobile-root-items .mobile-cat,
+    #menu .mobile .submenu-list .mobile-cat {
+        border-top: 0;
     }
 
     #menu .mobile .mobile-root-items {
@@ -86,7 +95,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var mobileRoot = document.querySelector('#menu .mobile');
         var mobileCols = Array.prototype.slice.call(document.querySelectorAll(
-        '#menu .mobile .mobile-menu-col'));
+            '#menu .mobile .mobile-menu-col'));
         var backLink = document.getElementById('mobile-menu-back');
         var backWrapper = backLink ? backLink.closest('.menu-mobile-back') : null;
 
