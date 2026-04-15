@@ -61,3 +61,7 @@ git-sat-cleanup.log
 shell-cleanup.log
 
 storage/framework
+
+# Runtime logs
+storage/logs/*.log
+storage/logs/errors/*.log
