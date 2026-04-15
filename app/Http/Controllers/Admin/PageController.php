@@ -389,7 +389,8 @@ class PageController extends Controller
                         'title_ar' => trim((string) ($item['title_ar'] ?? '')),
                         'subtitle_en' => trim((string) ($item['subtitle_en'] ?? '')),
                         'subtitle_ar' => trim((string) ($item['subtitle_ar'] ?? '')),
-                        'date' => trim((string) ($item['date'] ?? '')),
+                        'date_en' => trim((string) ($item['date_en'] ?? ($item['date'] ?? ''))),
+                        'date_ar' => trim((string) ($item['date_ar'] ?? ($item['date'] ?? ''))),
                         'description_en' => trim((string) ($item['description_en'] ?? '')),
                         'description_ar' => trim((string) ($item['description_ar'] ?? '')),
                     ];

@@ -79,12 +79,20 @@
                         <div class="row" dir="{{ $isArabic ? 'rtl' : 'ltr' }}">
                             @foreach ($row['items'] as $item)
                                 @php
+                                    $dateValue = $isArabic
+                                        ? (!empty($item['date_ar'])
+                                            ? $item['date_ar']
+                                            : $item['date'] ?? '')
+                                        : (!empty($item['date_en'])
+                                            ? $item['date_en']
+                                            : $item['date'] ?? '');
+
                                     $formattedDate = null;
-                                    if (!empty($item['date'])) {
+                                    if (!empty($dateValue)) {
                                         try {
-                                            $formattedDate = \Carbon\Carbon::parse($item['date'])->format('d-m-Y');
+                                            $formattedDate = \Carbon\Carbon::parse($dateValue)->format('d-m-Y');
                                         } catch (\Exception $exception) {
-                                            $formattedDate = $item['date'];
+                                            $formattedDate = $dateValue;
                                         }
                                     }
                                 @endphp
@@ -103,7 +111,8 @@
                                         @endif
 
                                         @if ($formattedDate)
-                                            <div class="publish_date en">{{ $formattedDate }}</div>
+                                            <div class="publish_date {{ $isArabic ? 'ar' : 'en' }}">
+                                                {{ $formattedDate }}</div>
                                         @endif
 
                                         @if ($isArabic)

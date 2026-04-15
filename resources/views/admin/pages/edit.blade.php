@@ -244,6 +244,8 @@
 
             function itemTemplate(item) {
                 var imagePath = escapeHtml(item && item.image);
+                var dateEn = escapeHtml((item && (item.date_en || item.date)) || '');
+                var dateAr = escapeHtml((item && (item.date_ar || item.date)) || '');
                 var previewStyle = imagePath ? '' : 'display:none;';
 
                 return '<div class="card row-item shadow-sm" draggable="true" style="margin-bottom:20px; border: 1px solid #ced4da; border-radius: 8px; cursor: move;">' +
@@ -282,8 +284,10 @@
 
                     '<div class="col-md-6"><div class="form-group"><label style="font-weight: 600;">Redirect URL (Link)</label><input type="url" class="form-control" data-item-field="url" placeholder="https://example.com" value="' +
                     escapeHtml(item && item.url) + '"></div></div>' +
-                    '<div class="col-md-6"><div class="form-group"><label style="font-weight: 600;">Item Date</label><input type="text" class="form-control" data-item-field="date" placeholder="e.g. 14-04-2026" value="' +
-                    escapeHtml(item && item.date) + '"></div></div>' +
+                    '<div class="col-md-3"><div class="form-group"><label style="font-weight: 600;">Date (EN)</label><input type="text" class="form-control" data-item-field="date_en" placeholder="e.g. 14-04-2026" value="' +
+                    dateEn + '"></div></div>' +
+                    '<div class="col-md-3"><div class="form-group"><label style="font-weight: 600;">Date (AR)</label><input type="text" class="form-control" data-item-field="date_ar" placeholder="مثال: 14-04-2026" value="' +
+                    dateAr + '"></div></div>' +
                     '</div>' +
                     '</div>' + // end col-md-8
 
