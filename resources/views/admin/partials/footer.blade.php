@@ -205,84 +205,99 @@
 <script type='text/javascript' src="{{ url('public/froala_editor/js/froala_editor.pkgd.min.js') }}"></script>
 
 <script>
-    setInterval(() => {
-        $('.summernote').summernote();
-        $('#summernote').summernote();
-    }, 10);
-
-    new FroalaEditor('#editor', {
-        fontFamily: {
-            "'Inter', sans-serif": 'Inter',
-            "Roboto,sans-serif": 'Roboto',
-            "Oswald,sans-serif": 'Oswald',
-            "Montserrat,sans-serif": 'Montserrat',
-            "'Open Sans Condensed',sans-serif": 'Open Sans Condensed'
-        },
-        fontFamilySelection: true,
-
-        // Enable HTML/Code View
-        htmlAllowedTags: ['.*'],
-        htmlAllowedAttrs: ['.*'],
-        htmlRemoveTags: [],
-
-        // Toolbar buttons - including code view
-        toolbarButtons: {
-            'moreText': {
-                'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
-                    'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'inlineClass', 'inlineStyle',
-                    'clearFormatting'
-                ]
-            },
-            'moreParagraph': {
-                'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
-                    'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight', 'outdent',
-                    'indent', 'quote'
-                ]
-            },
-            'moreRich': {
-                'buttons': ['insertLink', 'insertImage', 'insertVideo', 'insertTable', 'emoticons',
-                    'fontAwesome', 'specialCharacters', 'embedly', 'insertHR'
-                ]
-            },
-            'moreMisc': {
-                'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll',
-                    'html', 'help'
-                ],
-                'align': 'right',
-                'buttonsVisible': 2
+    $(function() {
+        $('.summernote').each(function() {
+            if (!$(this).data('summernote')) {
+                $(this).summernote();
             }
-        },
+        });
 
-        // Enable code view plugin
-        pluginsEnabled: ['align', 'charCounter', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'embedly',
-            'emoticons', 'entities', 'file', 'fontAwesome', 'fontFamily', 'fontSize', 'fullscreen', 'image',
-            'imageTUI', 'imageManager', 'inlineStyle', 'inlineClass', 'lineBreaker', 'lineHeight', 'link',
-            'lists', 'paragraphFormat', 'paragraphStyle', 'print', 'quickInsert', 'quote', 'save',
-            'specialCharacters', 'table', 'url', 'video', 'wordPaste'
-        ],
-
-        // Code view options
-        codeViewKeepActiveButtons: ['fullscreen'],
-
-        // Image upload settings
-        imageUploadURL: '{{ url('admin/upload-image') }}',
-        imageUploadParams: {
-            _token: '{{ csrf_token() }}'
-        },
-        imageUploadMethod: 'POST',
-        imageMaxSize: 5 * 1024 * 1024, // 5MB
-        imageAllowedTypes: ['jpeg', 'jpg', 'png', 'gif', 'webp'],
-        // Events
-        events: {
-            'image.error': function(error, response) {
-                console.log('Froala image error:', error, response);
-                alert('Image upload error: ' + (response ? response : error.message || 'Unknown error'));
-            },
-            'image.uploaded': function(response) {
-                console.log('Image uploaded successfully:', response);
-            }
+        if ($('#summernote').length && !$('#summernote').data('summernote')) {
+            $('#summernote').summernote();
         }
-    })
+    });
+
+    if (document.querySelector('#editor')) {
+        new FroalaEditor('#editor', {
+            fontFamily: {
+                "'Inter', sans-serif": 'Inter',
+                "Roboto,sans-serif": 'Roboto',
+                "Oswald,sans-serif": 'Oswald',
+                "Montserrat,sans-serif": 'Montserrat',
+                "'Open Sans Condensed',sans-serif": 'Open Sans Condensed'
+            },
+            fontFamilySelection: true,
+
+            // Enable HTML/Code View
+            htmlAllowedTags: ['.*'],
+            htmlAllowedAttrs: ['.*'],
+            htmlRemoveTags: [],
+
+            // Toolbar buttons - including code view
+            toolbarButtons: {
+                'moreText': {
+                    'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
+                        'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'inlineClass',
+                        'inlineStyle',
+                        'clearFormatting'
+                    ]
+                },
+                'moreParagraph': {
+                    'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
+                        'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight',
+                        'outdent',
+                        'indent', 'quote'
+                    ]
+                },
+                'moreRich': {
+                    'buttons': ['insertLink', 'insertImage', 'insertVideo', 'insertTable', 'emoticons',
+                        'fontAwesome', 'specialCharacters', 'embedly', 'insertHR'
+                    ]
+                },
+                'moreMisc': {
+                    'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll',
+                        'html', 'help'
+                    ],
+                    'align': 'right',
+                    'buttonsVisible': 2
+                }
+            },
+
+            // Enable code view plugin
+            pluginsEnabled: ['align', 'charCounter', 'codeBeautifier', 'codeView', 'colors', 'draggable',
+                'embedly',
+                'emoticons', 'entities', 'file', 'fontAwesome', 'fontFamily', 'fontSize', 'fullscreen',
+                'image',
+                'imageTUI', 'imageManager', 'inlineStyle', 'inlineClass', 'lineBreaker', 'lineHeight',
+                'link',
+                'lists', 'paragraphFormat', 'paragraphStyle', 'print', 'quickInsert', 'quote', 'save',
+                'specialCharacters', 'table', 'url', 'video', 'wordPaste'
+            ],
+
+            // Code view options
+            codeViewKeepActiveButtons: ['fullscreen'],
+
+            // Image upload settings
+            imageUploadURL: '{{ url('admin/upload-image') }}',
+            imageUploadParams: {
+                _token: '{{ csrf_token() }}'
+            },
+            imageUploadMethod: 'POST',
+            imageMaxSize: 5 * 1024 * 1024, // 5MB
+            imageAllowedTypes: ['jpeg', 'jpg', 'png', 'gif', 'webp'],
+            // Events
+            events: {
+                'image.error': function(error, response) {
+                    console.log('Froala image error:', error, response);
+                    alert('Image upload error: ' + (response ? response : error.message ||
+                    'Unknown error'));
+                },
+                'image.uploaded': function(response) {
+                    console.log('Image uploaded successfully:', response);
+                }
+            }
+        });
+    }
 
     $(window).on('load', function() {
         // $('#loader').hide();

@@ -7,6 +7,7 @@ use App\Models\Contributor;
 use App\Models\Forms\Form;
 use App\Models\Page;
 use App\Models\PageImageSlide;
+use App\Models\PageParent;
 use App\Models\PageTemplate;
 use App\Models\Post;
 use App\Models\Publication;
@@ -204,6 +205,7 @@ class PageController extends Controller
         $data['additional2_content_en'] = is_array($request->additional2_content_en) ? json_encode($request->additional2_content_en) : null;
         $data['additional2_content_ar'] = is_array($request->additional2_content_ar) ? json_encode($request->additional2_content_ar) : null;
         $data['additional2_content_img'] = $img_encoded;
+        $data['active'] = (int) $request->input('active', 0);
         $builderRows = $this->attachBuilderRowsUploads($request->input('builder_rows'), $request->file('builder_rows_uploads'));
         $data['builder_rows'] = $this->normalizeBuilderRows($builderRows);
 
@@ -221,8 +223,14 @@ class PageController extends Controller
             $page->update($data);
         }
 
-        if ($request->input('page_id')) {
-            $page->parent()->updateOrCreate([], ['page_parent_id' => $request->input('page_id')]);
+        $parentPageId = (int) $request->input('page_id', 0);
+        if ($parentPageId > 0 && $parentPageId !== (int) $page->id) {
+            PageParent::updateOrCreate(
+                ['page_id' => $page->id],
+                ['page_parent_id' => $parentPageId]
+            );
+        } else {
+            PageParent::where('page_id', $page->id)->delete();
         }
 
         $files = $request->file('images');
