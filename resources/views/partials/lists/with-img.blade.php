@@ -43,7 +43,7 @@
                                         <img src="{{ asset('public/img/placeholder-200x200.png') }}">
                                     @endif
                                     <div class="title enar">
-                                        {{ $child->pageType['type'] }}
+                                        {{-- {{ $child->pageType['type'] }} --}}
                                         <a href="#">
                                             <strong>
                                                 <a href="{{ $child->linkAr }}"
