@@ -1,11 +1,12 @@
-<?php namespace App\Services\Uploaders;
+<?php
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Support\Facades\Validator;
+namespace App\Services\Uploaders;
+
 use Exception;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-trait FileSecurityValidation {
-
+trait FileSecurityValidation
+{
     /**
      * Dangerous file extensions that should never be allowed
      *
@@ -18,7 +19,7 @@ trait FileSecurityValidation {
         'sh', 'bash', 'csh', 'ksh', 'pl', 'py', 'rb', 'rpm',
         'deb', 'dmg', 'iso', 'bin', 'jar', 'war', 'ear',
         'sql', 'dll', 'so', 'dylib', 'htaccess', 'htpasswd',
-        'ini', 'log', 'conf', 'config', 'env'
+        'ini', 'log', 'conf', 'config', 'env',
     ];
 
     /**
@@ -82,11 +83,25 @@ trait FileSecurityValidation {
     ];
 
     /**
+     * Allowed MIME types for videos
+     *
+     * @var array
+     */
+    protected $allowedVideoMimeTypes = [
+        'video/mp4',
+        'video/webm',
+        'video/ogg',
+        'video/quicktime',
+        'video/x-msvideo',
+        'video/x-m4v',
+    ];
+
+    /**
      * Validate uploaded file for security
      *
-     * @param UploadedFile $file
-     * @param string $type 'image' or 'file'
+     * @param  string  $type  'image' or 'file'
      * @return void
+     *
      * @throws Exception
      */
     protected function validateFileSecurity(UploadedFile $file, $type = 'file')
@@ -116,14 +131,14 @@ trait FileSecurityValidation {
     /**
      * Validate file size
      *
-     * @param UploadedFile $file
      * @return void
+     *
      * @throws Exception
      */
     protected function validateFileSize(UploadedFile $file)
     {
         if ($file->getSize() > $this->maxFileSize) {
-            throw new Exception('File size exceeds maximum allowed size of ' . ($this->maxFileSize / 1048576) . 'MB');
+            throw new Exception('File size exceeds maximum allowed size of '.($this->maxFileSize / 1048576).'MB');
         }
 
         if ($file->getSize() === 0) {
@@ -134,8 +149,8 @@ trait FileSecurityValidation {
     /**
      * Validate file extension
      *
-     * @param UploadedFile $file
      * @return void
+     *
      * @throws Exception
      */
     protected function validateFileExtension(UploadedFile $file)
@@ -144,7 +159,7 @@ trait FileSecurityValidation {
 
         // Check for dangerous extensions
         if (in_array($extension, $this->dangerousExtensions)) {
-            throw new Exception('File extension "' . $extension . '" is not allowed for security reasons');
+            throw new Exception('File extension "'.$extension.'" is not allowed for security reasons');
         }
 
         // Check for empty extension
@@ -161,9 +176,9 @@ trait FileSecurityValidation {
     /**
      * Validate MIME type
      *
-     * @param UploadedFile $file
-     * @param string $type
+     * @param  string  $type
      * @return void
+     *
      * @throws Exception
      */
     protected function validateMimeType(UploadedFile $file, $type = 'file')
@@ -172,21 +187,25 @@ trait FileSecurityValidation {
         $clientMimeType = $file->getClientMimeType();
 
         // Check for dangerous MIME types
-        if (in_array($mimeType, $this->dangerousMimeTypes) || 
+        if (in_array($mimeType, $this->dangerousMimeTypes) ||
             in_array($clientMimeType, $this->dangerousMimeTypes)) {
-            throw new Exception('File type "' . $mimeType . '" is not allowed for security reasons');
+            throw new Exception('File type "'.$mimeType.'" is not allowed for security reasons');
         }
 
         // Validate MIME type matches expected type
         if ($type === 'image') {
-            if (!in_array($mimeType, $this->allowedImageMimeTypes)) {
-                throw new Exception('File must be a valid image. Detected MIME type: ' . $mimeType);
+            if (! in_array($mimeType, $this->allowedImageMimeTypes)) {
+                throw new Exception('File must be a valid image. Detected MIME type: '.$mimeType);
             }
         } else {
-            // For files, check if it's an image (should use image uploader) or document
-            $allowedMimeTypes = array_merge($this->allowedImageMimeTypes, $this->allowedDocumentMimeTypes);
-            if (!in_array($mimeType, $allowedMimeTypes)) {
-                throw new Exception('File type "' . $mimeType . '" is not allowed');
+            // For files, allow images, documents, and explicitly supported videos
+            $allowedMimeTypes = array_merge(
+                $this->allowedImageMimeTypes,
+                $this->allowedDocumentMimeTypes,
+                $this->allowedVideoMimeTypes
+            );
+            if (! in_array($mimeType, $allowedMimeTypes)) {
+                throw new Exception('File type "'.$mimeType.'" is not allowed');
             }
         }
 
@@ -197,9 +216,9 @@ trait FileSecurityValidation {
     /**
      * Validate that MIME type matches file extension
      *
-     * @param UploadedFile $file
-     * @param string $mimeType
+     * @param  string  $mimeType
      * @return void
+     *
      * @throws Exception
      */
     protected function validateMimeTypeMatchesExtension(UploadedFile $file, $mimeType)
@@ -207,15 +226,15 @@ trait FileSecurityValidation {
         $extension = strtolower($file->getClientOriginalExtension());
         $expectedMimeTypes = $this->getMimeTypesForExtension($extension);
 
-        if (!empty($expectedMimeTypes) && !in_array($mimeType, $expectedMimeTypes)) {
-            throw new Exception('File MIME type "' . $mimeType . '" does not match file extension "' . $extension . '"');
+        if (! empty($expectedMimeTypes) && ! in_array($mimeType, $expectedMimeTypes)) {
+            throw new Exception('File MIME type "'.$mimeType.'" does not match file extension "'.$extension.'"');
         }
     }
 
     /**
      * Get expected MIME types for an extension
      *
-     * @param string $extension
+     * @param  string  $extension
      * @return array
      */
     protected function getMimeTypesForExtension($extension)
@@ -236,6 +255,12 @@ trait FileSecurityValidation {
             'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
             'txt' => ['text/plain'],
             'csv' => ['text/csv', 'text/plain'],
+            'mp4' => ['video/mp4'],
+            'webm' => ['video/webm'],
+            'ogv' => ['video/ogg'],
+            'mov' => ['video/quicktime'],
+            'avi' => ['video/x-msvideo'],
+            'm4v' => ['video/x-m4v', 'video/mp4'],
         ];
 
         return isset($mimeMap[$extension]) ? $mimeMap[$extension] : [];
@@ -244,22 +269,22 @@ trait FileSecurityValidation {
     /**
      * Validate file content using magic bytes
      *
-     * @param UploadedFile $file
-     * @param string $type
+     * @param  string  $type
      * @return void
+     *
      * @throws Exception
      */
     protected function validateFileContent(UploadedFile $file, $type = 'file')
     {
         $filePath = $file->getRealPath();
-        
-        if (!file_exists($filePath) || !is_readable($filePath)) {
+
+        if (! file_exists($filePath) || ! is_readable($filePath)) {
             throw new Exception('Cannot read file for content validation');
         }
 
         // Read first bytes to check magic bytes
         $handle = fopen($filePath, 'rb');
-        if (!$handle) {
+        if (! $handle) {
             throw new Exception('Cannot open file for content validation');
         }
 
@@ -277,9 +302,9 @@ trait FileSecurityValidation {
     /**
      * Validate image magic bytes
      *
-     * @param string $firstBytes
-     * @param UploadedFile $file
+     * @param  string  $firstBytes
      * @return void
+     *
      * @throws Exception
      */
     protected function validateImageMagicBytes($firstBytes, UploadedFile $file)
@@ -296,15 +321,15 @@ trait FileSecurityValidation {
             $isValidImage = true;
         }
         // GIF: 47 49 46 38
-        elseif (substr($firstBytes, 0, 4) === "GIF8" && $extension === 'gif') {
+        elseif (substr($firstBytes, 0, 4) === 'GIF8' && $extension === 'gif') {
             $isValidImage = true;
         }
         // BMP: 42 4D
-        elseif (substr($firstBytes, 0, 2) === "BM" && $extension === 'bmp') {
+        elseif (substr($firstBytes, 0, 2) === 'BM' && $extension === 'bmp') {
             $isValidImage = true;
         }
         // WebP: RIFF...WEBP
-        elseif (substr($firstBytes, 0, 4) === "RIFF" && substr($firstBytes, 8, 4) === "WEBP" && $extension === 'webp') {
+        elseif (substr($firstBytes, 0, 4) === 'RIFF' && substr($firstBytes, 8, 4) === 'WEBP' && $extension === 'webp') {
             $isValidImage = true;
         }
         // SVG: starts with <svg or <?xml
@@ -315,7 +340,7 @@ trait FileSecurityValidation {
             }
         }
 
-        if (!$isValidImage) {
+        if (! $isValidImage) {
             throw new Exception('File content does not match the declared image type. File may be corrupted or malicious.');
         }
     }
@@ -323,31 +348,31 @@ trait FileSecurityValidation {
     /**
      * Check for script tags in file content
      *
-     * @param string $filePath
-     * @param UploadedFile $file
+     * @param  string  $filePath
      * @return void
+     *
      * @throws Exception
      */
     protected function checkForScriptTags($filePath, UploadedFile $file)
     {
         $extension = strtolower($file->getClientOriginalExtension());
-        
+
         // Define groups of extensions
         // SVG is text-based (XML), so it should be checked like a text file
         $textExtensions = ['txt', 'csv', 'html', 'htm', 'xml', 'json', 'svg'];
         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-        
+
         // Scan content only for text-based files
         // We avoid scanning binary images for PHP tags because it causes false positives in binary data
         // and binary images are already validated by magic bytes in validateFileContent()
         if (in_array($extension, $textExtensions)) {
             $content = file_get_contents($filePath);
-            
+
             // Check for PHP tags: <?php and <?=
             if (preg_match('/<\?php/i', $content) || preg_match('/<\?=/i', $content)) {
                 throw new Exception('File contains potentially malicious PHP tags');
             }
-            
+
             // Check for script tags
             if (preg_match('/<script/i', $content)) {
                 throw new Exception('File contains potentially malicious script tags');
@@ -360,8 +385,8 @@ trait FileSecurityValidation {
     /**
      * Validate file name for SQL injection and path traversal
      *
-     * @param UploadedFile $file
      * @return void
+     *
      * @throws Exception
      */
     protected function validateFileName(UploadedFile $file)
@@ -370,8 +395,8 @@ trait FileSecurityValidation {
         $extension = $file->getClientOriginalExtension();
 
         // Check for path traversal
-        if (strpos($fileName, '..') !== false || 
-            strpos($fileName, '/') !== false || 
+        if (strpos($fileName, '..') !== false ||
+            strpos($fileName, '/') !== false ||
             strpos($fileName, '\\') !== false) {
             throw new Exception('File name contains invalid characters (path traversal attempt detected)');
         }
@@ -411,8 +436,8 @@ trait FileSecurityValidation {
     /**
      * Validate for double extensions (e.g., file.php.jpg)
      *
-     * @param UploadedFile $file
      * @return void
+     *
      * @throws Exception
      */
     protected function validateDoubleExtension(UploadedFile $file)
@@ -433,8 +458,8 @@ trait FileSecurityValidation {
     /**
      * Scan file content for malicious patterns
      *
-     * @param UploadedFile $file
      * @return void
+     *
      * @throws Exception
      */
     protected function scanFileContent(UploadedFile $file)
@@ -449,9 +474,9 @@ trait FileSecurityValidation {
 
         if (in_array($extension, $vulnerableExtensions)) {
             $content = file_get_contents($filePath);
-            
+
             // Check for PHP code
-            if (preg_match('/<\?php/i', $content) || 
+            if (preg_match('/<\?php/i', $content) ||
                 preg_match('/<\?=/i', $content) ||
                 preg_match('/<script[^>]*>/i', $content)) {
                 throw new Exception('File content contains potentially malicious code');
@@ -482,7 +507,6 @@ trait FileSecurityValidation {
     /**
      * Sanitize file name to prevent security issues
      *
-     * @param UploadedFile $file
      * @return string
      */
     protected function sanitizeFileName(UploadedFile $file)
@@ -500,17 +524,17 @@ trait FileSecurityValidation {
         $fileName = preg_replace('/\.{2,}/', '.', $fileName);
 
         // Ensure extension is preserved
-        if (!empty($extension)) {
+        if (! empty($extension)) {
             $baseName = pathinfo($fileName, PATHINFO_FILENAME);
             if (empty($baseName)) {
                 $baseName = 'file';
             }
-            $fileName = $baseName . '.' . $extension;
+            $fileName = $baseName.'.'.$extension;
         }
 
         // Limit length
         if (strlen($fileName) > 255) {
-            $fileName = substr($fileName, 0, 255 - strlen($extension) - 1) . '.' . $extension;
+            $fileName = substr($fileName, 0, 255 - strlen($extension) - 1).'.'.$extension;
         }
 
         return $fileName;
