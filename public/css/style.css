@@ -667,12 +667,12 @@ span {
 }
 
 .home-video #video {
-	position: absolute;
-	top: 0;
-	width: auto;
-	height: 100%;
-	opacity:0;
-	left: 50%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    left: 50%;
 }
 
 .container.main {
