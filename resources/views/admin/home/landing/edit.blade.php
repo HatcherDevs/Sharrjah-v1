@@ -44,6 +44,18 @@
                                     <input type="file" class="form-control" name="images[]" placeholder="Upload Image">
                                 </div>
                                 <div class="form-group">
+                                    <label for="display_on">Display Background On</label>
+                                    <select class="form-control" id="display_on" name="display_on">
+                                        <option value="both"
+                                            {{ ($data->display_on ?? 'both') == 'both' ? 'selected' : '' }}>Mobile and
+                                            Desktop</option>
+                                        <option value="mobile" {{ $data->display_on == 'mobile' ? 'selected' : '' }}>Mobile
+                                            only</option>
+                                        <option value="desktop" {{ $data->display_on == 'desktop' ? 'selected' : '' }}>
+                                            Desktop only</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleTextareaa1">Background Color for Windows</label>
                                     <input type="text" class="form-control" name="background_windows"
                                         placeholder="#000000" value="{{ $data->background_windows }}">

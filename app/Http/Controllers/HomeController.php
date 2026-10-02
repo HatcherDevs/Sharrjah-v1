@@ -246,8 +246,12 @@ class HomeController extends Controller
 
     public function saveLandingElement(Request $request)
     {
+        $request->validate([
+            'display_on' => 'sometimes|in:both,mobile,desktop',
+        ]);
 
         $data = $request->except('_token');
+        $data['display_on'] = $request->input('display_on', 'both');
 
         $newItem = LandingElement::create($data);
         $files = $request->file('images');
@@ -265,6 +269,9 @@ class HomeController extends Controller
 
     public function updateLandingElement(Request $request)
     {
+        $request->validate([
+            'display_on' => 'sometimes|in:both,mobile,desktop',
+        ]);
 
         $data = $request->except('_token', 'id');
         $target = LandingElement::find($request->input('id'));

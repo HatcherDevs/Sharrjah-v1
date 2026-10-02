@@ -15,7 +15,8 @@
                 </div>
             </div>
 
-            <form class="forms-sample" action="{{ url('admin/home/landing/create') }}" method="post" enctype="multipart/form-data">
+            <form class="forms-sample" action="{{ url('admin/home/landing/create') }}" method="post"
+                enctype="multipart/form-data">
                 <input type="hidden" value="{!! csrf_token() !!}" name="_token">
                 <div class="row">
                     <div class="col-md-12 grid-margin stretch-card">
@@ -34,16 +35,27 @@
                                     <input type="file" class="form-control" name="images[]" placeholder="Upload Image">
                                 </div>
                                 <div class="form-group">
+                                    <label for="display_on">Display Background On</label>
+                                    <select class="form-control" id="display_on" name="display_on">
+                                        <option value="both">Mobile and Desktop</option>
+                                        <option value="mobile">Mobile only</option>
+                                        <option value="desktop">Desktop only</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleTextareaa1">Background Color for Windows</label>
-                                    <input type="text" class="form-control" name="background_windows" placeholder="#cccccc">
+                                    <input type="text" class="form-control" name="background_windows"
+                                        placeholder="#cccccc">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Background Color for MacOs</label>
-                                    <input type="text" class="form-control" name="background_macos" placeholder="#cccccc">
+                                    <input type="text" class="form-control" name="background_macos"
+                                        placeholder="#cccccc">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Link</label>
-                                    <input type="text" class="form-control" name="link" placeholder="http://sharjaharchitecture.org/">
+                                    <input type="text" class="form-control" name="link"
+                                        placeholder="http://sharjaharchitecture.org/">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleTextareaa1">Enable Black Logos</label>
@@ -62,5 +74,4 @@
             </form>
         </div>
     </div>
-
 @endsection

@@ -82,9 +82,27 @@ class PageService
         return Post::where('page_id', 0)->where('active', 1)->orderBy('publish_date', 'DESC')->get();
     }
 
-    public function getHomeLandingElement()
+    public function getHomeLandingElement(?string $displayOn = null)
     {
-        return LandingElement::inRandomOrder()->first();
+        $query = LandingElement::query();
+
+        if ($displayOn !== null) {
+            $targetElement = (clone $query)
+                ->where('display_on', $displayOn)
+                ->inRandomOrder()
+                ->first();
+
+            if ($targetElement) {
+                return $targetElement;
+            }
+
+            $query->where(function ($query) {
+                $query->where('display_on', 'both')
+                    ->orWhereNull('display_on');
+            });
+        }
+
+        return $query->inRandomOrder()->first();
     }
 
     public function getGetMaterialSeriesContent()

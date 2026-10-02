@@ -14,7 +14,7 @@ class LandingElement extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    protected $fillable = ['title', 'title_ar', 'order', 'is_main', 'active', 'background_windows', 'background_macos', 'white_logos', 'link'];
+    protected $fillable = ['title', 'title_ar', 'order', 'is_main', 'active', 'background_windows', 'background_macos', 'white_logos', 'link', 'display_on'];
 
     public function uploads()
     {
