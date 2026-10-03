@@ -10,7 +10,7 @@
                     <img src="{{ $landingElement->white_logos ? asset('public/img/menu-bt-dark.png') : asset('public/img/menu-bt.png') }}"
                         style="{{ $landingElement->white_logos ? 'border-color:#000000' : '' }}" id="video-menu"
                         class="video-menu" width="50">
-                    <div id="scroll-down" class="scroll-down"></div>
+                    {{-- <div id="scroll-down" class="scroll-down"></div> --}}
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                                 <div class="overlay"></div>
                             @endif
                         </div>
-                        <div id="scroll-down" class="scroll-down"></div>
+                        {{-- <div id="scroll-down" class="scroll-down"></div> --}}
                     </div>
                 </div>
             </div>
