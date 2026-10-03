@@ -236,7 +236,7 @@
                 height: 100svh;
                 min-height: 100vh;
                 background-size: contain !important;
-                background-position: center center !important;
+                background-position: center top !important;
                 background-repeat: no-repeat !important;
             }
         }
