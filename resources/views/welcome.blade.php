@@ -235,8 +235,9 @@
                 height: 100vh;
                 height: 100svh;
                 min-height: 100vh;
-                background-size: cover !important;
+                background-size: contain !important;
                 background-position: center center !important;
+                background-repeat: no-repeat !important;
             }
         }
     </style>
