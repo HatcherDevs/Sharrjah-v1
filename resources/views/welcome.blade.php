@@ -486,8 +486,8 @@ if (!isset($_COOKIE['firsttime'])) {
 
         var scrollAnimating = false;
         console.log($(document).scrollTop());
-        console.log(parseInt($(window).outerHeight()));
-        if ($(document).scrollTop() > parseInt($(window).outerHeight())) {
+        console.log(window.innerHeight);
+        if ($(document).scrollTop() > window.innerHeight) {
             $('#floating-header').addClass('floating');
         }
 
@@ -513,10 +513,10 @@ if (!isset($_COOKIE['firsttime'])) {
             checkScroll();
 
             /** $('#scoller').html($(document).scrollTop());
-             $('#dimensions').html($(window).outerWidth()+'x'+$(window).outerHeight());
-             $('#home-video').html($(window).outerHeight()); **/
+             $('#dimensions').html($(window).outerWidth()+'x'+$(window).innerHeight);
+             $('#home-video').html($(window).innerHeight); **/
 
-            wHeight = parseInt($('.home-video-container:visible').first().outerHeight());
+            wHeight = window.innerHeight;
 
             if ($(document).scrollTop() > 100) {
                 $('.scroll-down').hide();

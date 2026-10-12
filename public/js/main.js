@@ -1,11 +1,13 @@
 
+var wHeight = window.innerHeight;
+
 toggleSearch();
 resizeHomeVideo();
 verticalAlign();
 
 
 function resizeHomeVideo() {
-	wHeight = parseInt($(window).outerHeight());
+	wHeight = window.innerHeight;
 
 	if (wHeight > 420) {
 
@@ -31,9 +33,9 @@ $(window).resize(function () {
 			resizeHomeVideo();
 			toggleSearch();
 		}
-		if ($(window).outerHeight() < 520) {
+		if (window.innerHeight < 520) {
 			$('#menu .mobile').css('overflow-y', 'scroll');
-			$('#menu .mobile').css('height', $(window).outerHeight() - parseInt($('#menu .mobile').css('margin-top')));
+			$('#menu .mobile').css('height', window.innerHeight - parseInt($('#menu .mobile').css('margin-top')));
 		}
 		else {
 			$('#menu .mobile').css('height', 'auto').css('overflow-y', 'hidden');

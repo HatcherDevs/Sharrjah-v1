@@ -16,12 +16,17 @@
         </div>
     </main>
 @elseif (strpos($randomElement->mime_type, 'video/') === 0)
+    @php
+        $fallbackBackgroundImage = data_get($landingElement, 'background_image_url');
+        $fallbackBackgroundImageUrl = $fallbackBackgroundImage ? asset('public' . $fallbackBackgroundImage) : null;
+    @endphp
     <div id="videoholder" class="videoholder landing-display-{{ $displayTarget }}"
         style="background-color: {{ $landingElement->background_windows }}"
         data-background-macos="{{ $landingElement->background_macos }}">
-        <main role="main" class="container main home-video-container" id="home-video-container">
+        <main role="main" class="container main home-video-container" id="home-video-container"
+            style="{{ $fallbackBackgroundImageUrl ? 'background-image: url(' . $fallbackBackgroundImageUrl . ');' : '' }} background-size: cover; background-position: center; background-repeat: no-repeat;">
             <div class="row">
-                <div class="container" style="position: relative;">
+                <div class="container-fluidi" style="position: relative;">
                     <div class="row">
                         <a href="{{ url('/') }}" id="video-logo"
                             class="{{ $landingElement->white_logos ? 'black' : '' }}"></a>
@@ -29,12 +34,13 @@
                             style="{{ $landingElement->white_logos ? 'border-color:#000000' : '' }}" id="video-menu"
                             class="video-menu" width="50">
                         <div class="home-video auto-height"
-                            style="background-color: {{ $landingElement->background_windows }}">
+                            style="background-color: {{ $landingElement->background_windows }}; {{ $fallbackBackgroundImageUrl ? 'background-image: url(' . $fallbackBackgroundImageUrl . ');' : '' }} background-size: cover; background-position: center; background-repeat: no-repeat;">
                             <?php
                             $mtClass = in_array($randomElement->original_name, ['4.mp4', '5.mp4', '6.mp4']) ? 'margin-top-negative' : '';
                             ?>
                             <video autoplay muted loop playsinline id="video"
-                                class="landing-video {{ $mtClass }}">
+                                class="landing-video {{ $mtClass }}"
+                                @if ($fallbackBackgroundImageUrl) poster="{{ $fallbackBackgroundImageUrl }}" @endif>
                                 <source src="{{ asset('public') . $randomElement->url }}"
                                     type="{{ $randomElement->mime_type }}">
                             </video>

@@ -16,6 +16,15 @@ a {
 	max-width: 2120px;
 }
 
+.container-fluidi {
+	width: 100%;
+	max-width: 100%;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
 .container {
 	max-width: 2120px;
 }
@@ -769,13 +778,13 @@ span {
 }
 
 @media (min-width: 2114px) {
-	.home-video {
+	/* .home-video {
 		overflow: visible;
 
-	}
+	} */
 
 	.home-video #video {
-		width: 100vw;
+		width: 99.7vw;
 	}
 }
 
