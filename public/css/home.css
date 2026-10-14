@@ -22,7 +22,7 @@
 .landing-overlay-center {
 	top: 50%;
 	left: 50%;
-	max-width: min(42vw, 640px);
+	max-width: 58%;
 	max-height: 44vh;
 	transform: translate(-50%, -50%);
 }

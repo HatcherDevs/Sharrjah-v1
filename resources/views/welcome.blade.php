@@ -97,7 +97,7 @@
     <link href="{{ asset('public/fonts/roboto/stylesheet.css') }}" rel="stylesheet">
     <link href="{{ asset('public/css/style.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
     <link href="{{ asset('public/css/responsive.css') }}?v={{ rand(1, 99999) }}" rel="stylesheet">
-    <link href="{{ asset('public/css/home.css') }}" rel="stylesheet">
+    <link href="{{ asset('public/css/home.css') }}?v={{ filemtime(public_path('css/home.css')) }}" rel="stylesheet">
 
     <link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
     <style>
