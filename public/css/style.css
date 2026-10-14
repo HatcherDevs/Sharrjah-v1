@@ -770,8 +770,8 @@ span {
 
 .home-video #video {
 	position: absolute;
-	top: 0;
-	width: 100%;
+	bottom: 0;
+	width: auto;
 	height: auto;
 	opacity: 0;
 	left: 50%;
