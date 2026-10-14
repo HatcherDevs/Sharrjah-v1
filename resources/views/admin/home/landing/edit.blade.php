@@ -43,6 +43,22 @@
                                     </label>
                                     <input type="file" class="form-control" name="images[]" placeholder="Upload Image">
                                 </div>
+                                @foreach ([
+            'center_image' => 'Center Image',
+            'bottom_left_image' => 'Bottom Left Image',
+            'bottom_right_image' => 'Bottom Right Image',
+        ] as $field => $label)
+                                    <div class="form-group">
+                                        <label for="{{ $field }}">{{ $label }} (PNG or SVG)</label>
+                                        @if ($data->{$field})
+                                            <img src="{{ asset('public/' . $data->{$field}) }}"
+                                                alt="{{ $label }} preview"
+                                                style="display: block; max-width: 180px; max-height: 120px; object-fit: contain; margin-bottom: 8px;">
+                                        @endif
+                                        <input type="file" class="form-control" id="{{ $field }}"
+                                            name="{{ $field }}" accept=".png,.svg,image/png,image/svg+xml">
+                                    </div>
+                                @endforeach
                                 <div class="form-group">
                                     <label for="display_on">Display Background On</label>
                                     <select class="form-control" id="display_on" name="display_on">

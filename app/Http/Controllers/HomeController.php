@@ -13,6 +13,8 @@ use App\Services\Uploaders\PostLandscapeImageUploader;
 use App\Traits\CanCreateSlug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -246,14 +248,17 @@ class HomeController extends Controller
 
     public function saveLandingElement(Request $request)
     {
+        $this->validateLandingDecorationImages($request);
+
         $request->validate([
             'display_on' => 'sometimes|in:both,mobile,desktop',
         ]);
 
-        $data = $request->except('_token');
+        $data = $request->except('_token', 'center_image', 'bottom_left_image', 'bottom_right_image');
         $data['display_on'] = $request->input('display_on', 'both');
 
         $newItem = LandingElement::create($data);
+        $this->storeLandingDecorationImages($request, $newItem);
         $files = $request->file('images');
 
         if ($newItem) {
@@ -269,15 +274,18 @@ class HomeController extends Controller
 
     public function updateLandingElement(Request $request)
     {
+        $this->validateLandingDecorationImages($request);
+
         $request->validate([
             'display_on' => 'sometimes|in:both,mobile,desktop',
         ]);
 
-        $data = $request->except('_token', 'id');
+        $data = $request->except('_token', 'id', 'center_image', 'bottom_left_image', 'bottom_right_image');
         $target = LandingElement::find($request->input('id'));
 
         if ($target) {
             $target->update($data);
+            $this->storeLandingDecorationImages($request, $target);
             $files = $request->file('images');
             $photo = ($files != null ? $this->uploader->uploadMultiple($files) : false);
 
@@ -288,5 +296,51 @@ class HomeController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    private function validateLandingDecorationImages(Request $request): void
+    {
+        $request->validate([
+            'center_image' => 'nullable|image|mimes:png,svg|extensions:png,svg|max:5120',
+            'bottom_left_image' => 'nullable|image|mimes:png,svg|extensions:png,svg|max:5120',
+            'bottom_right_image' => 'nullable|image|mimes:png,svg|extensions:png,svg|max:5120',
+        ]);
+    }
+
+    private function storeLandingDecorationImages(Request $request, LandingElement $landingElement): void
+    {
+        $directoryPath = 'uploads/landing/decorations';
+        $absoluteDirectoryPath = public_path($directoryPath);
+        $oldImagePaths = [];
+
+        foreach (['center_image', 'bottom_left_image', 'bottom_right_image'] as $field) {
+            $image = $request->file($field);
+
+            if (! $image) {
+                continue;
+            }
+
+            if (! File::isDirectory($absoluteDirectoryPath)) {
+                File::makeDirectory($absoluteDirectoryPath, 0755, true);
+            }
+
+            $extension = strtolower($image->getClientOriginalExtension());
+            $fileName = Str::uuid().'.'.$extension;
+            $image->move($absoluteDirectoryPath, $fileName);
+
+            if ($landingElement->{$field}) {
+                $oldImagePaths[] = $landingElement->{$field};
+            }
+
+            $landingElement->{$field} = $directoryPath.'/'.$fileName;
+        }
+
+        $landingElement->save();
+
+        foreach ($oldImagePaths as $oldImagePath) {
+            if (str_starts_with($oldImagePath, $directoryPath.'/') && File::exists(public_path($oldImagePath))) {
+                File::delete(public_path($oldImagePath));
+            }
+        }
     }
 }

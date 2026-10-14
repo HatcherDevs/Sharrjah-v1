@@ -14,6 +14,7 @@
                 </div>
             </div>
         </div>
+        @include('home-landing-overlays', ['landingElement' => $landingElement])
     </main>
 @elseif (strpos($randomElement->mime_type, 'video/') === 0)
     @php
@@ -44,6 +45,7 @@
                                 <source src="{{ asset('public') . $randomElement->url }}"
                                     type="{{ $randomElement->mime_type }}">
                             </video>
+                            @include('home-landing-overlays', ['landingElement' => $landingElement])
                             @if ($landingElement->link)
                                 <a href="{{ $landingElement->link }}">
                                     <div class="overlay"></div>

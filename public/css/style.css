@@ -772,7 +772,8 @@ span {
 	position: absolute;
 	bottom: 0;
 	width: auto;
-	height: auto;
+	/* height: auto; */
+	height: 100vh;
 	opacity: 0;
 	left: 50%;
 }
@@ -784,7 +785,8 @@ span {
 	} */
 
 	.home-video #video {
-		width: 99.7vw;
+		width: 100%;
+		height: auto;
 	}
 }
 

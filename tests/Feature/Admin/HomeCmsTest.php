@@ -6,6 +6,7 @@ use App\Models\LandingElement;
 use App\Models\Option;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /**
@@ -298,7 +299,10 @@ class HomeCmsTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->get('/admin/home/create/landing')
-            ->assertStatus(200);
+            ->assertStatus(200)
+            ->assertSee('name="center_image"', false)
+            ->assertSee('name="bottom_left_image"', false)
+            ->assertSee('name="bottom_right_image"', false);
     }
 
     public function test_admin_can_save_a_landing_element(): void
@@ -322,7 +326,11 @@ class HomeCmsTest extends TestCase
 
         $this->actingAs($this->admin)
             ->get("/admin/home/landing/{$element->id}/edit")
-            ->assertStatus(200);
+            ->assertStatus(200)
+            ->assertSee('name="center_image"', false)
+            ->assertSee('name="bottom_left_image"', false)
+            ->assertSee('name="bottom_right_image"', false)
+            ->assertSee('accept=".png,.svg,image/png,image/svg+xml"', false);
     }
 
     public function test_admin_can_update_a_landing_element(): void
@@ -344,6 +352,31 @@ class HomeCmsTest extends TestCase
             'id' => $element->id,
             'title' => 'Updated Title',
         ]);
+    }
+
+    public function test_admin_can_upload_png_and_svg_landing_decoration_images(): void
+    {
+        $element = LandingElement::factory()->create();
+        $svg = UploadedFile::fake()->createWithContent(
+            'decoration.svg',
+            '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>'
+        );
+
+        $this->actingAs($this->admin)
+            ->post('/admin/home/landing/update', [
+                'id' => $element->id,
+                'center_image' => UploadedFile::fake()->image('center.png'),
+                'bottom_left_image' => $svg,
+            ])
+            ->assertRedirect();
+
+        $element->refresh();
+
+        $this->assertStringEndsWith('.png', $element->center_image);
+        $this->assertStringEndsWith('.svg', $element->bottom_left_image);
+        $this->assertNull($element->bottom_right_image);
+        $this->assertFileExists(public_path($element->center_image));
+        $this->assertFileExists(public_path($element->bottom_left_image));
     }
 
     public function test_updating_nonexistent_landing_element_returns_no_database_changes(): void

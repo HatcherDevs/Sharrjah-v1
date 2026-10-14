@@ -1,5 +1,64 @@
+.home-video-container {
+	position: relative;
+}
+
+.landing-overlays {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.landing-overlay-image {
+	position: absolute;
+	width: auto;
+	height: auto;
+	max-width: 22vw;
+	max-height: 24vh;
+	object-fit: contain;
+}
+
+.landing-overlay-center {
+	top: 50%;
+	left: 50%;
+	max-width: min(42vw, 640px);
+	max-height: 44vh;
+	transform: translate(-50%, -50%);
+}
+
+.landing-overlay-bottom-left {
+	bottom: 4%;
+	left: 4%;
+}
+
+.landing-overlay-bottom-right {
+	right: 4%;
+	bottom: 4%;
+}
+
+@media screen and (max-width: 767px) {
+	.landing-overlay-image {
+		max-width: 30vw;
+		max-height: 20vh;
+	}
+
+	.landing-overlay-center {
+		max-width: 65vw;
+		max-height: 40vh;
+	}
+
+	.landing-overlay-bottom-left {
+		left: 3%;
+	}
+
+	.landing-overlay-bottom-right {
+		right: 3%;
+	}
+}
 
 @media screen and (max-height: 800px) {
+
 	/** .home-video video {
 		width: 100%;
 		height: auto;
