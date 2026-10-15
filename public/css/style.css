@@ -739,23 +739,23 @@ span {
 }
 
 #home-video-container,
-#home-video-container .container
- {
+#home-video-container .container {
 	max-width: 2120px !important;
 }
+
 .home #menu,
 .home #menu .container {
 	max-width: 100% !important;
 }
 
 .home-video {
-	padding: 30px 0;
-	height: 600px;
-	background-color: #597769;
-	overflow: hidden;
-	position: relative;
-	width: 100%;
-	margin-bottom: 30px;
+    padding: 30px 0;
+    height: 600px;
+    background-color: #597769;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    margin-bottom: 30px;
 }
 
 .home-video .overlay {
@@ -772,26 +772,22 @@ span {
 }
 
 .home-video #video {
-	position: absolute;
-	bottom: 0;
-	width: auto !important;
-	height: 100vh !important;
-	opacity: 0;
-	left: 50%;
-	margin-left: -50% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: auto;
+
+    width: 100% !important;
+    height: 100% !important;
+    margin-left: 0 !important;
+
+    object-fit: cover;
+    object-position: center;
+
+    opacity: 0;
 }
 
-@media (min-width: 2670px) {
-	/* .home-video {
-		overflow: visible;
 
-	} */
-
-	.home-video #video {
-		width: 115% !important;
-		height: auto !important;
-	}
-}
 
 
 .home-video .headline {
