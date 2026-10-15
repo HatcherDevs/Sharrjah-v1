@@ -776,7 +776,7 @@ span {
 	bottom: 0;
 	width: auto;
 	/* height: auto; */
-	height: 100vh;
+	height: auto !important;
 	opacity: 0;
 	left: 50%;
 	margin-left: -50% !important;
