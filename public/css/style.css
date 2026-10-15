@@ -742,7 +742,8 @@ span {
 #home-video-container .container,
 .home #menu,
 .home #menu .container {
-	max-width: 2120px !important;
+	/* max-width: 2120px !important; */
+	max-width: 100% !important;
 }
 
 .home-video {
