@@ -739,10 +739,12 @@ span {
 }
 
 #home-video-container,
-#home-video-container .container,
+#home-video-container .container
+ {
+	max-width: 2120px !important;
+}
 .home #menu,
 .home #menu .container {
-	/* max-width: 2120px !important; */
 	max-width: 100% !important;
 }
 
