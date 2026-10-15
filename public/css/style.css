@@ -774,7 +774,7 @@ span {
 .home-video #video {
 	position: absolute;
 	bottom: 0;
-	width: 100vw !important;
+	width: auto !important;
 	height: 100vh !important;
 	opacity: 0;
 	left: 50%;
