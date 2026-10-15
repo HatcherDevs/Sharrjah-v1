@@ -788,8 +788,8 @@ span {
 	} */
 
 	.home-video #video {
-		width: 115% !important;
-		height: auto !important;
+		width: 100vw !important;
+		height: 100vh !important;
 	}
 }
 
