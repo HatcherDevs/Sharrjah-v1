@@ -875,6 +875,14 @@ span {
 	opacity: .7;
 }
 
+.home #featured-list .featured a img {
+    filter: transparent !important;
+    -webkit-filter: grayscale(0) !important;
+    -webkit-transition: -webkit-filter 500ms linear filter: grayscale(0) !important;
+    opacity: 1 !important;
+}
+
+
 #featured-list .featured:hover a img {
 	-webkit-filter: grayscale(0);
 	-webkit-transition: -webkit-filter 500ms linear filter: none;
