@@ -391,10 +391,17 @@ trait FileSecurityValidation
      */
     protected function validateFileName(UploadedFile $file)
     {
+        // Sanitize the original filename to avoid inadvertent path traversal
         $fileName = $file->getClientOriginalName();
+        // Use basename to strip any directory components that might be present
+        // in the client-supplied file name. This also normalises backslashes
+        // on Windows where basename uses forward slashes.
+        $fileName = basename($fileName);
         $extension = $file->getClientOriginalExtension();
 
-        // Check for path traversal
+        // After basename, the remaining string should not contain any
+        // residual path separators. However, we keep a defensive check
+        // to catch any exotic characters that were not removed.
         if (strpos($fileName, '..') !== false ||
             strpos($fileName, '/') !== false ||
             strpos($fileName, '\\') !== false) {
