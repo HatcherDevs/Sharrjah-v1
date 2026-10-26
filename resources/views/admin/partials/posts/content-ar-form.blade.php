@@ -45,7 +45,7 @@
             Upload file:
             @if (isset($pageType['ar']['type']) && $pageType['ar']['type'] == 'file')
                 <a
-                    href="{{ url('public/' . $pageType['ar']['value']->path . '/' . $pageType['ar']['value']->file_name) }} ">{{ $pageType['ar']['value']->original_name }}</a>
+                    href="{{ isset($pageType['ar']['value']) ? url('public/' . $pageType['ar']['value']->path . '/' . $pageType['ar']['value']->file_name) : '#' }}">{{ isset($pageType['ar']['value']) ? $pageType['ar']['value']->original_name : 'No file' }}</a>
             @endif
         </label>
         <input type="file" class="form-control" placeholder="External link" name="external_file_ar">
