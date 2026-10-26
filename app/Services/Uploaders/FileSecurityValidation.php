@@ -402,8 +402,7 @@ trait FileSecurityValidation
         // After basename, the remaining string should not contain any
         // residual path separators. However, we keep a defensive check
         // to catch any exotic characters that were not removed.
-        if (strpos($fileName, '..') !== false ||
-            strpos($fileName, '/') !== false ||
+        if (strpos($fileName, '/') !== false ||
             strpos($fileName, '\\') !== false) {
             throw new Exception('File name contains invalid characters (path traversal attempt detected)');
         }
